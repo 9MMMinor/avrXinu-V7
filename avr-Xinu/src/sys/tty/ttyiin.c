@@ -2,58 +2,59 @@
 
 #include <conf.h>
 #include <kernel.h>
+#include <USART.h>
 #include <tty.h>
-#include <io.h>
-#include <slu.h>
-#include <zsreg.h>
 
+#include <avr/io.h>
 
-/*------------------------------------------------------------------------
+static void erase1();
+static void echoch();
+static void eputc();
+extern SYSCALL send(int pid, WORD msg);
+extern SYSCALL signal(int sem);
+extern SYSCALL signaln(int sem, int count);
+
+/*
+ *------------------------------------------------------------------------
  *  ttyiin  --  lower-half tty device driver for input interrupts
  *------------------------------------------------------------------------
  */
-INTPROC	ttyiin(iptr)
-	register struct	tty	*iptr;	/* pointer to tty block		*/
+ 
+void ttyiin(struct tty *iptr)
 {
-	STATWORD ps;    
-    
-	register struct	zscc_device *zptr;
-	register int	ch;
+	int n;
+	unsigned register int ch;
 	int	err;
 	int	cerr;
 	int	ct;
+	unsigned char status;
+	
+	n = iptr->unit;		/* tty unit */
+	status = *USART[n].UCSRA;
+	ch = *USART[n].UDR;
 
-	zptr = iptr->ioaddr;
-        ch = zptr->zscc_data;
-
-	/* get the contents of RR1 */
-	zptr->zscc_control = 1;
-	DELAY(2);
-	err = zptr->zscc_control;
-
-	/* check for Parity, Overrun, and Framing errors */
-	err &= (ZSRR1_PE | ZSRR1_DO | ZSRR1_FE);
+	err = status & ((1<<FE0) | (1<<DOR0) | (1<<UPE0));
 
 	cerr = 0;
 	if (err != 0) {
 #ifdef PRINTERRORS	    
 	    kprintf("recv error, ch: 0x%x ", (unsigned int) ch);
-	    if (err & ZSRR1_PE)
-		kprintf(", Parity Error");
-	    if (err & ZSRR1_DO)
-		kprintf(", Data Overrun");
-	    if (err & ZSRR1_PE)
-		kprintf(", Framing Error");
+	    if (err & (1<<PE0))
+			kprintf(", Parity Error");
+	    if (err & (1<<DOR0))
+			kprintf(", Data Overrun");
+	    if (err & (1<<FE0))
+			kprintf(", Framing Error");
 	    kprintf("\n");
 #endif	    
 	    cerr = IOCHERR;
-	    zptr->zscc_control = ZSWR0_RESET_ERRORS;	/* reset the error */
 	}
-#ifdef DEBUG	
-	kprintf("\n<%c,%x,%x,%x>	",
-		ch,(unsigned int) ch, (unsigned int) err,
-		(unsigned int) cerr);
-#endif	
+	
+//#ifdef DEBUG
+//	kprintf("\nttyiin:<%c,%x,%x,%x>	",
+//		ch,(unsigned int) ch, (unsigned int) err,
+//		(unsigned int) cerr);
+//#endif	
 	
 	if (iptr->imode == IMRAW) {
 		if (iptr->icnt >= IBUFLEN){
@@ -69,13 +70,13 @@ INTPROC	ttyiin(iptr)
 			ch = NEWLINE;
 		if (iptr->iintr && ch == iptr->iintrc) {
 			send(iptr->iintpid, INTRMSG);
-			eputc(ch, iptr, zptr);
+			eputc(ch, iptr);
 			return;
 		}
 		if (iptr->oflow) {
 			if (ch == iptr->ostart)	{
 				iptr->oheld = FALSE;
-				ttyostart(iptr);
+				*USART[n].UCSRB |= (1<<UDRIE0);	/*ttyostart(iptr);*/
 				return;
 			}
 			if (ch == iptr->ostop) {
@@ -86,14 +87,14 @@ INTPROC	ttyiin(iptr)
 		    iptr->oheld = FALSE;
 		if (iptr->imode	== IMCBREAK) {		/* cbreak mode	*/
 			if (iptr->icnt >= IBUFLEN) {
-				eputc(iptr->ifullc,iptr,zptr);
+				eputc(iptr->ifullc,iptr);
 				return;
 			}
 			iptr->ibuff[iptr->ihead++] = ch	| cerr;
 			if (iptr->ihead	>= IBUFLEN)
 				iptr->ihead = 0;
 			if (iptr->iecho)
-				echoch(ch,iptr,zptr);
+				echoch(ch,iptr);
 			if (iptr->icnt < IBUFLEN) {
 				++iptr->icnt;
 				signal(iptr->isem);
@@ -104,23 +105,23 @@ INTPROC	ttyiin(iptr)
 				if (iptr->ihead	< 0)
 					iptr->ihead += IBUFLEN;
 				iptr->icursor =	0;
-				eputc(RETURN,iptr,zptr);
-				eputc(NEWLINE,iptr,zptr);
+				eputc(RETURN,iptr);
+				eputc(NEWLINE,iptr);
 				return;
 			}
 			if (ch == iptr->ierasec	&& iptr->ierase) {
 				if (iptr->icursor > 0) {
 					iptr->icursor--;
-					erase1(iptr,zptr);
+					erase1(iptr);
 				}
 				return;
 			}
 			if (ch == NEWLINE || ch == RETURN ||
 				(iptr->ieof && ch == iptr->ieofc)) {
 				if (iptr->iecho) {
-					echoch(ch,iptr,zptr);
+					echoch(ch,iptr);
 					if (ch == iptr->ieofc)
-						echoch(NEWLINE,iptr,zptr);
+						echoch(NEWLINE,iptr);
 				}
 				iptr->ibuff[iptr->ihead++] = ch | cerr;
 				if (iptr->ihead	>= IBUFLEN)
@@ -134,11 +135,11 @@ INTPROC	ttyiin(iptr)
 			ct = iptr->icnt;
 			ct = ct	< 0 ? 0	: ct;
 			if ((ct	+ iptr->icursor) >= IBUFLEN-1) {
-				eputc(iptr->ifullc,iptr,zptr);
+				eputc(iptr->ifullc,iptr);
 				return;
 			}
 			if (iptr->iecho)
-				echoch(ch,iptr,zptr);
+			        echoch(ch,iptr);
 			iptr->icursor++;
 			iptr->ibuff[iptr->ihead++] = ch	| cerr;
 			if (iptr->ihead	>= IBUFLEN)
@@ -151,9 +152,7 @@ INTPROC	ttyiin(iptr)
  *  erase1  --  erase one character honoring erasing backspace
  *------------------------------------------------------------------------
  */
-LOCAL erase1(iptr,zptr)
-	struct	tty   *iptr;
-	struct	zscc_device	*zptr;
+static void erase1(struct tty *iptr)
 {
 	char	ch;
 
@@ -163,27 +162,27 @@ LOCAL erase1(iptr,zptr)
 	if (iptr->iecho) {
 		if (ch < BLANK || ch == 0177) {
 			if (iptr->evis)	{
-				eputc(BACKSP,iptr,zptr);
+				eputc(BACKSP,iptr);
 				if (iptr->ieback) {
-					eputc(BLANK,iptr,zptr);
-					eputc(BACKSP,iptr,zptr);
+					eputc(BLANK,iptr);
+					eputc(BACKSP,iptr);
 				}
 			}
-			eputc(BACKSP,iptr,zptr);
+			eputc(BACKSP,iptr);
 			if (iptr->ieback) {
-				eputc(BLANK,iptr,zptr);
-				eputc(BACKSP,iptr,zptr);
+				eputc(BLANK,iptr);
+				eputc(BACKSP,iptr);
 			}
 		} else {
-			eputc(BACKSP,iptr,zptr);
+			eputc(BACKSP,iptr);
 			if (iptr->ieback) {
-				eputc(BLANK,iptr,zptr);
-				eputc(BACKSP,iptr,zptr);
+				eputc(BLANK,iptr);
+				eputc(BACKSP,iptr);
 			}
 		}
 	} 
         else
-            ttyostart(iptr);
+			*USART[iptr->unit].UCSRB |= (1<<UDRIE0);			/*ttyostart(iptr);*/
 }
 
 
@@ -193,19 +192,20 @@ LOCAL erase1(iptr,zptr)
  *  echoch  --  echo a character with visual and ocrlf options
  *------------------------------------------------------------------------
  */
-LOCAL echoch(ch, iptr, zptr)
+static void echoch(ch, iptr)
 	char	ch;		/* character to	echo			*/
 	struct	tty   *iptr;	/* pointer to I/O block for this devptr	*/
-	struct	zscc_device	*zptr;	/* zscc_device address for this devptr		*/
 {
-	if ((ch==NEWLINE||ch==RETURN)&&iptr->ecrlf) {
-		eputc(RETURN,iptr,zptr);
-		eputc(NEWLINE,iptr,zptr);
+	if (ch==NEWLINE||ch==RETURN) {
+		if (iptr->ecrlf) {
+			eputc(RETURN,iptr);
+			eputc(NEWLINE,iptr);
+		}
 	} else if ((ch<BLANK||ch==0177) && iptr->evis) {
-		eputc(UPARROW,iptr,zptr);
-		eputc(ch+0100,iptr,zptr);	/* make it printable	*/
+		eputc(UPARROW,iptr);
+		eputc(ch+0100,iptr);	/* make it printable	*/
 	} else {
-		eputc(ch,iptr,zptr);
+		eputc(ch,iptr);
 	}
 }
 
@@ -213,29 +213,29 @@ LOCAL echoch(ch, iptr, zptr)
  *  eputc - put one character in the echo queue
  *------------------------------------------------------------------------
  */
-LOCAL eputc(ch,iptr,zptr)
+static void eputc(ch,iptr)
 	char	ch;
 	struct	tty   *iptr;
-	struct	zscc_device *zptr;
 {
 	iptr->ebuff[iptr->ehead++] = ch;
 	if (iptr->ehead	>= EBUFLEN)
 		iptr->ehead = 0;
-	ttyostart(iptr);
+	*USART[iptr->unit].UCSRB |= (1<<UDRIE0);			/*ttyostart(iptr);*/
 }
 
 
-/*------------------------------------------------------------------------
+/*-----------------------------------------------------------------------
  *  ttybreak -- handle a break received on the serial line
- *------------------------------------------------------------------------
+ *-----------------------------------------------------------------------
  */
-ttybreak()
-{
-    STATWORD ps;
+//static void ttybreak()
+//{
+//    STATWORD ps;
     
-    disable(ps);
-    kprintf("\n\nSerial line BREAK detected.\n");
-    ret_mon();
-    restore(ps);
-    return;
-}
+//    disable(ps);
+//    kprintf("\n\nSerial line BREAK detected.\n");
+//	pause();
+//    restore(ps);
+//    return;
+//}
+

@@ -8,12 +8,11 @@
  *  init  -  initialize a device
  *------------------------------------------------------------------------
  */
-init(descrp)
-int descrp;
+SYSCALL init(int descrp)
 {
 	struct	devsw	*devptr;
 
-	if (isbaddev(descrp) ) {
+	if ( isbaddev(descrp) ) {
 	    return(SYSERR);
 	}
 	devptr = &devtab[descrp];

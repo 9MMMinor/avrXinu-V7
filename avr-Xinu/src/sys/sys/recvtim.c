@@ -6,12 +6,16 @@
 #include <q.h>
 #include <sleep.h>
 
-/*------------------------------------------------------------------------
+extern int insertd(int, int, int);
+extern int resched(void);
+
+/*
+ *------------------------------------------------------------------------
  *  recvtim  -  wait to receive a message or timeout and return result
  *------------------------------------------------------------------------
  */
-SYSCALL	recvtim(maxwait)
-	int	maxwait;
+
+SYSCALL recvtim(int maxwait)
 {
 	STATWORD ps;    
 	struct	pentry	*pptr;
@@ -22,10 +26,10 @@ SYSCALL	recvtim(maxwait)
 	disable(ps);
 	pptr = &proctab[currpid];
 	if ( !pptr->phasmsg ) {		/* if no message, wait		*/
-	        insertd(currpid, clockq, maxwait);
+		insertd(currpid, clockq, maxwait);
 		slnempty = TRUE;
 		sltop = (int *)&q[q[clockq].qnext].qkey;
-	        pptr->pstate = PRTRECV;
+		pptr->pstate = PRTRECV;
 		resched();
 	}
 	if ( pptr->phasmsg ) {

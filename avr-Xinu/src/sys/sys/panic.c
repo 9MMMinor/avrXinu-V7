@@ -3,15 +3,15 @@
  *------------------------------------------------------------------------
  */
 
-#include <kernel.h>    
+#include <kernel.h>
 
-panic (msg)
-char *msg;
+void panic (char *msg)
 {
 	STATWORD ps;    
 	disable(ps);
 	kprintf("Panic: %s\n", msg);
-	ret_mon();
+	while (1)
+		{}
 	restore(ps);
 }
 

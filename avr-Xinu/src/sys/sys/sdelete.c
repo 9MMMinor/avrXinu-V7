@@ -6,12 +6,17 @@
 #include <q.h>
 #include <sem.h>
 
-/*------------------------------------------------------------------------
+extern int getfirst(int);
+extern int ready(int, int);
+extern int resched(void);
+
+/*
+ *------------------------------------------------------------------------
  * sdelete  --  delete a semaphore by releasing its table entry
  *------------------------------------------------------------------------
  */
-SYSCALL sdelete(sem)
-	int	sem;
+
+SYSCALL sdelete(int sem)
 {
 	STATWORD ps;    
 	int	pid;

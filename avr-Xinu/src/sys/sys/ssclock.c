@@ -6,13 +6,18 @@
 #include <q.h>
 #include <sleep.h>
 
+extern INTPROC wakeup(void);
+extern int resched(void);
+
 #ifdef	RTCLOCK
 
 /*------------------------------------------------------------------------
  *  stopclk  --  put the clock in defer mode
  *------------------------------------------------------------------------
  */
-stopclk()
+
+void
+stopclk(void)
 {
 	defclk++;
 }
@@ -21,7 +26,9 @@ stopclk()
  *  strtclk  --  take the clock out of defer mode
  *------------------------------------------------------------------------
  */
-strtclk()
+
+void
+strtclk(void)
 {
 	STATWORD ps;    
 	int makeup;

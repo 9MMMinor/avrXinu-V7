@@ -4,13 +4,13 @@
 #include <kernel.h>
 #include <io.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  write  -  write 1 or more bytes to a device
  *------------------------------------------------------------------------
  */
-write(descrp, buff, count)
-	int descrp, count;
-	char *buff;
+
+SYSCALL write(int descrp, unsigned char *buff, int count)
 {
 	struct	devsw	*devptr;
 

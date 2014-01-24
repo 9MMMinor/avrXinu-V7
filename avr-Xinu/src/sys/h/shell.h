@@ -10,15 +10,15 @@
 #define	SHARGLEN	82		/* length of area for arguments	*/
 #define	SHMAXTOK	16		/* maximum tokens per line	*/
 #define	SHMLEN		12		/* maximum length of mach. name	*/
-#define	SHCMDSTK	5000		/* size of command proc. stack	*/
+#define	SHCMDSTK	300		/* (SMALL!) size of command proc. stack	*/
 #define	SHCMDPRI	20		/* command process priority	*/
 
-struct	shvars	{			/* shell variables		*/
-	long	shlast;			/* time shell last touched	*/
-	long	shlogon;		/* time user logged on		*/
-	int	shncmds;		/* number of commands available	*/
-	MARKER	shmark;			/* marked if shused valid	*/
-	Bool	shused;			/* TRUE => user using shell	*/
+struct	shvars	{				/* shell variables		*/
+	long	shlast;				/* time shell last touched	*/
+	long	shlogon;			/* time user logged on		*/
+	int		shncmds;			/* number of commands available	*/
+	MARKER	shmark;				/* marked if shused valid	*/
+	Bool	shused;				/* TRUE => user using shell	*/
 	char	shuser[SHNAMLEN];	/* current user name		*/
 	char	shmach[SHMLEN];		/* name of this machine		*/
 	char	shbuf[SHBUFLEN];	/* general purpose buffer	*/
@@ -28,3 +28,7 @@ struct	shvars	{			/* shell variables		*/
 };
 
 extern	struct	shvars	Shl;
+
+/* declarations */
+int login(int);
+int shell(int);

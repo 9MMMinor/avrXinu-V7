@@ -2,18 +2,18 @@
 
 #include <conf.h>
 #include <kernel.h>
+#include <USART.h>
 #include <tty.h>
 #include <io.h>
-#include <slu.h>
+
+LOCAL writcopy();
+extern SYSCALL sreset();
 
 /*------------------------------------------------------------------------
  *  ttywrite - write one or more characters to a tty device
  *------------------------------------------------------------------------
  */
-ttywrite(devptr, buff, count)
-struct	devsw	*devptr;
-char	*buff;
-int	count;
+int ttywrite(struct devsw *devptr, unsigned char *buff, int count)
 {
 	STATWORD ps;    
 	register struct tty *ttyp;
@@ -40,10 +40,7 @@ int	count;
  *  writcopy - high-speed copy from user's buffer into system buffer
  *------------------------------------------------------------------------
  */
-LOCAL writcopy(buff, ttyp, count)
-char	*buff;
-struct	tty *ttyp;
-int	count;
+LOCAL writcopy(char *buff, struct tty *ttyp, int count)
 {
 	register int	avail;
 	register char	*cp, *qhead, *qend, *uend;
@@ -67,6 +64,6 @@ int	count;
 	ttyp->ohead = qhead - ttyp->obuff;	/* extra time when loop	*/
 	ttyp->ocnt = OBUFLEN - (avail+1);
 	sreset(ttyp->osem, ++avail);		/* condition fails.	*/
-	ttyostart(ttyp);
+	*USART[ttyp->unit].UCSRB |= (1<<UDRIE0);			/*ttyostart(ttyp);*/
 	return(cp - buff);
 }

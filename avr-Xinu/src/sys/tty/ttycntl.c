@@ -2,17 +2,19 @@
 
 #include <conf.h>
 #include <kernel.h>
+#include <USART.h>
 #include <tty.h>
 #include <io.h>
-#include <slu.h>
+
+extern int getpid(void);
+extern SYSCALL signal(int sem);
+extern SYSCALL wait(int sem);
 
 /*------------------------------------------------------------------------
  *  ttycntl  -  control a tty device by setting modes
  *------------------------------------------------------------------------
  */
-ttycntl(devptr, func)
-struct	devsw	*devptr;
-int func;
+int ttycntl(struct devsw *devptr, int func)
 {
 	STATWORD ps;    
 	register struct	tty *ttyp;
@@ -21,7 +23,7 @@ int func;
 	ttyp = &tty[devptr->dvminor];
 	switch ( func )	{
 	case TCSETBRK:
-	        return(SYSERR);
+		return(SYSERR);
 		/* ORIG: ttyp->ioaddr->ctstat |= SLUTBREAK; */
 		break;
 	case TCRSTBRK:
@@ -49,6 +51,12 @@ int func;
 		break;
 	case TCNOECHO:
 		ttyp->iecho = FALSE;
+		break;
+	case TCNOCRLF:
+		ttyp->ecrlf = FALSE;
+		break;
+	case TCCRLF:
+		ttyp->ecrlf = TRUE;
 		break;
 	case TCICHARS:
 		return(ttyp->icnt);

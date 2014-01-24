@@ -1,16 +1,16 @@
 /* x_dg.c - x_dg */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
 /*------------------------------------------------------------------------
  *  x_dg  -  (command dg) print info for currently open datagram devices
  *------------------------------------------------------------------------
  */
-COMMAND	x_dg(stdin, stdout, stderr, nargs, args)
-int	stdin, stdout, stderr, nargs;
-char	*args[];
+ 
+COMMAND	x_dg(int narg, int *varg)
+//int	stdin, stdout, stderr, nargs;
+//char	*args[];
 {
 	struct	dgblk	*dgptr;
 	char	str[80];
@@ -30,7 +30,7 @@ char	*args[];
 				dgptr->dg_faddr[1] &0377,
 				dgptr->dg_faddr[2] &0377,
 				dgptr->dg_faddr[3] &0377);
-		write(stdout, str, strlen(str));
+		write(varg[1], (unsigned char *)str, strlen(str));
 	}
 	return(OK);
 }

@@ -1,45 +1,89 @@
 /* shell.c - shell */
 
-#include <conf.h>
-#include <kernel.h>
-#include <proc.h>
+#include <avr-Xinu.h>
 #include <shell.h>
 #include <cmd.h>
 #include <tty.h>
 
-struct	shvars	Shl;			/* globals used by Xinu shell	*/
-struct	cmdent	cmds[]  = {CMDS};	/* shell commands		*/
-LOCAL	char	errhd[] = "Syntax error\n";/* global error messages	*/
-LOCAL	char	fmt[]   = "Cannot open %s\n";
-LOCAL	char	fmt2[]  = "[%d]\n";
+#ifndef NAMESPACE
+#define NAMESPACE -1
+#endif
+
+SYSCALL getutim(long *);
+int lexan(char *);
+int addarg(int, int);
+SYSCALL	setdev(int, int, int);
+SYSCALL	setnok(int, int);
+
+struct	shvars	Shl;				/* globals used by Xinu shell	*/
+struct	cmdent	cmds[]  = 	{		/* shell commands		*/
+/* 		 name		Builtin?	procedure	*/
+
+		{"bpool",	FALSE,		x_bpool},
+//		{"conf",	FALSE,		x_conf},
+		{"date",	FALSE,		x_date},
+//		{"devs",	FALSE,		x_devs},
+//		{"dg",		FALSE,		x_dg},
+		{"netstat",	FALSE,		x_net},
+//		{"cat",		FALSE,		x_cat},
+//		{"close",	FALSE,		x_close},
+//		{"cp",		FALSE,		x_cp},
+//		{"create",	FALSE,		x_creat},
+//		{"echo",	FALSE,		x_echo},
+//		{"exit",	TRUE,		x_exit},
+		{"help",	FALSE,		x_help},
+//		{"kill",	TRUE,		x_kill},
+//		{"logout",	TRUE,		x_exit},
+		{"mem",		FALSE,		x_mem},
+//		{"mount",	FALSE,		x_mount},
+//		{"mv",		FALSE,		x_mv},
+		{"ps",		FALSE,		x_ps},
+//		{"reboot",	TRUE,		x_reboot},
+//		{"rf",		FALSE,		x_rf},
+//		{"rls",		FALSE,		x_rls},
+//		{"rm",		FALSE,		x_rm},
+//		{"routes",	FALSE,		x_routes},
+//		{"ruptime",	FALSE,		x_uptime},
+//		{"sleep",	FALSE,		x_sleep},
+//		{"time",	FALSE,		x_date},
+//		{"unmount",	FALSE,		x_unmou},
+//		{"uptime",	FALSE,		x_uptime},
+//		{"who",		FALSE,		x_who},
+//		{"worm"		FALSE,		playworm},
+		{"?",		FALSE,		x_help}	};
+
+static	char	*errhd	= "Syntax error\n"; /* global error messages	*/
+static	char	*fmt	= "Cannot open %s\n";
+static	char	*fmt2	= "[%d]\n";
 
 /*------------------------------------------------------------------------
  *  shell  -  Xinu shell with file redirection and background processing
  *------------------------------------------------------------------------
  */
-shell(dev)
-int	dev;
+ 
+int shell(int dev)
 {
-	int	ntokens;
-	int	i, j, len;
-	int	com;
+	int		ntokens;
+	int		i, j, len;
+	int		com;
 	char	*outnam, *innam;
-	int	stdin, stdout, stderr;
+	int		stdIN, stdOUT, stdERR;
 	Bool	backgnd;
 	char	ch, mach[SHMLEN];
-	int	child;
+	int		child;
+	FILE * stream = stdout;
 
 	Shl.shncmds = sizeof(cmds)/sizeof(struct cmdent);
 	for (getname(mach) ; TRUE ; ) {
-		fprintf(dev, "%s %% ", mach);
+		fprintf(stream, "%s %% ", mach);
 		getutim(&Shl.shlast);
-		if ( (len = read(dev, Shl.shbuf, SHBUFLEN)) == 0)
-			len = read(dev, Shl.shbuf, SHBUFLEN);
+		if ( (len = read(file_get_fdesc(stream), (unsigned char *)Shl.shbuf, SHBUFLEN)) == 0)
+			len = read(file_get_fdesc(stream), (unsigned char *)Shl.shbuf, SHBUFLEN);
 		if (len == EOF)
 			break;
 		Shl.shbuf[len-1] = NULLCH;
 		if ( (ntokens=lexan(Shl.shbuf)) == SYSERR) {
-			fprintf(dev, errhd);
+			fprintf(stream, errhd);
 			continue;
 		} else if (ntokens == 0)
 			continue;
@@ -86,10 +130,11 @@ int	dev;
 			}
 		}
 		if (ntokens <= 0) {
-			fprintf(dev, errhd);
+			fprintf(stream, errhd);
 			continue;
 		}
-		stdin = stdout = stderr = dev;
+		stdIN = stdOUT = file_get_fdesc(stream);
+		stdERR = CONSOLE;
 
 		/* Look up command in table */
 
@@ -98,7 +143,7 @@ int	dev;
 				break;
 		}
 		if (com >= Shl.shncmds) {
-			fprintf(dev, "%s: not found\n", Shl.shtok[0]);
+			fprintf(stream, "%s: not found\n", Shl.shtok[0]);
 			continue;
 		}
 
@@ -106,23 +151,23 @@ int	dev;
 
 		if (cmds[com].cbuiltin) {
 			if (innam != NULL || outnam != NULL || backgnd)
-				fprintf(dev, errhd);
-			else if ( (*cmds[com].cproc)(stdin, stdout,
-				stderr, ntokens, Shl.shtok) == SHEXIT)
+				fprintf(stream, errhd);
+			else if ( (*cmds[com].cproc)(stdIN, stdOUT,
+				stdERR, ntokens, Shl.shtok) == SHEXIT)
 				break;
 			continue;
 		}
 
 		/* Open files and redirect I/O if specified */
 
-		if (innam != NULL && (stdin=open(NAMESPACE,innam,"ro"))
+		if (innam != NULL && (stdIN=open(NAMESPACE,innam,"ro"))
 			== SYSERR) {
-			fprintf(dev, fmt, innam);
+			fprintf(stream, fmt, innam);
 			continue;
 		}
-		if (outnam != NULL && (stdout=open(NAMESPACE,outnam,"w"))
+		if (outnam != NULL && (stdOUT=open(NAMESPACE,outnam,"w"))
 			== SYSERR) {
-			fprintf(dev, fmt, outnam);
+			fprintf(stream, fmt, outnam);
 			continue;
 		}
 
@@ -130,34 +175,33 @@ int	dev;
 
 		/* add a null for the end of each string, plus a    */
 		/*    pointer to the string (see xinu2, p300)       */
-		len += ntokens * (sizeof(char *) + sizeof(char));
+//		len += ntokens * (sizeof(char *) + sizeof(char));
 
 		/* plus a (char *) null for the end of the table    */
-		len += sizeof(char *);
+//		len += sizeof(char *);
 
 		/* plus a pointer to the head of the table          */
-		len += sizeof(char *);
+//		len += sizeof(char *);
 
 		
-		len = (len+3) & ~(unsigned) 0x3;
+//		len = (len+3) & ~(unsigned) 0x3;
 
-		control(dev, TCINT, getpid());
+		control(file_get_fdesc(stream), TCINT, (void *)getpid(), (void *)0);
 
 		/* create process to execute conventional command */
 
 		if ( (child = create(cmds[com].cproc, SHCMDSTK, SHCMDPRI,
-				Shl.shtok[0],(len/sizeof(long)) + 4,
-				stdin, stdout, stderr, ntokens))
-				== SYSERR) {
-			fprintf(dev, "Cannot create\n");
-			close(stdout);
-			close(stdin);
+				Shl.shtok[0],4,stdIN, stdOUT, stdERR, ntokens))
+				== SYSERR ) {
+			fprintf(stream, "Cannot create\n");
+			close(stdOUT);
+			close(stdIN);
 			continue;
 		}
-		addarg(child, ntokens, len);
-		setdev(child, stdin, stdout);
+		addarg(child, ntokens);		/* , len); */
+		setdev(child, stdIN, stdOUT);
 		if (backgnd) {
-			fprintf(dev, fmt2, child);
+			fprintf(stream, fmt2, child);
 			resume(child);
 		} else {
 			setnok(getpid(), child);
@@ -165,7 +209,7 @@ int	dev;
 			resume(child);
 			if (receive() == INTRMSG) {
 				setnok(BADPID, child);
-				fprintf(dev, fmt2, child);
+				fprintf(stream, fmt2, child);
 			}
 		}
 	}

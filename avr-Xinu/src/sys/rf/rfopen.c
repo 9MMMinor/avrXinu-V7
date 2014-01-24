@@ -1,17 +1,14 @@
 /* rfopen.c - rfopen */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
 /*------------------------------------------------------------------------
  *  rfopen  --  open a remote file
  *------------------------------------------------------------------------
  */
-rfopen(devptr, name, mode)
-struct	devsw	*devptr;
-char	*name;
-char	*mode;
+ 
+int rfopen(struct devsw *devptr, char *name, char *mode)
 {
 	STATWORD ps;    
 	struct	rfblk	*rfptr;
@@ -33,7 +30,7 @@ char	*mode;
 
 	/* send remote file open request */
 
-	if ( rfio(&devtab[devnum], FS_OPEN, NULLSTR, mbits) == SYSERR ) {
+	if ( rfio(&devtab[devnum], FS_OPEN, NULLSTR, 0) == SYSERR ) {
 		rfptr->rf_state = RFREE;
 		restore(ps);
 		return(SYSERR);

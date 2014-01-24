@@ -5,13 +5,17 @@
 #include <mark.h>
 #include <ports.h>
 
-/*------------------------------------------------------------------------
+extern SYSCALL wait(int);
+extern void panic(char *);
+extern SYSCALL signal(int sem);
+
+/*
+ *------------------------------------------------------------------------
  *  psend  --  send a message to a port by enqueuing it
  *------------------------------------------------------------------------
  */
-SYSCALL	psend(portid, msg)
-int	portid;
-WORD	msg;
+
+SYSCALL psend(int portid, WORD msg)
 {
 	STATWORD ps;    
 	struct	pt	*ptptr;
@@ -37,13 +41,13 @@ WORD	msg;
 		restore(ps);
 		return(SYSERR);
 	}
-	if (ptfree == NULL)
+	if (ptfree == (struct ptnode *)NULLPTR)
 		panic("Ports  -  out of nodes");
 	freenode = ptfree;
 	ptfree  = freenode->ptnext;
-	freenode->ptnext = (struct ptnode *) NULL;
+	freenode->ptnext = (struct ptnode *) NULLPTR;
 	freenode->ptmsg  = msg;
-	if (ptptr->pttail == (struct ptnode *) NULL)	/* empty queue */
+	if (ptptr->pttail == (struct ptnode *) NULLPTR)	/* empty queue */
 		ptptr->pttail = ptptr->pthead = freenode;
 	else {
 		(ptptr->pttail)->ptnext = freenode;

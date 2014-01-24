@@ -1,7 +1,6 @@
 /* rfseek.c - rfseek */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <fserver.h>
 #include <rfile.h>
 
@@ -9,9 +8,9 @@
  *  rfseek  --  seek to a specified position of a remote file
  *------------------------------------------------------------------------
  */
-rfseek(devptr, offset)
-struct	devsw	*devptr;
-long	offset;
+
+int
+rfseek(struct devsw *devptr, long offset)
 {
 	struct	rfblk	*rfptr;
 

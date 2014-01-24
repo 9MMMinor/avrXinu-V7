@@ -1,17 +1,17 @@
 /* x_date.c - x_date */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <sleep.h>
 #include <date.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  x_date  -  (command date) print the date and time
  *------------------------------------------------------------------------
  */
-COMMAND	x_date(stdin, stdout, stderr, nargs, args)
-int	stdin, stdout, stderr, nargs;
-char	*args[];
+ 
+COMMAND	x_date(int nargs, int *argv)
+//int	stdin, stdout, stderr, nargs;
 {
 	long	now;
 	char	str[80];
@@ -21,6 +21,7 @@ char	*args[];
 	gettime(&now);
 	ascdate(now, str);
 	strcat(str, "\n");
-	write(stdout, str, strlen(str));
+	write(argv[1], (unsigned char *)str, strlen(str));
+	
 	return(OK);
 }

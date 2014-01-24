@@ -1,21 +1,17 @@
 /* rfio.c - rfio */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
 /*------------------------------------------------------------------------
  *  rfio  --  perform input or output using remote file server
  *------------------------------------------------------------------------
  */
-rfio(devptr, rop, buff, len)
-struct	devsw	*devptr;
-int	rop;
-char	*buff;
-int	len;
+
+int rfio(struct devsw *devptr, int rop, char *buff, int len)
 {
-	struct	rfblk	*rfptr;
-	int	retcode;
+	struct rfblk *rfptr;
+	int retcode;
 
 	rfptr = (struct rfblk *)devptr->dvioblk;
 	wait(rfptr->rf_mutex);

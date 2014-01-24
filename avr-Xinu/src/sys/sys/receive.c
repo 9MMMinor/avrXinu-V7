@@ -4,11 +4,15 @@
 #include <kernel.h>
 #include <proc.h>
 
-/*------------------------------------------------------------------------
+extern int resched(void);
+
+/*
+ *------------------------------------------------------------------------
  *  receive  -  wait for a message and return it
  *------------------------------------------------------------------------
  */
-SYSCALL	receive()
+
+SYSCALL receive(void)
 {
 	STATWORD ps;    
 	struct	pentry	*pptr;

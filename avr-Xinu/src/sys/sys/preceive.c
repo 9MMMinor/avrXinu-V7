@@ -5,12 +5,16 @@
 #include <mark.h>
 #include <ports.h>
 
-/*------------------------------------------------------------------------
+extern SYSCALL wait(int sem);
+extern SYSCALL signal(int sem);
+
+/*
+ *------------------------------------------------------------------------
  *  preceive  --  receive a message from a port, blocking if port empty
  *------------------------------------------------------------------------
  */
-SYSCALL	preceive(portid)
-int portid;
+ 
+SYSCALL	preceive(int portid)
 {
 	STATWORD ps;    
 	struct	pt	*ptptr;
@@ -42,7 +46,7 @@ int portid;
 	nxtnode = ptptr->pthead;
 	msg = nxtnode->ptmsg;
 	if (ptptr->pthead == ptptr->pttail)	/* delete last item	*/
-		ptptr->pthead = ptptr->pttail = (struct ptnode *)NULL;
+		ptptr->pthead = ptptr->pttail = (struct ptnode *)NULLPTR;
 	else
 		ptptr->pthead = nxtnode->ptnext;
 	nxtnode->ptnext = ptfree;		/* return to free list	*/

@@ -2,17 +2,19 @@
 
 #include <conf.h>
 #include <kernel.h>
+#include <USART.h>
 #include <tty.h>
 #include <io.h>
+
+extern SYSCALL signal(int sem);
+extern SYSCALL sreset(int sem, int count);
+extern SYSCALL wait(int sem);
 
 /*------------------------------------------------------------------------
  *  ttyread - read one or more characters from a tty device
  *------------------------------------------------------------------------
  */
-ttyread(devptr, buff, count)
-struct	devsw	*devptr;
-int count;
-char *buff;
+int ttyread(struct devsw *devptr, unsigned char *buff, int count)
 {
 	STATWORD ps;    
 	register struct	tty *iptr;

@@ -4,16 +4,19 @@
 #include <kernel.h>
 #include <proc.h>
 
-/*------------------------------------------------------------------------
+extern int ready();
+extern SYSCALL unsleep();
+
+/*
+ *------------------------------------------------------------------------
  *  send  --  send a message to another process
  *------------------------------------------------------------------------
  */
-SYSCALL	send(pid, msg)
-int	pid;
-WORD	msg;
+ 
+SYSCALL	send(int pid, WORD msg)
 {
 	STATWORD ps;    
-	struct	pentry	*pptr;
+	struct pentry *pptr;
 
 	disable(ps);
 	if (isbadpid(pid) || ( (pptr= &proctab[pid])->pstate == PRFREE)

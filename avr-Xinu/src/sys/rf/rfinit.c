@@ -1,7 +1,6 @@
 /* rfinit.c - rfinit */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <fserver.h>
 #include <rfile.h>
 
@@ -9,8 +8,9 @@
  *  rfinit  --  initialize remote file pseudo devices
  *------------------------------------------------------------------------
  */
-rfinit(devptr)
-struct	devsw	*devptr;
+
+void
+rfinit(struct devsw *devptr)
 {
 	struct	rfblk	*rfptr;
 
@@ -26,4 +26,4 @@ struct	devsw	*devptr;
 	}
 }
 
-struct	rfinfo	Rf;
+struct rfinfo Rf;

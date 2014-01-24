@@ -6,26 +6,32 @@
 #include <q.h>
 #include <sleep.h>
 
-/*------------------------------------------------------------------------
- * sleep10  --  delay the caller for a time specified in tenths of seconds
+extern int resched();
+extern int insertd();
+
+/*
+ *------------------------------------------------------------------------
+ * sleep10  --  delay the caller for a specified number of clock ticks n
+ * sleep10(TICK); is guaranteed to put the process to sleep for 1 second
  *------------------------------------------------------------------------
  */
-SYSCALL	sleep10(n)
-	int n;
+
+SYSCALL	sleep10(int n)
 {
-	STATWORD ps;    
+	STATWORD ps;
+    
 	if (n < 0  || clkruns==0)
-	         return(SYSERR);
+		return(SYSERR);
 	disable(ps);
 	if (n == 0) {		/* sleep10(0) -> end time slice */
-	        ;
+		;
 	} else {
 		insertd(currpid,clockq,n);
 		slnempty = TRUE;
-		sltop = &q[q[clockq].qnext].qkey;
+		sltop = (int *volatile) &q[q[clockq].qnext].qkey;
 		proctab[currpid].pstate = PRSLEEP;
 	}
 	resched();
-        restore(ps);
+	restore(ps);
 	return(OK);
 }

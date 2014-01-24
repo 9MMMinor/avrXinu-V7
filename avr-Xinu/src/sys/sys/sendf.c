@@ -4,13 +4,15 @@
 #include <kernel.h>
 #include <proc.h>
 
-/*------------------------------------------------------------------------
+extern int ready(int, int);
+
+/*
+ *------------------------------------------------------------------------
  *  sendf  --  sendf a message to another process, forcing delivery
  *------------------------------------------------------------------------
  */
-SYSCALL	sendf(pid, msg)
-int	pid;
-int	msg;
+
+SYSCALL	sendf(int pid, int msg)
 {
 	STATWORD ps;    
 	struct	pentry	*pptr;

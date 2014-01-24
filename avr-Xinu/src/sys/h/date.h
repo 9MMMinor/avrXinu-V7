@@ -4,8 +4,8 @@
 /* 1 being 1 second into Jan. 1, 1970, GMT (universal time).  The	*/
 /* Internet uses seconds past Jan 1, 1900 (also GMT or universal time)	*/
 
-#define	net2xt(x)	((x)-2208988800L)  /* convert net-to-xinu time	*/
-#define	xt2net(x)	((x)+2208988800L)  /* convert xinu-to-net time	*/
+#define	net2xt(x)	((x)-2208988800UL)  /* convert net-to-xinu time	*/
+#define	xt2net(x)	((x)+2208988800UL)  /* convert xinu-to-net time	*/
 
 /* Days in months and month names used to format a date */
 
@@ -18,7 +18,8 @@ extern	struct	datinfo	Dat;
 
 /* Constants for converting time to month/day/year/hour/minute/second	*/
 
-#define	isleap(x)	((x)%4==0)	/* leap year? (1970-1999)	*/
+//#define	isleap(x)	((x)%4==0)	/* leap year? (1970-1999)	*/
+#define isleap(x)	(((x)%4==0 && (x)%100!=0) || (x)%400==0) /* for Y2K */
 #define	SECPERDY	(60L*60L*24L)	/* one day in seconds		*/
 #define	SECPERHR	(60L*60L)	/* one hour in seconds		*/
 #define	SECPERMN	(60L)		/* one minute in seconds	*/
@@ -32,13 +33,14 @@ extern	struct	datinfo	Dat;
 #define	ZONE_CST	6		/*  hours west of England	*/
 #define	ZONE_MST	7
 #define	ZONE_PST	8
-#define	TIMEZONE	ZONE_EST	/* timezone for this system	*/
+#define	TIMEZONE	ZONE_PST	/* timezone for this system	*/
 
 /* In-line procedures to convert universal-to-local time and vice versa	*/
 
 #define	ut2ltim(x)	((x)-TIMEZONE*SECPERHR)
 #define	ltim2ut(x)	((x)+TIMEZONE*SECPERHR)
 
-#ifndef	TSERVER
-#define	TSERVER		"128.10.2.3:37"
-#endif
+/* declarations */
+
+int ascdate(long time, char * str);
+SYSCALL	gettime(long *timvar);

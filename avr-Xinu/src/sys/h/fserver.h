@@ -1,7 +1,7 @@
 /* fserver.h */
 
 #ifndef	RSERVER
-#define	RSERVER		"128.10.2.3:2001"/* remote file server address	*/
+#define	RSERVER		"192.168.1.100:2001" /* remote file server address	*/
 #endif
 
 /* Definitions of remote file server constants and packet format */
@@ -15,7 +15,7 @@
 #define	FS_WRITE	3		/* write data to a file		*/
 #define	FS_UNLINK	4		/* unlink a file from directory	*/
 #define	FS_RENAME	5		/* change the name of file (data*/
-					/*  area in packet is new name)	*/
+							/*  area in packet is new name)	*/
 #define	FS_MKDIR	6		/* make a directory (count=mode)*/
 #define	FS_RMDIR	7		/* remove a directory		*/
 #define	FS_ACCESS	8		/* determine file accessibility	*/
@@ -25,10 +25,11 @@
 #define	RNAMLEN		80		/* Maximum bytes in file name	*/
 #define	RCLOSED		-1		/* server device not opened	*/
 
+/* host and target machines have to agree on this structure ! */
 struct	fphdr	{			/* Format of server packet hdr	*/
-	long	f_pos;			/* byte position in file	*/
-	short	f_count;		/* count of data bytes		*/
-	short	f_op;			/* Operation requested		*/
+	int32_t	f_pos;			/* byte position in file	*/
+	int16_t	f_count;		/* count of data bytes		*/
+	int16_t	f_op;			/* Operation requested		*/
 	char	f_name[RNAMLEN];	/* Name of remote file		*/
 };
 

@@ -1,0 +1,50 @@
+# This Makefile contains rules to build files in the src/sys/sys directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = src/sys/sys
+
+# Source files for this component
+
+# Important system components
+C_FILES = getc.c putc.c malloc.c
+
+# Files for process control
+C_FILES += chprio.c getpid.c getprio.c kill.c panic.c setnok.c setdev.c
+C_FILES += resume.c suspend.c unsleep.c userret.c wakeup.c xdone.c 
+
+# Files for scheduling and context switching
+C_FILES += ctxsw.S ready.c resched.c ssclock.c
+
+# Files for real-time clock management and time
+C_FILES +=  insertd.c sleep.c sleep10.c gettime.c
+
+# Files for lists and queues
+C_FILES += getitem.c insert.c newqueue.c queue.c
+
+# Files for process coordination (semaphores)
+C_FILES += scount.c screate.c sdelete.c signal.c signaln.c sreset.c wait.c
+
+# Files for memory management
+C_FILES += freebuf.c freemem.c getbuf.c getmem.c getstk.c mark.c mkpool.c poolinit.c nqalloc.c
+
+# Files for ports
+C_FILES += pcount.c pcreate.c pdelete.c pinit.c preceive.c preset.c psend.c ptclear.c
+
+# Files for interprocess communication
+C_FILES += receive.c recvclr.c recvtim.c send.c sendf.c
+
+# Files for device drivers
+C_FILES += close.c control.c init.c open.c read.c seek.c write.c ckmode.c
+
+# Files for device drivers no op and error calls
+C_FILES += ionull.c ioerr.c
+
+# Files for miscellany
+C_FILES += blkcopy.c blkequ.c interrupt_enable.c printq.c
+
+# Files for SPI driver
+#C_FILES += spicntl.c spigetc.c spiioint.c spiinit.c spiputc.c spiread.c spiwrite.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_FILES:%=${DIR}/%}

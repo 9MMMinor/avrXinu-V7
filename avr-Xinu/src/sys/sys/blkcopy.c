@@ -1,15 +1,14 @@
 /* blkcopy.c - blkcopy */
 
+#include <stdio.h>
 #include <kernel.h>
 
 /*------------------------------------------------------------------------
  *  blkcopy  -  copy a block of memory form one location to another
  *------------------------------------------------------------------------
  */
-blkcopy(to, from, nbytes)
-register char	*to;
-register char	*from;
-register int	nbytes;
+
+int blkcopy(register uint8_t *to, register uint8_t *from, register int16_t nbytes)
 {
 	while (--nbytes >= 0)
 		*to++ = *from++;

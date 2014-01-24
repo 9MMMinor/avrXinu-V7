@@ -5,9 +5,9 @@
 struct	dgblk	{			/* Datagram device control block*/
 	int	dg_dnum;		/* device number of this device	*/
 	int	dg_state;		/* whether this device allocated*/
-	short	dg_lport;		/* local datagram port number	*/
-	short	dg_fport;		/* foreign datagram port number	*/
-	IPaddr	dg_faddr;		/* foreign machine IP address	*/
+	int	dg_lport;		/* local datagram port number	*/
+	int	dg_fport;		/* foreign datagram port number	*/
+	IPaddr dg_faddr;		/* foreign machine IP address	*/
 	int	dg_xport;		/* incoming packet queue	*/
 	int	dg_netq;		/* index of our netq entry	*/
 	int	dg_mode;		/* mode of this interface	*/
@@ -18,7 +18,7 @@ struct	dgblk	{			/* Datagram device control block*/
 #define	DG_FREE		0		/* this device is available	*/
 #define	DG_USED		1		/* this device is in use	*/
 
-#define	DG_TIME		30		/* read timeout (tenths of sec)	*/
+#define	DG_TIME		5*TICK		/* read timeout (5 sec)	*/
 
 /* Constants for dgm pseudo-device control functions */
 
@@ -38,10 +38,10 @@ struct	dgblk	{			/* Datagram device control block*/
 /* Structure of xinugram as dg interface delivers it to user */
 
 struct	xgram	{			/* Xinu datagram (not UDP)	*/
-	IPaddr	xg_faddr;		/* foreign host IP address	*/
-	short	xg_fport;		/* foreign UDP port number	*/
-	short	xg_lport;		/* local UDP port number	*/
-	char	xg_data[UMAXLEN];	/* maximum data to/from UDP	*/
+	IPaddr xg_faddr;		/* foreign host IP address	*/
+	int	xg_fport;			/* foreign UDP port number	*/
+	int	xg_lport;			/* local UDP port number	*/
+	char xg_data[UMAXLEN];	/* maximum data to/from UDP	*/
 };
 
 #define	XGHLEN	8	/* error in ( (sizeof(struct xgram)) - UMAXLEN)	*/
@@ -50,5 +50,17 @@ struct	xgram	{			/* Xinu datagram (not UDP)	*/
 
 #define	ANYFPORT	(char *)0	/* Accept any foreign UDP port	*/
 #define	ANYLPORT	0		/* Assign a fresh local port num*/
-
+#ifndef Ndg
+#define Ndg 0
+#endif
 extern	struct	dgblk	dgtab[Ndg];
+
+/* Driver functions */
+DEVCALL dgmopen(struct devsw *, int, int);
+DEVCALL dgmcntl(struct devsw *, int, char *);
+DEVCALL dginit(struct devsw *);
+DEVCALL dgcntl(struct devsw *, int, void *, void *);
+DEVCALL dgclose(struct devsw *);
+DEVCALL dgread(struct devsw *, struct xgram *, int);
+DEVCALL dgwrite(struct devsw *, struct xgram *, int);
+

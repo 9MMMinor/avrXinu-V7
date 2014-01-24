@@ -4,18 +4,19 @@
 #include <kernel.h>
 #include <file.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  ckmode  --  parse open's mode argument and generate actual mode bits
  *------------------------------------------------------------------------
  */
-ckmode(mode)
-char	*mode;
+ 
+int ckmode(char *mode)
 {
 	int	mbits;
 	char	ch;
 
 	mbits = 0;
-	while (ch = *mode++)
+	while ( (ch = *mode++) )
 		switch (ch) {
 
 		    case FLRMODE:

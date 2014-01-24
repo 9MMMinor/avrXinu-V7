@@ -19,8 +19,13 @@ struct	nam	{			/* all name space variables	*/
 	int	nnames;			/* number of entries in nametab	*/
 	struct	nament	nametab[NNAMES];/* actual table of mappings	*/
 } Nam;
+
 #ifndef	NAMESPACE
 #define	NAMESPACE	SYSERR
 #endif
 
-#define	fopen(n,m)	open(NAMESPACE, n, m)
+SYSCALL nammap(char *name, char *newname);
+SYSCALL mount(char *prefix, int dev, char *replace);
+SYSCALL namopen(struct devsw *devptr, char *filenam, char *mode);
+SYSCALL namrepl(char *name, char *newname);
+void	naminit(void);

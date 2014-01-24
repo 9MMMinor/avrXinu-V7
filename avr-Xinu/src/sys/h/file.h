@@ -1,4 +1,6 @@
 /* file.h */
+#ifndef __FILE_H_
+#define __FILE_H_ 1
 
 #define	FLREAD		001		/* file mode bit for "read"	*/
 #define	FLWRITE		002		/* file mode bit for "write"	*/
@@ -18,3 +20,7 @@
 #define	FLREMOVE	3001		/* remove file (name)		*/
 #define	FLACCESS	3002		/* test access (name, mode)	*/
 #define	FLRENAME	3003		/* change file name (old, new)	*/
+#define FLMKDIR		3004		/* mkdir(char *name, int mode)  */
+#define FLRMDIR		3005		/* rmdir(char *name)			*/
+
+#endif

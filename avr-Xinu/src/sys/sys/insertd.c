@@ -8,10 +8,7 @@
  *  insertd  --  insert process pid in delta list "head", given its key
  *------------------------------------------------------------------------
  */
-insertd(pid, head, key)
-	int	pid;
-	int	head;
-	int	key;
+int insertd(int pid, int head, int key)
 {
 	int	next;			/* runs through list		*/
 	int	prev;			/* follows next through list	*/

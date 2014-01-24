@@ -8,12 +8,12 @@
  *  close  -  close a device
  *------------------------------------------------------------------------
  */
-SYSCALL	close(descrp)
-int descrp;
+ 
+SYSCALL	close(int descrp)
 {
 	struct	devsw	*devptr;
 
-	if (isbaddev(descrp) )
+	if ( isbaddev(descrp) )
 		return(SYSERR);
 	devptr = &devtab[descrp];
 	return( (*devptr->dvclose)(devptr));

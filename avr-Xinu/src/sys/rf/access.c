@@ -1,17 +1,17 @@
 /* access.c - access */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <file.h>
+#include <fserver.h>
+#include <rfile.h>
 #include <name.h>
 
 /*------------------------------------------------------------------------
  *  access  -  determine accessability given file name and desired mode
  *------------------------------------------------------------------------
  */
-SYSCALL	access(name, mode)
-char	*name;
-int	mode;
+
+SYSCALL access(char *name, int mode)
 {
 	char	fullnam[NAMLEN];
 	struct	devsw	*devptr;
@@ -20,5 +20,5 @@ int	mode;
 	if ( (dev=nammap(name, fullnam)) == SYSERR)
 		return(SYSERR);
 	devptr = &devtab[dev];
-	return(	(*devptr->dvcntl)(devptr, FLACCESS, fullnam, mode) );
+	return(	(*devptr->dvcntl)(devptr, FLACCESS, fullnam, (void *)mode) );
 }

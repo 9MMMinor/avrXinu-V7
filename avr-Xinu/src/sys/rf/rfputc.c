@@ -1,21 +1,19 @@
 /* rfputc.c - rfputc */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
 /*------------------------------------------------------------------------
  *  rfputc  --  put a single character into a remote file
  *------------------------------------------------------------------------
  */
-rfputc(devptr, ch)
-struct	devsw	*devptr;
-char	ch;
+
+int rfputc(struct devsw *devptr, char ch)
 {
 	char	outch;
 
 	outch = ch;
-	if ( write(devptr->dvnum, &outch, 1) == 1)
+	if ( write(devptr->dvnum, (unsigned char *)&outch, 1) == 1)
 		return(OK);
 	else
 		return(SYSERR);

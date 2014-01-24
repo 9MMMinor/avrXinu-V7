@@ -6,12 +6,16 @@
 #include <q.h>
 #include <sem.h>
 
-/*------------------------------------------------------------------------
+extern SYSCALL enqueue();
+extern int resched();
+
+/*
+ *------------------------------------------------------------------------
  * wait  --  make current process wait on a semaphore
  *------------------------------------------------------------------------
  */
-SYSCALL	wait(sem)
-	int	sem;
+ 
+SYSCALL	wait(int sem)
 {
 	STATWORD ps;    
 	struct	sentry	*sptr;

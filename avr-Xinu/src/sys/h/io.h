@@ -16,19 +16,23 @@ struct	intmap	{		/* device-to-interrupt routine mapping	*/
 	int	ocode;		/* argument passed to output routine	*/
 	};
 
-#ifdef	NDEVS
-extern	struct	intmap intmap[NDEVS];
-#define	isbaddev(f)	( (f)<0 || (f)>=NDEVS )
-#endif
+
 #define	BADDEV		-1
+#ifdef	NDEVS
+extern struct intmap intmap[NDEVS];
+#define	isbaddev(f)	( (f)<0 || (f)>=NDEVS )
+#else
+#define isbaddev(f) ( BADDEV )
+#endif
+
 
 /* In-line I/O procedures */
 
-#define	getchar()	getc(CONSOLE)
-#define	putchar(ch)	putc(CONSOLE,(ch))
-#define	fgetc(unit)	getc((unit))
-#define	fputc(unit,ch)	putc((unit),(ch))
-#define level(vec)      ((vec-BASE)/OFFSET)     /* determine autovector level */
+//#define	getchar()	getc(CONSOLE)
+//#define	putchar(ch)	putc(CONSOLE,(ch))
+//#define	fgetc(unit)	getc((unit))
+//#define	fputc(unit,ch)	putc((unit),(ch))
+//#define level(vec)      ((vec-BASE)/OFFSET)     /* determine autovector level */
                                                 /* L.L.                       */
 
 struct	vector	{
@@ -40,9 +44,9 @@ extern	struct vector disptab[];
 /* fd_to_dd()  converts file descriptor to device descriptor
  * -- to be used in converting old XINU code to new I/O formats
  */
-#define fd_to_dd(f)	(proctab[getpid()].fildes[f])
+//#define fd_to_dd(f)	(proctab[getpid()].fildes[f])
 
-#define findfd()	(dd_to_fd(FDFREE))
+//#define findfd()	(dd_to_fd(FDFREE))
 
 /* Unix open flags */
 #define	O_RDONLY	000		/* open for reading */

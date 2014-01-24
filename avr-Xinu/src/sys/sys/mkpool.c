@@ -1,21 +1,24 @@
 /* mkpool.c - mkpool */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <mark.h>
 #include <bufpool.h>
+#include <mem.h>
+
 
 /*------------------------------------------------------------------------
  *  mkpool  --  allocate memory for a buffer pool and link together
  *------------------------------------------------------------------------
  */
-mkpool(bufsiz, numbufs)
-int	bufsiz, numbufs;
+SYSCALL mkpool(int bufsiz, int numbufs)
+
 {
 	STATWORD ps;    
 	int	poolid;
-	char	*where;
+	char *where;
 	int	*getmem();
+	char *a;
+	int i;
 
 #ifdef	MEMMARK
 	if ( unmarked(bpmark) )
@@ -24,8 +27,19 @@ int	bufsiz, numbufs;
 	disable(ps);
 	if (bufsiz<BPMINB || bufsiz>BPMAXB
 	    || numbufs<1 || numbufs>BPMAXN
-	    || nbpools >= NBPOOLS
-	    || (where= (char *) getmem((bufsiz+sizeof(int))*numbufs)) == (char *) SYSERR) {
+	    || nbpools >= NBPOOLS) {
+		kprintf("mkpool: bufsiz=%d, %d %d\n", bufsiz, BPMINB, BPMAXB);
+		kprintf("mkpool: numbufs=%d 1 %d\n", numbufs, BPMAXN);
+		kprintf("mkpool: nbpools=%d, %d\n", nbpools, NBPOOLS);
+		restore(ps);
+		return(SYSERR);
+	}
+	if ((where= (char *) getmem((bufsiz+sizeof(int))*numbufs)) == (char *) SYSERR) {
+		kprintf("mkpool: Failure to allocate %d bytes for %d buffers\n",(bufsiz+sizeof(int))*numbufs,numbufs);
+		for (i=2; (a=(char *) getmem(i)) != (char *) SYSERR; i += 2) {
+			freemem((struct mblock *)a,i);
+		}
+		kprintf("%d bytes avail to getmem\n",i-2);
 		restore(ps);
 		return(SYSERR);
 	}
@@ -36,7 +50,7 @@ int	bufsiz, numbufs;
 	bufsiz+=sizeof(int);
 	for (numbufs-- ; numbufs>0 ; numbufs--,where+=bufsiz)
 		*( (int *) where ) = (int)(where+bufsiz);
-	*( (int *) where) = (int) NULL;
+	*( (int *) where) = (int) NULLPTR;
 	restore(ps);
 	return(poolid);
 }

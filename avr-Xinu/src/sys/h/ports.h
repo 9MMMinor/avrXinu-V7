@@ -1,7 +1,7 @@
 /* ports.h - isbadport */
 
-#define	NPORTS		20		/* maximum number of ports	*/
-#define	MAXMSGS		50		/* maximum messages on all ports*/
+#define	NPORTS		5		/* maximum number of ports	*/
+#define	MAXMSGS		15		/* maximum messages on all ports*/
 #define	PTFREE		'\01'		/* port is Free			*/
 #define	PTLIMBO		'\02'		/* port is being deleted/reset	*/
 #define	PTALLOC		'\03'		/* port is allocated		*/
@@ -31,3 +31,6 @@ extern	MARKER	ptmark;
 #endif
 
 #define	isbadport(portid)	( (portid)<0 || (portid)>=NPORTS )
+
+// prototypes
+SYSCALL pinit(int maxmsgs);

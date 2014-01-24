@@ -12,12 +12,16 @@ struct	ptnode	*ptfree;		/* list of free queue nodes	*/
 struct	pt	ports[NPORTS];
 int	ptnextp;
 
+extern SYSCALL getmem();
+extern void panic(char *);
+
 /*------------------------------------------------------------------------
  *  pinit  --  initialize all ports
  *------------------------------------------------------------------------
  */
-SYSCALL	pinit(maxmsgs)
-int maxmsgs;
+
+SYSCALL
+pinit(int maxmsgs) 
 {
 	int	i;
 	struct	ptnode	*next, *prev;
@@ -32,6 +36,6 @@ int maxmsgs;
 
 	for ( prev=next=ptfree ;  --maxmsgs > 0  ; prev=next )
 		prev->ptnext = ++next;
-	prev->ptnext = (struct ptnode *)NULL;
+	prev->ptnext = (struct ptnode *)NULLPTR;
 	return(OK);
 }

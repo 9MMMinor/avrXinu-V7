@@ -5,12 +5,15 @@
 #include <mark.h>
 #include <ports.h>
 
-/*------------------------------------------------------------------------
+extern SYSCALL scount();
+
+/*
+ *------------------------------------------------------------------------
  *  pcount  --  return the count of current messages in a port
  *------------------------------------------------------------------------
  */
-SYSCALL	pcount(portid)
-int	portid;
+ 
+SYSCALL	pcount(int portid)
 {
 	STATWORD ps;    
 	int	scnt;

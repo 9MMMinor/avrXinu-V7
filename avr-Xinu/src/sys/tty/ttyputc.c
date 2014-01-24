@@ -2,35 +2,31 @@
 
 #include <conf.h>
 #include <kernel.h>
+#include <USART.h>
 #include <tty.h>
 #include <io.h>
-#include <slu.h>
-#include <zsreg.h>
 
-extern char *foob2;
+extern SYSCALL wait();
 
 /*------------------------------------------------------------------------
  *  ttyputc - write one character to a tty device
  *------------------------------------------------------------------------
  */
-ttyputc(devptr, ch )
-struct	devsw	*devptr;
-char	ch;
+int ttyputc(struct devsw *devptr, unsigned char ch)
 {
 	STATWORD ps;    
-	struct	tty   *iptr;
+	struct tty *iptr;
 
 	iptr = &tty[devptr->dvminor];
-        if ( ch==NEWLINE && iptr->ocrlf )
-                ttyputc(devptr,RETURN);
+	if ( ch==NEWLINE && iptr->ocrlf )
+		ttyputc(devptr,RETURN);
 	disable(ps);
 	wait(iptr->osem);		/* wait	for space in queue	*/
-	/**foob2++ = ch;*/
 	iptr->obuff[iptr->ohead++] = ch;
 	++iptr->ocnt;
 	if (iptr->ohead	>= OBUFLEN)
 		iptr->ohead = 0;
-	ttyostart(iptr);
+	*USART[iptr->unit].UCSRB |= (1<<UDRIE0);			/*ttyostart(iptr);*/
 	restore(ps);
 	return(OK);
 }

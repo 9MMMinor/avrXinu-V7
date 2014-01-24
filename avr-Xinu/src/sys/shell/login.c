@@ -1,27 +1,31 @@
 /* login.c - login */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <shell.h>
 
-/*------------------------------------------------------------------------
+extern int mark(int *loc);
+extern SYSCALL getutim(long *time);
+
+/*
+ *------------------------------------------------------------------------
  *  login  -  log user onto system
  *------------------------------------------------------------------------
  */
-login(dev)
-int	dev;
+ 
+int login(int dev)
 {
 	int	len;
+	FILE *stream = stdout;
 
 	Shl.shused = FALSE;
 	Shl.shuser[0] = NULLCH;
 	for (getname(Shl.shmach) ; TRUE ; ) {
-		fprintf(dev,"\n\n%s - The magic of Xinu\n\nlogin: ",
+		fprintf(stream,"\n\n%s - Xinu\n\nlogin: ",
 			Shl.shmach);
-		while ( (len=read(dev,Shl.shbuf,SHBUFLEN))==0 || len==1)
-			fprintf(dev, "login: ");
+		while ( (len=read(file_get_fdesc(stream),(unsigned char *)Shl.shbuf,SHBUFLEN))==0 || len==1)
+			fprintf(stream, "login: ");
 		if (len == EOF) {
-			read(dev, Shl.shbuf, 0);
+			read(file_get_fdesc(stream), (unsigned char *)Shl.shbuf, 0);
 			Shl.shused = FALSE;
 			continue;
 		}
@@ -30,7 +34,7 @@ int	dev;
 		Shl.shused = TRUE;
 		getutim(&Shl.shlogon);
 		mark(Shl.shmark);
-		fprintf(dev,"\n%s\n\n",
+		fprintf(stream,"\n%s\n\n",
 		"      Welcome to Xinu (type ? for help)" );
 		getutim(&Shl.shlast);
 		return(OK);

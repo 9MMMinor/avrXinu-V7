@@ -4,21 +4,22 @@
 #include <kernel.h>
 #include <proc.h>
 
+extern void insert();
+extern int dequeue();
+extern void resched();
+
 /*------------------------------------------------------------------------
  * chprio  --  change the scheduling priority of a process
  *------------------------------------------------------------------------
  */
-SYSCALL chprio(pid,newprio)
-	int	pid;
-	int	newprio;		/* newprio > 0			*/
+SYSCALL chprio(int pid, int newprio)
 {
 	STATWORD ps;    
-	int	oldprio;
-	struct	pentry	*pptr;
+	int oldprio;
+	struct pentry *const pptr = &proctab[pid]; /* mmm */
 
 	disable(ps);
-	if (isbadpid(pid) || newprio<=0 ||
-	    (pptr = &proctab[pid])->pstate == PRFREE) {
+	if (isbadpid(pid) || newprio<=0 || pptr->pstate == PRFREE) {
 		restore(ps);
 		return(SYSERR);
 	}

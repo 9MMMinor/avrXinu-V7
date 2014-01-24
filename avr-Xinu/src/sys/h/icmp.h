@@ -13,6 +13,7 @@
 #define	ICTIMRP	14			/* Timestamp reply		*/
 #define	ICRQINF	15			/* Information request		*/
 #define	ICRPINF	16			/* Information reply		*/
+#define ICCKOFF 02			/* ic_cksum offset			*/
 
 /* ICMP packet format (part of the packet that follows the IP header)	*/
 

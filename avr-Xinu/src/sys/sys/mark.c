@@ -1,7 +1,6 @@
 /* mark.c - _mkinit, mark */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <mark.h>
 
 
@@ -10,24 +9,26 @@ int	*marks[MAXMARK];
 int	nmarks;
 int	mkmutex;
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  _mkinit  --  called once at system startup
  *------------------------------------------------------------------------
  */
-_mkinit()
+ 
+void _mkinit(void)
 {
 	mkmutex = screate(1);
 	nmarks = 0;
 }
 
 
-
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  mark  --  mark a location if it hasn't been marked
  *------------------------------------------------------------------------
  */
-mark(loc)
-int *loc;
+ 
+int mark(int *loc)
 {
 
 	if ( *loc>=0 && *loc<nmarks && marks[*loc]==loc )

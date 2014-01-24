@@ -1,0 +1,13 @@
+# This Makefile contains rules to build files in the src/sys/tty directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = src/sys/tty
+
+# Source files for this component
+
+# Files for tty driver
+C_FILES = ttycntl.c ttygetc.c ttyiin.c ttyinit.c ttyoin.c ttyopen.c ttyputc.c ttyread.c ttywrite.c 
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_FILES:%=${DIR}/%}

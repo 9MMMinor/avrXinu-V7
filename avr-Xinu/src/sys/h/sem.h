@@ -8,12 +8,12 @@
 #define	SUSED	'\02'		/* this semaphore is used		*/
 
 struct	sentry	{		/* semaphore table entry		*/
-	char	sstate;		/* the state SFREE or SUSED		*/
-	int	semcnt;		/* count for this semaphore		*/
-	int	sqhead;		/* q index of head of list		*/
-	int	sqtail;		/* q index of tail of list		*/
+	char sstate;		/* the state SFREE or SUSED		*/
+	int semcnt;		/* count for this semaphore		*/
+	int sqhead;		/* q index of head of list		*/
+	int sqtail;		/* q index of tail of list		*/
 };
-extern	struct	sentry	semaph[];
-extern	int	nextsem;
+extern struct sentry semaph[];
+extern int nextsem;
 
 #define	isbadsem(s)	(s<0 || s>=NSEM)

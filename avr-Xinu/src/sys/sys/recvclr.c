@@ -4,11 +4,13 @@
 #include <kernel.h>
 #include <proc.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  recvclr  --  clear messages, returning waiting message (if any)
  *------------------------------------------------------------------------
  */
-SYSCALL	recvclr()
+ 
+SYSCALL recvclr(void)
 {
 	STATWORD ps;    
 	WORD	msg;

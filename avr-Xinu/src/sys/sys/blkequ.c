@@ -2,14 +2,14 @@
 
 #include <kernel.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  blkequ  -  return TRUE iff one block of memory is equal to another
  *------------------------------------------------------------------------
  */
-blkequ(first, second, nbytes)
-register char	*first;
-register char	*second;
-register int	nbytes;
+
+int blkequ(register char *first, register char *second, register int16_t nbytes)
+
 {
 	while (--nbytes >= 0)
 		if (*first++ != *second++)

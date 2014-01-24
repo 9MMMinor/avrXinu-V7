@@ -5,13 +5,15 @@
 #include <mark.h>
 #include <ports.h>
 
-/*------------------------------------------------------------------------
+extern void _ptclear();
+
+/*
+ *------------------------------------------------------------------------
  *  pdelete  --  delete a port, freeing waiting processes and messages
  *------------------------------------------------------------------------
  */
-SYSCALL	pdelete(portid, dispose)
-	int	portid;
-	int	(*dispose)();
+ 
+SYSCALL	pdelete(int portid, int (*dispose)())
 {
 	STATWORD ps;    
 	struct	pt *ptptr;

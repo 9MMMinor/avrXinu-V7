@@ -5,12 +5,15 @@
 #include <mark.h>
 #include <bufpool.h>
 
-/*------------------------------------------------------------------------
+extern SYSCALL wait();
+
+/*
+ *------------------------------------------------------------------------
  *  getbuf  --  get a buffer from a preestablished buffer pool
  *------------------------------------------------------------------------
  */
-int *getbuf(poolid)
-int poolid;
+ 
+int *getbuf(int poolid)
 {
 	STATWORD ps;    
 	int	*buf;

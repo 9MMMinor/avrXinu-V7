@@ -3,11 +3,11 @@
 /* DARPA Internet Address Resolution Protocol  (see RFCs 826, 920) */
 
 #define	AR_HRD	1		/* Ethernet hardware type code		*/
-#define	AR_PROT	0x0800		/* IP protocol address code		*/
+#define	AR_PROT	0x0800	/* IP protocol address code		*/
 #define	AR_HLEN	6		/* Ethernet physical address length	*/
 #define	AR_PLEN	4		/* IP Protocol address length		*/
 #define	AR_TAB	20		/* size of IP-to-Ether addr. cache (>1)	*/
-#define	AR_TIME	60		/* time to wait for reply in 1/10 secs	*/
+#define	AR_TIME	120		/* time to wait for reply in 1/10 secs	*/
 #define	AR_RTRY	2		/* num. of times to try an arp request	*/
 
 /* Definitions of codes used in operation field of ARP packet */
@@ -54,6 +54,9 @@ struct	arpblk	{		/* all information about ARP cache	*/
 	IPaddr	arpwant;	/* IP addr. process waiting to resolve	*/
 	int	rarppid;	/* id of process waiting for RARP reply	*/
 	int	rarpsem;	/* semaphore for access to RARP service	*/
+	int	dhcppid;	/* id of process waiting for DHCP reply	*/
+	int	dhcpsem;	/* semaphore for access to DHCP service	*/
 };
 
-extern	struct	arpblk	Arp;
+extern struct arpblk Arp;
+extern int arpfind(IPaddr faddr);

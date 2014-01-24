@@ -9,7 +9,7 @@
  *  nqalloc  -  allocate a network demultiplexing queue
  *------------------------------------------------------------------------
  */
-nqalloc()
+int nqalloc(void)
 {
 	STATWORD ps;    
 	int	i;

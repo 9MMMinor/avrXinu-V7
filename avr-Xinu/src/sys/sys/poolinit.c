@@ -15,10 +15,13 @@ MARKER	bpmark;				/* self initializing mark	*/
  *  poolinit  --  initialize the buffer pool routines
  *------------------------------------------------------------------------
  */
-poolinit()
+
+SYSCALL
+poolinit(void)
 {
-	STATWORD ps;    
 #ifdef	MEMMARK
+	STATWORD ps;    
+
 	int	status;
 
 	disable(ps);

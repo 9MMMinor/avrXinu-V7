@@ -1,21 +1,17 @@
 /* rfmkpac.c - rfmkpac */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-static	struct	fpacket	packet;
+static struct fpacket packet;
 
 /*------------------------------------------------------------------------
  *  rfmkpac  --  make a remote file request packet and send it
  *------------------------------------------------------------------------
  */
-rfmkpac(rop, rname, rpos, buff, len)
-int	rop;
-char	*rname;
-long	*rpos;
-char	*buff;
-int	len;
+
+int
+rfmkpac(int rop, char *rname, long *rpos, char *buff, int len)
 {
 	struct	fphdr	*fptr;
 	int	reqlen, rplylen;
@@ -31,13 +27,13 @@ int	len;
 
 	    case FS_WRITE:
 	    case FS_RENAME:
-		if (len > RDATLEN) {
-			signal(Rf.rmutex);
-			return(SYSERR);
-		}
-		blkcopy(packet.fpdata, buff, len);
-		rplylen = FPHLEN;
-		break;
+			if (len > RDATLEN) {
+				signal(Rf.rmutex);
+				return(SYSERR);
+			}
+			blkcopy(packet.fpdata, buff, len);
+			rplylen = FPHLEN;
+			break;
 
 	    case FS_CLOSE:
 	    case FS_OPEN:
@@ -45,16 +41,17 @@ int	len;
 	    case FS_MKDIR:
 	    case FS_RMDIR:
 	    case FS_ACCESS:
-		rplylen = FPHLEN;
-		/* fall through */
+			rplylen = FPHLEN;	/* packet header length */
+								/* fs: (send) FHDRLEN */
+			/* fall through */
 		
 	    case FS_READ:
-		if (len > RDATLEN) {
-			signal(Rf.rmutex);
-			return(SYSERR);
-		}
-		reqlen = FPHLEN;
-		break;
+			if (len > RDATLEN) {
+				signal(Rf.rmutex);
+				return(SYSERR);
+			}
+			reqlen = FPHLEN;
+			break;
 
 	    default:
 	    	;
@@ -67,16 +64,16 @@ int	len;
 	switch (rop) {
 
 	    case FS_READ:
-		blkcopy(buff, packet.fpdata, len);
-		/* fall through */
+			blkcopy(buff, packet.fpdata, len);
+			/* fall through */
 
 	    case FS_WRITE:
-		*rpos = net2hl(fptr->f_pos);
-		len = net2hs(fptr->f_count);
-		break;
+			*rpos = net2hl(fptr->f_pos);
+			len = net2hs(fptr->f_count);
+			break;
 
 	    default:
-		len = OK;
+			len = OK;
 	}
 	signal(Rf.rmutex);
 	return(len);

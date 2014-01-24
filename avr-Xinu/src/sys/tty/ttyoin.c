@@ -2,41 +2,41 @@
 
 #include <conf.h>
 #include <kernel.h>
+#include <USART.h>
 #include <tty.h>
 #include <io.h>
-#include <slu.h>
-#include <zsreg.h>
 
-/*------------------------------------------------------------------------
+#include <avr/io.h>
+
+extern SYSCALL signal(int sem);
+extern SYSCALL signaln(int sem, int count);
+
+/*
+ *------------------------------------------------------------------------
  *  ttyoin  --  lower-half tty device driver for output interrupts
  *------------------------------------------------------------------------
  */
-INTPROC	ttyoin(iptr)
-	register struct	tty   *iptr;
+ 
+void ttyoin(struct tty *iptr)
 {
-	STATWORD ps;    
-	register struct	zscc_device	*zptr;
+	int n;
 	int	ct;
 
-	zptr = iptr->ioaddr;
-	
-        disable(ps);	
+	n = iptr->unit;		/*  USART[n]  */
 
 	if (iptr->ehead	!= iptr->etail)	{
-		zptr->zscc_data = iptr->ebuff[iptr->etail++];
+		*USART[n].UDR = iptr->ebuff[iptr->etail++];
 		if (iptr->etail	>= EBUFLEN)
 			iptr->etail = 0;
-		restore(ps);
 		return;
 	}
 	if (iptr->oheld) {			/* honor flow control	*/
-		ttyostop(iptr);
-		restore(ps);
+		*USART[n].UCSRB &= ~(1<<UDRIE0);		/* disable Data Ready Interrupt */
 		return;
 	}
 	if ((ct=iptr->ocnt) > 0) {
-		zptr->zscc_data = iptr->obuff[iptr->otail++];
-	        --iptr->ocnt;
+		*USART[n].UDR = iptr->obuff[iptr->otail++];
+		--iptr->ocnt;
 		if (iptr->otail	>= OBUFLEN)
 			iptr->otail = 0;
 		if (ct > OBMINSP)
@@ -46,7 +46,5 @@ INTPROC	ttyoin(iptr)
 			signaln(iptr->osem, OBMINSP);
 		}
 	} else
-	        ttyostop(iptr);
-
-	restore(ps);
+		*USART[n].UCSRB &= ~(1<<UDRIE0);		/* disable Data Ready Interrupt */
 }

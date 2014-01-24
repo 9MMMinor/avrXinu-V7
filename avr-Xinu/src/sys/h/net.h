@@ -1,17 +1,18 @@
 /* net.h */
 
 /* High-level network definitions and constants */
-
-#define	NETBUFS		10		/* number of network buffers	*/
+#ifndef NETBUFS	/* override in avr-Configuration for small or large Targets */
+#define	NETBUFS		6		/* number of network buffers	*/
+#endif
 #ifndef	Ndg
 #define	NETQS		1		/* number of xinu ports used to	*/
-#else					/*  demultiplex udp datagrams	*/
+#else						/*  demultiplex udp datagrams	*/
 #define	NETQS		Ndg
 #endif
-#define	NETQLEN		3		/* size of a demux queue	*/
+#define	NETQLEN		3		/* size of a demux queue		*/
 #define	NETFQ		3		/* size of input-to-output queue*/
 #ifndef	NETNLEN
-#define	NETNLEN		30		/* length of network name	*/
+#define	NETNLEN		30		/* length of network name		*/
 #endif
 
 /* Commands for the network pseudo device control call */
@@ -23,8 +24,8 @@
 #define	NETIN		netin		/* network input daemon process	*/
 #define	NETOUT		netout		/* network output process	*/
 extern	int		NETIN(), NETOUT();
-#define	NETISTK		1000		/* stack size for network input	*/
-#define	NETOSTK		1000		/* stack size for network output*/
+#define	NETISTK		600		/* stack size for network input	*/
+#define	NETOSTK		600		/* stack size for network output*/
 #define	NETIPRI		100		/* network runs at high priority*/
 #define	NETOPRI		 99		/* network output priority	*/
 #define	NETINAM		"netin"		/* name of network input process*/
@@ -51,12 +52,12 @@ struct	netinfo	{			/* info and parms. for network	*/
 	IPaddr	mynet;			/* Network portion of myaddr	*/
 	IPaddr	gateway;		/* IP address of gateway to use	*/
 	int	nxtprt;			/* next available local UDP port*/
-	long	nmutex;			/* output mutual excl. semaphore*/
-	long	npacket;		/* # of packets processed	*/
-	long	ndrop;			/* # of packets discarded	*/
-	long	nover;			/* # dropped because queue full	*/
-	long	nmiss;			/* # dropped, LANCE missed pack	*/
-	long	nerror;			/* # dropped, other LANCE error	*/
+	int	nmutex;			/* output mutual excl. semaphore*/
+	int	npacket;		/* # of packets processed	*/
+	int	ndrop;			/* # of packets discarded	*/
+	int	nover;			/* # dropped because queue full	*/
+	int	nmiss;			/* # dropped, LANCE missed pack	*/
+	int	nerror;			/* # dropped, other LANCE error	*/
 };
 
 extern	struct	netinfo	Net;		/* All network parameters	*/

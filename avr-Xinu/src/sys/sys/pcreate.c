@@ -5,12 +5,15 @@
 #include <mark.h>
 #include <ports.h>
 
-/*------------------------------------------------------------------------
+extern SYSCALL screate();
+
+/*
+ *------------------------------------------------------------------------
  *  pcreate  --  create a port that allows "count" outstanding messages
  *------------------------------------------------------------------------
  */
-SYSCALL	pcreate(count)
-int	count;
+ 
+SYSCALL	pcreate(int count)
 {
 	STATWORD ps;    
 	int	i, p;
@@ -30,7 +33,7 @@ int	count;
 			ptptr->ptstate = PTALLOC;
 			ptptr->ptssem = screate(count);
 			ptptr->ptrsem = screate(0);
-			ptptr->pthead = ptptr->pttail = (struct ptnode *)NULL;
+			ptptr->pthead = ptptr->pttail = (struct ptnode *)NULLPTR;
 			ptptr->ptseq++;
 			ptptr->ptmaxcnt = count;
 			restore(ps);

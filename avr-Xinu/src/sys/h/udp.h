@@ -3,7 +3,7 @@
 /* DARPA User Datagram Protocol (UDP) constants and formats */
 
 #define	UHLEN	8		/* UDP header length in bytes		*/
-#define	UMAXLEN	IMAXLEN-IPHLEN-UHLEN /* Maximum data in UDP packet	*/
+#define	UMAXLEN	IMAXLEN-UHLEN /* Maximum data in UDP packet	*/
 
 struct	udp	{		/* Message format of DARPA UDP		*/
 	short	u_sport;	/* Source UDP port number		*/
@@ -16,7 +16,7 @@ struct	udp	{		/* Message format of DARPA UDP		*/
 /* UDP constants */
 
 #define	UPROTO		(char)17/* IP protocol type (17 => UDP)		*/
-#define	ULPORT		2050	/* Initial UDP local "port" number	*/
+#define	ULPORT		2001	/* Initial UDP local "port" number (should be 49152, requiring a long)*/
 
 /* Assigned UDP port numbers */
 

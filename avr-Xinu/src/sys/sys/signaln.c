@@ -6,16 +6,20 @@
 #include <q.h>
 #include <sem.h>
 
-/*------------------------------------------------------------------------
+extern int ready();
+extern int getfirst();
+extern int resched();
+
+/*
+ *------------------------------------------------------------------------
  *  signaln -- signal a semaphore n times
  *------------------------------------------------------------------------
  */
-SYSCALL signaln(sem,count)
-	int	sem;
-	int	count;
+ 
+SYSCALL signaln(int sem, int count)
 {
 	STATWORD ps;    
-	struct	sentry	*sptr;
+	struct sentry *sptr;
 
 	disable(ps);
 	if (isbadsem(sem) || semaph[sem].sstate==SFREE || count<=0) {

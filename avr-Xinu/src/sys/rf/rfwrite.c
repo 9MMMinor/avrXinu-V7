@@ -1,17 +1,14 @@
 /* rfwrite.c - rfwrite */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
 /*------------------------------------------------------------------------
  *  rfwrite  --  write one or more bytes to a remote file
  *------------------------------------------------------------------------
  */
-rfwrite(devptr, buff, len)
-struct	devsw	*devptr;
-char	*buff;
-int	len;
+ 
+int rfwrite(struct devsw *devptr, char *buff, int len)
 {
 	int	i;
 

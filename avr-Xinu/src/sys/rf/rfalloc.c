@@ -1,7 +1,6 @@
 /* rfalloc.c - rfalloc */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <fserver.h>
 #include <rfile.h>
 
@@ -9,7 +8,9 @@
  *  rfalloc  --  allocate pseudo device for a remote file; return id
  *------------------------------------------------------------------------
  */
-rfalloc()
+
+int
+rfalloc(void)
 {
 	STATWORD ps;    
 	int	i;

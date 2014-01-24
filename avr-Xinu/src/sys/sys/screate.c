@@ -6,12 +6,15 @@
 #include <q.h>
 #include <sem.h>
 
-/*------------------------------------------------------------------------
+LOCAL newsem();
+
+/*
+ *------------------------------------------------------------------------
  * screate  --  create and initialize a semaphore, returning its id
  *------------------------------------------------------------------------
  */
-SYSCALL screate(count)
-	int	count;			/* initial count (>=0)		*/
+ 
+SYSCALL screate(int count)
 {
 	STATWORD ps;    
 	int	sem;
@@ -27,10 +30,12 @@ SYSCALL screate(count)
 	return(sem);
 }
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  * newsem  --  allocate an unused semaphore and return its index
  *------------------------------------------------------------------------
  */
+ 
 LOCAL	newsem()
 {
 	int	sem;

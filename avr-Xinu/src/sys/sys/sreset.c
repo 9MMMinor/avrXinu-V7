@@ -6,16 +6,20 @@
 #include <q.h>
 #include <sem.h>
 
-/*------------------------------------------------------------------------
+extern int resched();
+extern SYSCALL ready();
+extern int getfirst();
+
+/*
+ *------------------------------------------------------------------------
  *  sreset  --  reset the count and queue of a semaphore
  *------------------------------------------------------------------------
  */
-SYSCALL sreset(sem,count)
-	int	sem;
-	int	count;
+ 
+SYSCALL sreset(int sem, int count)
 {
 	STATWORD ps;    
-	struct	sentry	*sptr;
+	struct sentry *sptr;
 	int	pid;
 	int	slist;
 

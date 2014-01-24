@@ -1,6 +1,8 @@
 /* rfile.h */
 
+#ifndef __FILE_H_
 #include <file.h>
+#endif
 
 /* Remote file device control block and defined constants */
 
@@ -39,3 +41,25 @@ struct	rfinfo	{			/* all remote server info.	*/
 };
 
 extern	struct	rfinfo	Rf;
+
+/* declarations */
+
+SYSCALL access(char *name, int mode);
+SYSCALL remove(char * name, int key);
+SYSCALL rename(char * old, char * new);
+int rfalloc(void);
+int rfclose(struct devsw *devptr);
+int rfcntl(struct devsw *devptr, int func, char *addr, char *addr2);
+void rfdump(void);
+int rfgetc(struct devsw *devptr);
+void rfinit(struct devsw *devptr);
+int rfio(struct devsw *devptr, int rop, char *buff, int len);
+int rfmkpac(int rop, char *rname, long *rpos, char *buff, int len);
+int rfopen(struct devsw *devptr, char *name, char *mode);
+int rfputc(struct devsw *devptr, char ch);
+int rfread(struct devsw *devptr, char *buff, int len);
+int rfseek(struct devsw *devptr, long offset);
+int rfsend(struct fphdr *fptr, int reqlen, int rplylen);
+int rfwrite(struct devsw *devptr, char *buff, int len);
+
+

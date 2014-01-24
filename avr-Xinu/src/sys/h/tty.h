@@ -1,15 +1,20 @@
 /* tty.h */
 
-#define IOCHERR		0200		/* bit set on when an error	*/
-					/* occurred reading the char.	*/
-#define	OBMINSP		40		/* min space in buffer before	*/
-					/* processes awakened to write	*/
-#define	EBUFLEN		50		/* size of echo queue		*/
+#define IOCHERR		0200		/* bit set on when an error	    */
+					            /* occurred reading the char.	*/
+#define	OBMINSP		40		    /* min space in buffer before	*/
+				            	/* processes awakened to write	*/
+#define	EBUFLEN		50		    /* size of echo queue	    	*/
+
+/* inline definitions */
+
+#define ttyostart(iptr)     UCSR0B |= (1<<UDRIE0);
 
 /* size constants */
 
 #ifndef	Ntty
 #define	Ntty		1		/* number of serial tty lines	*/
+#define CONSOLE     0
 #endif
 #ifndef	IBUFLEN
 #define	IBUFLEN		512		/* num.	chars in input queue	*/
@@ -26,48 +31,48 @@
 #define	OMRAW		'R'		/* raw mode => normal processing*/
 
 struct	tty	{			/* tty line control block	*/
-	int	ihead;			/* head of input queue		*/
-	int	itail;			/* tail of input queue		*/
-	char	ibuff[IBUFLEN];		/* input buffer for this line	*/
-	int	isem;			/* input semaphore		*/
-	int	icnt;			/* count of chars in input buf	*/
-	int	ohead;			/* head of output queue		*/
-	int	otail;			/* tail of output queue		*/
-	char	obuff[OBUFLEN];		/* output buffer for this line	*/
-	int	osem;			/* output semaphore		*/
-	int	ocnt;			/* count of chars in output buf	*/
-	int	odsend;			/* sends delayed for space	*/
-	int	ehead;			/* head of echo queue		*/
-	int	etail;			/* tail of echo queue		*/
-	char	ebuff[EBUFLEN];		/* echo queue			*/
-	char	imode;			/* IMRAW, IMCBREAK, IMCOOKED	*/
-	Bool	iecho;			/* is input echoed?		*/
-	Bool	ieback;			/* do erasing backspace on echo?*/
-	Bool	evis;			/* echo control chars as ^X ?	*/
-	Bool	ecrlf;			/* echo CR-LF for newline?	*/
-	Bool	icrlf;			/* map '\r' to '\n' on input?	*/
-	Bool	ierase;			/* honor erase character?	*/
-	char	ierasec;		/* erases character, usu. backsp*/
-	Bool	ikill;			/* honor line kill character?	*/
-	char	ikillc;			/* line kill character		*/
-	Bool	iintr;			/* is interrupt char honored?	*/
-	char	iintrc;			/* interrupt character		*/
-	int	iintpid;		/* interrupt process id		*/
-	Bool	ieof;			/* honor end-of-file char?	*/
-	char	ieofc;			/* end-of-file character	*/
-	int	icursor;		/* current cursor position	*/
-	Bool	oflow;			/* honor ostop/ostart?		*/
-	Bool	oheld;			/* output currently being held?	*/
-	char	ostop;			/* character that stops output	*/
-	char	ostart;			/* character that starts output	*/
-	Bool	ocrlf;			/* echo CR/LF for LF ?		*/
-	char	ifullc;			/* char to send when input full	*/
-	struct	zscc_device	*ioaddr;	/* device address of this unit	*/
-	int	intrstate;		/* device interrupt state	*/
-	Bool	tbusy;			/* terminal busy bit		*/
-	char	constatus;		/* current device contol status */
+	int  ihead;			/* head of input queue		*/
+	int  itail;			/* tail of input queue		*/
+	char ibuff[IBUFLEN];/* input buffer for this line	*/
+	int  isem;			/* input semaphore		*/
+	int  icnt;			/* count of chars in input buf	*/
+	int  ohead;			/* head of output queue		*/
+	int  otail;			/* tail of output queue		*/
+	char obuff[OBUFLEN];/* output buffer for this line	*/
+	int  osem;			/* output semaphore		*/
+	int  ocnt;			/* count of chars in output buf	*/
+	int  odsend;		/* sends delayed for space	*/
+	int  ehead;			/* head of echo queue		*/
+	int  etail;			/* tail of echo queue		*/
+	char ebuff[EBUFLEN];/* echo queue			*/
+	char  imode;		/* IMRAW, IMCBREAK, IMCOOKED	*/
+	Bool  iecho;		/* is input echoed?		*/
+	Bool  ieback;		/* do erasing backspace on echo?*/
+	Bool  evis;			/* echo control chars as ^X ?	*/
+	Bool  ecrlf;		/* echo CR-LF for newline?	*/
+	Bool  icrlf;		/* map '\r' to '\n' on input?	*/
+	Bool  ierase;		/* honor erase character?	*/
+	unsigned char  ierasec;		/* erases character, usu. backsp*/
+	Bool  ikill;		/* honor line kill character?	*/
+	char  ikillc;		/* line kill character		*/
+	Bool  iintr;		/* is interrupt char honored?	*/
+	char  iintrc;		/* interrupt character		*/
+	int  iintpid;		/* interrupt process id		*/
+	Bool  ieof;			/* honor end-of-file char?	*/
+	char  ieofc;		/* end-of-file character	*/
+	int  icursor;		/* current cursor position	*/
+	Bool  oflow;		/* honor ostop/ostart?		*/
+	Bool  oheld;		/* output currently being held?	*/
+	char  ostop;		/* character that stops output	*/
+	char  ostart;		/* character that starts output	*/
+	Bool  ocrlf;		/* echo CR/LF for LF ?		*/
+	char  ifullc;		/* char to send when input full	*/
+	int	unit;			/* USART_ptr index of this unit	(minor device #) */
+	int  intrstate;		/* device interrupt state	*/
+	Bool  tbusy;		/* terminal busy bit		*/
+	char  constatus;	/* current device control status */
 };
-extern	struct	tty tty[];
+extern struct tty  tty[];
 
 #define	ATSIGN	'@'
 #define	BACKSP	'\b'
@@ -80,6 +85,7 @@ extern	struct	tty tty[];
 #define	STOPCH	'\023'			/* control-S stops output	*/
 #define	STRTCH	'\021'			/* control-Q restarts output	*/
 #define	INTRCH	'\002'			/* control-B is interrupt	*/
+#define DEL		'\0177'			/* Delete, rubout			*/
 #define	UPARROW	'^'
 
 /* ttycontrol function codes */
@@ -96,4 +102,19 @@ extern	struct	tty tty[];
 #define	TCINT		11		/* set input interrupt pid	*/
 #define	TCINTCH		12		/* set input interrupt char	*/
 #define	TCNOINT		13		/* turn off input interrupt	*/
+#define TCCRLF		14		/* turn on echo CR-LF for NEWLINE */
+#define TCNOCRLF	15		/* turn off echo CR-LF for NEWLINE */
 #define	TFULLC		BELL		/* char to echo when buffer full*/
+
+/* Driver functions */
+DEVCALL ttyinit(struct devsw *);
+DEVCALL	ttyopen(struct devsw *, char *, char *);
+DEVCALL ttyclose(struct devsw *);
+DEVCALL ttyread(struct devsw *, unsigned char *, int);
+DEVCALL ttywrite(struct devsw *, unsigned char *, int);
+DEVCALL ttygetc(struct devsw *);
+DEVCALL ttyputc(struct devsw *, unsigned char);
+DEVCALL ttycntl(struct devsw *, int);
+/* ISR functions */
+void ttyiin(struct tty *);
+void ttyoin(struct tty *);

@@ -1,17 +1,17 @@
 /* rename.c - rename */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <file.h>
+#include <fserver.h>
+#include <rfile.h>
 #include <name.h>
 
 /*------------------------------------------------------------------------
  *  rename  -  rename a file (key is optional)
  *------------------------------------------------------------------------
  */
-SYSCALL	rename(old, new)
-char	*old;
-char	*new;
+
+SYSCALL rename(char * old, char * new)
 {
 	char	fullold[NAMLEN];
 	char	fullnew[NAMLEN];
@@ -19,7 +19,9 @@ char	*new;
 	int	dev, dev2;
 
 	/* map names through namespace and restrict to single device */
-
+	
+//	printf("rename: dev=%d :%s:%s:\n", nammap(old,fullold), old, fullold);
+//	printf("rename: dev2=%d :%s:%s:\n", nammap(new,fullnew), new, fullnew);
 	if ( (dev = nammap(old, fullold)) == SYSERR ||
 	     (dev2= nammap(new, fullnew)) == SYSERR ||
 	      dev != dev2)

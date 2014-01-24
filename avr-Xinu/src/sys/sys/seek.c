@@ -4,13 +4,13 @@
 #include <kernel.h>
 #include <io.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  seek  --  position a device (very common special case of control)
  *------------------------------------------------------------------------
  */
-seek(descrp, pos)
-int descrp;
-long pos;
+ 
+int seek(int descrp, long pos)
 {
 	struct	devsw	*devptr;
 

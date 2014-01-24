@@ -6,12 +6,13 @@
 #include <q.h>
 #include <sleep.h>
 
+extern int dequeue();
+
 /*------------------------------------------------------------------------
  * unsleep  --  remove  process from the sleep queue prematurely
  *------------------------------------------------------------------------
  */
-SYSCALL	unsleep(pid)
-	int	pid;
+SYSCALL	unsleep(int pid)
 {
 	STATWORD ps;    
 	struct	pentry	*pptr;
@@ -19,7 +20,7 @@ SYSCALL	unsleep(pid)
 	int	remain;
 	int	next;
 
-        disable(ps);
+	disable(ps);
 	if (isbadpid(pid) ||
 	    ( (pptr = &proctab[pid])->pstate != PRSLEEP &&
 	     pptr->pstate != PRTRECV) ) {
@@ -35,6 +36,6 @@ SYSCALL	unsleep(pid)
 		sltop = (int *) & q[next].qkey;
 	else
 		slnempty = FALSE;
-        restore(ps);
+	restore(ps);
 	return(OK);
 }

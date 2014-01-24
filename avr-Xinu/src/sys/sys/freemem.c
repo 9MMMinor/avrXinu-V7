@@ -4,29 +4,26 @@
 #include <kernel.h>
 #include <mem.h>
 
+
 /*------------------------------------------------------------------------
  *  freemem  --  free a memory block, returning it to memlist
  *------------------------------------------------------------------------
  */
-SYSCALL	freemem(block, size)
-	struct	mblock	*block;
-	unsigned size;
+SYSCALL	freemem(struct mblock *block, unsigned size)
 {
 	STATWORD ps;    
-	struct	mblock	*p, *q;
+	struct mblock *p, *q;
 	unsigned top;
 
-	if (size==0 || (unsigned)block>(unsigned)maxaddr
-	    || ((unsigned)block)<((unsigned) &end))
+	if (size==0 || (unsigned)block>(unsigned)__malloc_heap_end
+	    || ((unsigned)block)<((unsigned) __malloc_heap_start))
 		return(SYSERR);
 	size = (unsigned)roundmb(size);
 	disable(ps);
-	for( p=memlist.mnext,q= &memlist;
-	     p != (struct mblock *) NULL && p < block ;
-	     q=p,p=p->mnext )
+	for( p = memlist.mnext, q = &memlist; p != NULLBLK && p < block ; q = p, p = p->mnext )
 		;
-	if ((top=q->mlen+(unsigned)q)>(unsigned)block && q!= &memlist ||
-	    p!=NULL && (size+(unsigned)block) > (unsigned)p ) {
+	if (((top=q->mlen+(unsigned)q)>(unsigned)block && q!= &memlist) ||
+	    (p!=NULLBLK && (size+(unsigned)block) > (unsigned)p) ) {
 		restore(ps);
 		return(SYSERR);
 	}

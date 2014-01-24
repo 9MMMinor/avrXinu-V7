@@ -6,12 +6,16 @@
 #include <q.h>
 #include <sem.h>
 
-/*------------------------------------------------------------------------
+extern int ready();
+extern int getfirst();
+
+/*
+ *------------------------------------------------------------------------
  * signal  --  signal a semaphore, releasing one waiting process
  *------------------------------------------------------------------------
  */
-SYSCALL signal(sem)
-	int	sem;
+ 
+SYSCALL signal(int sem)
 {
 	STATWORD ps;    
 	register struct	sentry	*sptr;

@@ -1,20 +1,20 @@
 /* rfgetc.c - rfgetc */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
 /*------------------------------------------------------------------------
  *  rfgetc  --  get a character from a remote file
  *------------------------------------------------------------------------
  */
-rfgetc(devptr)
-struct	devsw	*devptr;
+
+int
+rfgetc(struct devsw *devptr)
 {
-	char	ch;
+	char ch;
 	int	retcode;
 
-	if ( (retcode=read(devptr->dvnum, &ch, 1)) == 1)
+	if ( (retcode=read(devptr->dvnum, (unsigned char *)&ch, 1)) == 1)
 		return(ch);
 	else if (retcode != EOF)
 		retcode = SYSERR;

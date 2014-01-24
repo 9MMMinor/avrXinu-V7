@@ -1,18 +1,18 @@
 /* lexan.c - lexan */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <shell.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  lexan  -  ad hoc lexical analyzer to divide command line into tokens
  *------------------------------------------------------------------------
  */
-lexan(line)
-char	*line;
+ 
+int lexan(char *line)
 {
 	char	**tokptr;
-	int	ntok;
+	int		ntok;
 	char	*p;
 	char	ch;
 	char	*to;

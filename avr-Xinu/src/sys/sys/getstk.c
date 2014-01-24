@@ -8,8 +8,8 @@
  * getstk  --  allocate stack memory, returning address of topmost WORD
  *------------------------------------------------------------------------
  */
-WORD	*getstk(nbytes)
-	unsigned  int nbytes;
+WORD *
+getstk(unsigned int nbytes)	
 {
 	STATWORD ps;    
 	struct	mblock	*p, *q;	/* q follows p along memlist		*/
@@ -22,14 +22,14 @@ WORD	*getstk(nbytes)
 		return( (WORD *)SYSERR );
 	}
 	nbytes = (unsigned int) roundmb(nbytes);
-	fits = (struct mblock *) NULL;
+	fits = fitsq = NULLBLK;
 	q = &memlist;
-	for (p = q->mnext ; p !=(struct mblock *) NULL ; q = p,p = p->mnext)
+	for (p = q->mnext ; p != NULLBLK ; q = p,p = p->mnext)
 		if ( p->mlen >= nbytes) {
 			fitsq = q;
 			fits = p;
 		}
-	if (fits == (struct mblock *) NULL) {
+	if (fits == NULLBLK) {
 		restore(ps);
 		return( (WORD *)SYSERR );
 	}

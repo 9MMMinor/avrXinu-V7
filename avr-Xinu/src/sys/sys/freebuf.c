@@ -5,12 +5,14 @@
 #include <mark.h>
 #include <bufpool.h>
 
+SYSCALL signal();
+
 /*------------------------------------------------------------------------
  *  freebuf  --  free a buffer that was allocated from a pool by getbuf
  *------------------------------------------------------------------------
  */
-freebuf(buf)
-int *buf;
+ 
+int freebuf(int *buf)
 {
 	STATWORD ps;    
 	int	poolid;
