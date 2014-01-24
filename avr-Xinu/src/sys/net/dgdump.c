@@ -4,11 +4,13 @@
 #include <kernel.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  dgdump  -  dump the datagram pseudo device control blocks
  *------------------------------------------------------------------------
  */
-dgdump()
+ 
+int dgdump(void)
 {
 	struct	dgblk	*dgptr;
 	int	i;

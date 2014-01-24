@@ -1,21 +1,21 @@
 /* unmount.c - unmount */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <name.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  unmount  -  remove an entry from the name prefix mapping table
  *------------------------------------------------------------------------
  */
-SYSCALL	unmount(prefix)
-char	*prefix;
+
+SYSCALL unmount(char *prefix)
 {
 	STATWORD ps;    
 	struct	nament	*nptr;
 	int	i;
 
-	if (prefix == NULL)
+	if (prefix == 0)
 		prefix = NULLSTR;
 	else if (strlen(prefix) >= NAMPLEN)
 		return(SYSERR);

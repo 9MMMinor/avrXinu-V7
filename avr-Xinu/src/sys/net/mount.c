@@ -1,27 +1,25 @@
 /* mount.c - mount */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <name.h>
 
 /*------------------------------------------------------------------------
  *  mount  -  give meaning to a prefix in the abstract name space
  *------------------------------------------------------------------------
  */
-SYSCALL	mount(prefix, dev, replace)
-char	*prefix;
-char	*replace;
-int	dev;
+
+SYSCALL
+mount(char *prefix, int dev, char *replace)
 {
 	STATWORD ps;    
 	struct	nament	*nptr;
 	struct	nament	*last;
 	int	i;
 
-	if (prefix == NULL)
-		prefix == NULLSTR;
-	if (replace == NULL)
-		replace == NULLSTR;
+	if (prefix == NULLPTR)
+		prefix = NULLSTR;
+	if (replace == NULLPTR)
+		replace = NULLSTR;
 	if (strlen(prefix) >= NAMPLEN || strlen(replace) >= NAMRLEN)
 		return(SYSERR);
 	disable(ps);

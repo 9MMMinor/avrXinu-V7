@@ -1,16 +1,14 @@
 /* namrepl.c - namrepl */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <name.h>
 
 /*------------------------------------------------------------------------
  *  namrepl  -  using namespace, replace name with (newname,device)
  *------------------------------------------------------------------------
  */
-SYSCALL	namrepl(name, newname)
-char	*name;
-char	*newname;
+ 
+SYSCALL namrepl(char *name, char *newname)
 {
 	STATWORD ps;    
 	register struct	nament	*nptr;

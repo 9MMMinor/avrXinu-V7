@@ -1,0 +1,76 @@
+# This Makefile contains rules to build files in the src/sys/net directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = src/sys/net
+
+# Source files for this component
+
+# Files for network input and output
+C_FILES = netin.c netout.c
+
+# Files for arp and rarp protocols
+C_FILES += arp_in.c arpfind.c arpinit.c mkarp.c rarp_in.c sndrarp.c
+
+# Files for IP and routing
+C_FILES += cksum.c dot2ip.c getaddr.c
+C_FILES += getnet.c getpath.c ip2name.c ip_in.c ipsend.c netnum.c route.c
+
+# Files for UDP
+C_FILES += udpecho.c udpnxtp.c udpsend.c
+
+# Files for ICMP protocol
+C_FILES += icmp_in.c
+
+# Files for a Syntactic Namespace
+C_FILES += getname.c mount.c naminit.c nammap.c namopen.c namrepl.c unmount.c
+
+# Files for a buffer pool and rest of Net structure
+C_FILES += netinit.c netdump.c netutil.c
+
+# Files for a datagram pseudo driver
+C_FILES += dgalloc.c dgclose.c dgcntl.c dgdump.c dginit.c dgmcntl.c dgmopen.c
+C_FILES += dgparse.c dgread.c dgwrite.c
+
+# Files for a datagram debug
+C_FILES += dgdump.c udpdump.c hexdump.c
+
+# Files for an DHCP client
+C_FILES += dhcp_client.c DHCP_getaddr.c
+
+# Files for a time server
+C_FILES += 	getutim.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_FILES:%=${DIR}/%}
+
+
+lance_ethernet_driver =	ethcntl.c\
+	ethinit.c\
+	ethinter.c\
+	ethread.c\
+	ethstrt.c\
+	ethwrite.c\
+	ethwstrt.c
+
+remote_file_server =  access.c\
+	rfalloc.c\
+	rfclose.c\
+	rfcntl.c\
+	rfdump.c\
+	rfgetc.c\
+	rfinit.c\
+	rfio.c\
+	rfmkpac.c\
+	rfopen.c\
+	rfputc.c\
+	rfread.c\
+	rfseek.c\
+	rfsend.c\
+	rfwrite.c\
+	remove.c\
+	rename.c
+	
+remote_who_server = rwho.c\
+	rwhod.c\
+	rwhoind.c

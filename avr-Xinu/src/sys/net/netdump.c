@@ -1,22 +1,23 @@
 /* netdump.c - netdump */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  netdump  -  dump the contents of Net struct and  udp demux queues
  *------------------------------------------------------------------------
  */
-netdump()
+ 
+int netdump(void)
 {
 	int	i;
 	struct	netq	*nqptr;
 
-	kprintf("Network: buffer pool=%d, mutex=%d, next udp #=%d,",
+	kprintf("Network: buffer pool=%d, mutex=%d, next udp=%d,",
 		Net.netpool, Net.nmutex, Net.nxtprt);
 	kprintf(" addr is %svalid\n", Net.mavalid?"":"in");
-	kprintf("Packets: recvd=%d, tossed=%d (%d for queue overflow)\n",
+	kprintf("Packets: recvd=%d, dropped=%d (%d for queue overflow)\n",
 		Net.npacket, Net.ndrop, Net.nover);
 	for (i=0; i<NETQS; i++) {
 		nqptr = &Net.netqs[i];

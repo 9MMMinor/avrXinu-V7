@@ -1,16 +1,15 @@
 /* netnum.c - netnum */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  netnum  -  obtain the network portion of a given IP address
  *------------------------------------------------------------------------
  */
-netnum(netpart, address)
-IPaddr	netpart;
-IPaddr	address;
+ 
+int netnum(IPaddr netpart, IPaddr address)
 {
 	blkcopy(netpart, address, IPLEN);
 	switch (netpart[0] & IPTMASK) {

@@ -1,28 +1,30 @@
 /* dgmopen.c - dgmopen */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+int dgalloc(void);
+int dgparse(struct dgblk *dgptr, char *fspec);
+
+/*
+ *------------------------------------------------------------------------
  *  dgmopen  -  open a fresh datagram pseudo device and return descriptor
  *------------------------------------------------------------------------
  */
-dgmopen(devptr, forport, locport)
-struct	devsw	*devptr;
-char	*forport;
-int	locport;
+ 
+int dgmopen(struct devsw *devptr, int forport, int locport)
 {
 	STATWORD ps;    
 	struct	dgblk	*dgptr;
 	struct	netq	*nqptr;
 	int	slot;
-	int	nq;
+	int	nq=0;
 	int	i;
 
 	disable(ps);
 	if ( (slot=dgalloc()) == SYSERR) {
 		restore(ps);
+		kprintf("dgalloc: SYSERR\n");
 		return(SYSERR);
 	}
 	dgptr = &dgtab[slot];
@@ -34,11 +36,13 @@ int	locport;
 				Net.netqs[i].uport == locport) {
 				dgptr->dg_state = DG_FREE;
 				restore(ps);
+				kprintf("dgmopen: invalid netq %d\n",i);
 				return(SYSERR);
 			}
 	}
-	if (dgparse(dgptr,forport)==SYSERR || (nq=nqalloc())==SYSERR ) {
+	if (dgparse(dgptr,(char *)forport)==SYSERR || (nq=nqalloc())==SYSERR ) {
 		dgptr->dg_state = DG_FREE;
+		kprintf("dgmopen: bad dgparse or nq=%d\n",nq);
 		restore(ps);
 		return(SYSERR);
 	}

@@ -1,20 +1,18 @@
 /* nammap.c - nammap */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <name.h>
 
 /*------------------------------------------------------------------------
  *  nammap  -  using namespace, iteratively map name onto (newname,device) 
  *------------------------------------------------------------------------
  */
-SYSCALL	nammap(name, newname)
-char	*name;
-char	*newname;
+
+SYSCALL nammap(char *name, char *newname)
 {
 	STATWORD ps;    
 	int	dev;
-	char	tmpnam[NAMLEN];
+	char tmpnam[NAMLEN];
 
 	disable(ps);
 	dev = namrepl(name, newname);

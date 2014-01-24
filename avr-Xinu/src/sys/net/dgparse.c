@@ -1,21 +1,21 @@
 /* dgparse.c - dgparse */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 #include <ctype.h>
 
-/*------------------------------------------------------------------------
+
+/*
+ *------------------------------------------------------------------------
  *  dgparse  -  parse foreign address specification; get IP and port #s
  *------------------------------------------------------------------------
  */
-dgparse(dgptr, fspec)
-struct	dgblk	*dgptr;
-char	*fspec;
+ 
+int dgparse(struct dgblk *dgptr, char *fspec)
 {
 	int	i, byte;
-	char	ch;
-	char	*ipptr;
+	unsigned char ch;
+	char *ipptr;
 
 	if (fspec == ANYFPORT) {
 		dgptr->dg_fport = 0;

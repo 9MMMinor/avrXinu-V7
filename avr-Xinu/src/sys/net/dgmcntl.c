@@ -1,17 +1,14 @@
 /* dgmcntl.c - dgmcntl */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
 /*------------------------------------------------------------------------
  *  dgmcntl  -  control the network and datagram interface pseudo devices
  *------------------------------------------------------------------------
  */
-dgmcntl(devptr, func, addr)
-struct	devsw	*devptr;
-int	func;
-char	*addr;
+ 
+int dgmcntl(struct devsw *devptr, int func, char *addr)
 {
 	int	status;
 

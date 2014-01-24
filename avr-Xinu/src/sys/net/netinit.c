@@ -1,15 +1,26 @@
 /* netinit.c - netinit */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <sleep.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+#ifndef GATEWAY
+#define GATEWAY 192,168,1,1
+#endif
+#ifndef DHCP_REQUEST_IP
+#define DHCP_REQUEST_IP 192,168,1,105
+#endif
+
+
+static char *local_name = "Xinu.local.";
+
+/*
+ *------------------------------------------------------------------------
  *  netinit  -  initialize network data structures
  *------------------------------------------------------------------------
  */
-netinit()
+
+int netinit(void)
 {
 	struct	netq	*nqptr;
 	int	i;
@@ -27,15 +38,13 @@ netinit()
 	}
 	Net.mnvalid = Net.mavalid = FALSE;
 	dot2ip(Net.gateway, GATEWAY);
+	dot2ip(Net.myaddr, DHCP_REQUEST_IP);
+	netnum(Net.mynet, Net.myaddr);
 	Net.nxtprt = ULPORT;
 	Net.nmutex = screate(1);
 	Net.npacket = Net.ndrop = Net.nover = Net.nmiss = Net.nerror = 0;
+	blkcopy(Net.myname,local_name,strlen(local_name));
 	return(OK);
 }
 
-struct	netinfo	Net;
-
-
-
-
-
+struct netinfo Net;

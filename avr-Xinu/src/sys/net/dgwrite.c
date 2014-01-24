@@ -1,23 +1,21 @@
 /* dgwrite.c - dgwrite */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  dgwrite  -  write one datagram to a datagram protocol pseudo-device
  *------------------------------------------------------------------------
  */
-dgwrite(devptr, buff, len)
-struct	devsw	*devptr;
-struct	xgram	*buff;
-int	len;
+ 
+int dgwrite(struct devsw *devptr, struct xgram *buff, int len)
 {
 	struct	epacket	*packet;
 	struct	ip	*ipptr;
 	struct	udp	*udpptr;
 	struct	dgblk	*dgptr;
-	int	dstport;
+	int		dstport;
 	char	*dstIP;
 
 	if (len < 0 || len > UMAXLEN)
@@ -36,7 +34,7 @@ int	len;
 		blkcopy(udpptr->u_data, buff->xg_data, len);
 	} else {
 		if ( dstport == 0) {
-			freebuf(packet);
+			freebuf((int *)packet);
 			return(SYSERR);
 		}
 		blkcopy(udpptr->u_data, buff, len);

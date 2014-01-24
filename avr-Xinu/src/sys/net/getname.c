@@ -1,18 +1,18 @@
 /* getname.c - getname */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  getname  -  get name of this host and place it where specified
  *------------------------------------------------------------------------
  */
-SYSCALL	getname(nam)
-char	*nam;
+ 
+SYSCALL	getname(char *nam)
 {
-	IPaddr	myaddr[4];
-	char	*p;
+	IPaddr myaddr;
+	char *p;
 
 	*nam = NULLCH;
 	if (!Net.mnvalid) {
@@ -24,5 +24,6 @@ char	*nam;
 	for (p=Net.myname ; *p != NULLCH && *p != '.' ; )
 		*nam++ = *p++;
 	*nam = NULLCH;
+//	kprintf("getname: OK\n");
 	return(OK);
 }

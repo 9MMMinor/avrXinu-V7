@@ -274,6 +274,15 @@
 		BD558D781892E7F400476D83 /* udpnxtp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = udpnxtp.c; sourceTree = "<group>"; };
 		BD558D791892E7F400476D83 /* udpsend.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = udpsend.c; sourceTree = "<group>"; };
 		BD558D7A1892E7F400476D83 /* unmount.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = unmount.c; sourceTree = "<group>"; };
+		BD558D7B1892EA1C00476D83 /* cksum.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cksum.c; sourceTree = "<group>"; };
+		BD558D7C1892EA4800476D83 /* dhcp_client.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = dhcp_client.c; sourceTree = "<group>"; };
+		BD558D7D1892EA4800476D83 /* DHCP_getaddr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = DHCP_getaddr.c; sourceTree = "<group>"; };
+		BD558D7E1892EAAE00476D83 /* hexdump.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = hexdump.c; sourceTree = "<group>"; };
+		BD558D7F1892EAFE00476D83 /* Makerules */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makerules; sourceTree = "<group>"; };
+		BD558D801892EBAC00476D83 /* mkarp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mkarp.c; sourceTree = "<group>"; };
+		BD558D811892EBAC00476D83 /* mkdpool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mkdpool.c; sourceTree = "<group>"; };
+		BD558D821892EBF000476D83 /* netutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = netutil.c; sourceTree = "<group>"; };
+		BD558D831892EC1300476D83 /* udpdump.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = udpdump.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -576,9 +585,11 @@
 		BD558D4F1892E7F400476D83 /* net */ = {
 			isa = PBXGroup;
 			children = (
+				BD558D7F1892EAFE00476D83 /* Makerules */,
 				BD558D501892E7F400476D83 /* arp_in.c */,
 				BD558D511892E7F400476D83 /* arpfind.c */,
 				BD558D521892E7F400476D83 /* arpinit.c */,
+				BD558D7B1892EA1C00476D83 /* cksum.c */,
 				BD558D531892E7F400476D83 /* dgalloc.c */,
 				BD558D541892E7F400476D83 /* dgclose.c */,
 				BD558D551892E7F400476D83 /* dgcntl.c */,
@@ -589,16 +600,21 @@
 				BD558D5A1892E7F400476D83 /* dgparse.c */,
 				BD558D5B1892E7F400476D83 /* dgread.c */,
 				BD558D5C1892E7F400476D83 /* dgwrite.c */,
+				BD558D7C1892EA4800476D83 /* dhcp_client.c */,
+				BD558D7D1892EA4800476D83 /* DHCP_getaddr.c */,
 				BD558D5D1892E7F400476D83 /* dot2ip.c */,
 				BD558D5E1892E7F400476D83 /* getaddr.c */,
 				BD558D5F1892E7F400476D83 /* getname.c */,
 				BD558D601892E7F400476D83 /* getnet.c */,
 				BD558D611892E7F400476D83 /* getpath.c */,
 				BD558D621892E7F400476D83 /* getutim.c */,
+				BD558D7E1892EAAE00476D83 /* hexdump.c */,
 				BD558D631892E7F400476D83 /* icmp_in.c */,
-				BD558D641892E7F400476D83 /* ip2name.c */,
 				BD558D651892E7F400476D83 /* ip_in.c */,
+				BD558D641892E7F400476D83 /* ip2name.c */,
 				BD558D661892E7F400476D83 /* ipsend.c */,
+				BD558D801892EBAC00476D83 /* mkarp.c */,
+				BD558D811892EBAC00476D83 /* mkdpool.c */,
 				BD558D671892E7F400476D83 /* mount.c */,
 				BD558D681892E7F400476D83 /* naminit.c */,
 				BD558D691892E7F400476D83 /* nammap.c */,
@@ -609,12 +625,14 @@
 				BD558D6E1892E7F400476D83 /* netinit.c */,
 				BD558D6F1892E7F400476D83 /* netnum.c */,
 				BD558D701892E7F400476D83 /* netout.c */,
+				BD558D821892EBF000476D83 /* netutil.c */,
 				BD558D711892E7F400476D83 /* rarp_in.c */,
 				BD558D721892E7F400476D83 /* route.c */,
 				BD558D731892E7F400476D83 /* rwho.c */,
 				BD558D741892E7F400476D83 /* rwhod.c */,
 				BD558D751892E7F400476D83 /* rwhoind.c */,
 				BD558D761892E7F400476D83 /* sndrarp.c */,
+				BD558D831892EC1300476D83 /* udpdump.c */,
 				BD558D771892E7F400476D83 /* udpecho.c */,
 				BD558D781892E7F400476D83 /* udpnxtp.c */,
 				BD558D791892E7F400476D83 /* udpsend.c */,

@@ -1,18 +1,15 @@
 /* dgread.c - dgread */
 
-#include <conf.h>
-#include <kernel.h>
-#include <proc.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  dgread  -  read one datagram from a datagram protocol pseudo-device
  *------------------------------------------------------------------------
  */
-dgread(devptr, buff, len)
-struct	devsw	*devptr;
-struct	xgram	*buff;
-int	len;
+ 
+int dgread(struct devsw *devptr, struct xgram *buff, int len)
 {
 	STATWORD ps;    
 	struct	dgblk	*dgptr;
@@ -48,7 +45,7 @@ int	len;
 	datalen = net2hs(udpptr->u_udplen) - UHLEN;
 	if (dgptr->dg_mode & DG_NMODE) {
 		if ( (datalen+XGHLEN) > len) {
-			freebuf(packet);
+			freebuf((int *)packet);
 			restore(ps);
 			return(SYSERR);
 		}
@@ -61,7 +58,7 @@ int	len;
 			datalen = len;
 		blkcopy(buff, udpptr->u_data, datalen);
 	}
-	freebuf(packet);
+	freebuf((int *)packet);
 	restore(ps);
 	return(datalen);
 }

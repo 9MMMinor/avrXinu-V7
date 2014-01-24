@@ -1,18 +1,15 @@
 /* ip_in.c - ip_in */
 
-#include <conf.h>
-#include <kernel.h>
-#include <proc.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  ip_in  -  handle IP packet coming in from the network
  *------------------------------------------------------------------------
  */
-ip_in(packet, icmpp, lim)
-struct	epacket	*packet;
-int	icmpp;
-int	lim;
+ 
+int ip_in(struct epacket *packet, int input2output_port, int lim)
 {
 	STATWORD ps;    
 	struct	udp	*udpptr;
@@ -29,11 +26,11 @@ int	lim;
 #ifdef DEBUG
 	        kprintf("    ICMP\n");
 #endif		
-		return(icmp_in(packet, icmpp, lim));
+		return(icmp_in(packet, input2output_port, lim));
 
 	case IPRO_UDP:		/* UDP: demultiplex based on UDP "port"	*/
 #ifdef DEBUG
-		      kprintf("    UDP\n");
+			kprintf("    UDP\n");
 #endif		
 		udpptr = (struct udp *) ipptr->i_data;
 		dport = net2hs(udpptr->u_dport);
@@ -44,10 +41,10 @@ int	lim;
 				if (pcount(nqptr->xport) >= NETQLEN) {
 					Net.ndrop++;
 					Net.nover++;
-					freebuf(packet);
+					freebuf((int *)packet);
 					return(SYSERR);
 				}
-				psend(nqptr->xport, packet);
+				psend(nqptr->xport, (int)packet);
 				disable(ps);
 				to = nqptr->pid;
 				if ( !isbadpid(to) ) {
@@ -64,6 +61,6 @@ int	lim;
 		break;		
 	}
 	Net.ndrop++;
-	freebuf(packet);
+	freebuf((int *)packet);
 	return(OK);
 }

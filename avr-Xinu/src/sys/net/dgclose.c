@@ -5,12 +5,13 @@
 #include <proc.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  dgclose  -  close a datagram pseudo device, making it available again
  *------------------------------------------------------------------------
  */
-dgclose(devptr)
-struct	devsw	*devptr;
+ 
+int dgclose(struct devsw *devptr)
 {
 	STATWORD ps;    
 	struct	dgblk	*dgptr;

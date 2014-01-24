@@ -4,11 +4,13 @@
 #include <kernel.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  dgalloc  -  allocate a datagram psuedo device and return descriptor
  *------------------------------------------------------------------------
  */
-dgalloc()
+
+int dgalloc(void)
 {
 	STATWORD ps;    
 	struct	dgblk	*dgptr;

@@ -1,17 +1,15 @@
 /* dgcntl.c - dgcntl */
 
-#include <conf.h>
-#include <kernel.h>
+#include <avr-Xinu.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  dgcntl  -  control function for datagram pseudo-devices
  *------------------------------------------------------------------------
  */
-dgcntl(devptr, func, arg)
-struct	devsw	*devptr;
-int	func;
-int	arg;
+ 
+int dgcntl(struct devsw *devptr, int func, void * arg, void * arg2)
 {
 	STATWORD ps;    
 	struct	dgblk	*dgptr;
@@ -24,7 +22,7 @@ int	arg;
 	switch (func) {
 
 		case DG_SETMODE:	/* set mode bits */
-			dgptr->dg_mode = arg;
+			dgptr->dg_mode = (int)arg;
 			break;
 
 		case DG_CLEAR:		/* clear queued packets */

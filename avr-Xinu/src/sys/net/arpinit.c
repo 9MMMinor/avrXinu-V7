@@ -5,13 +5,17 @@
 #include <proc.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+extern SYSCALL screate(int count);
+
+/*
+ *------------------------------------------------------------------------
  *  arpinit  -  initialize data structures for ARP processing
  *------------------------------------------------------------------------
  */
-arpinit()
+ 
+void arpinit(void)
 {
-	struct	arpent	*atabptr;
+	struct arpent *atabptr;
 	int	i, j;
 
 	Arp.atabsiz = 0;
@@ -28,4 +32,4 @@ arpinit()
 	}
 }
 
-struct	arpblk	Arp;
+struct arpblk Arp;

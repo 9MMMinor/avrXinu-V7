@@ -4,12 +4,13 @@
 #include <kernel.h>
 #include <network.h>
 
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  *  dginit  -  initialize datagram protocol pseudo device marking it free
  *------------------------------------------------------------------------
  */
-dginit(devptr)
-struct	devsw	*devptr;
+ 
+int dginit(struct devsw *devptr)
 {
 	struct	dgblk	*dgptr;
 
@@ -20,5 +21,5 @@ struct	devsw	*devptr;
 }
 
 #ifdef	Ndg
-struct	dgblk	dgtab[Ndg];		/* dg device control blocks	*/
+struct dgblk dgtab[Ndg];		/* dg device control blocks	*/
 #endif

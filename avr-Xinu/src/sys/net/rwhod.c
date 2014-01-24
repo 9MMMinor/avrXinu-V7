@@ -10,6 +10,7 @@
  *  rwhod  -  Periodically clean cache and (optionally) send rwho packets
  *------------------------------------------------------------------------
  */
+
 PROCESS	rwhod()
 {
 	STATWORD ps;    
