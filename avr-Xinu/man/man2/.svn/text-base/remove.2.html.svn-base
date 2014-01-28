@@ -1,0 +1,62 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:49 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">REMOVE(2) avr-Xinu REMOVE(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">remove &minus; remove a file
+from the file system</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int remove(filename, key)
+<br>
+char *filename; <br>
+int key;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Remove</i> takes a file name
+as an argument and destroys the named file (i.e., removes it
+from the file system). Argument <i>filename</i> specifies
+the name of a file to remove, and the optional argument
+<i>key</i> gives a one-word protection key.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>Remove</i>
+uses the namespace to map the given file name to a new name,
+and invokes CONTROL(2) on the underlying device to destroy
+the file. It returns SYSERR if the name is illegal or cannot
+be mapped to an underlying device. It returns whatever
+CONTROL(2) returns otherwise.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">control(2), nammap(2),
+namespace(4)</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

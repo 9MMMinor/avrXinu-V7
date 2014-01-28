@@ -1,0 +1,68 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:32 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">NETNUM(3) Xinu
+Programmer&rsquo;s Manual NETNUM(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+netnum &minus; compute the network portion of a given
+Internet (IP) address</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+#include &lt;network.h&gt;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b>int
+netnum(netpart, address) <br>
+IPaddr netpart; <br>
+IPaddr address;</b></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<i><br>
+Netnum</i> extracts the network portion of the Internet
+address specified by argument <i>address</i>, and places the
+result in argument <i>netpart</i>. It operates by using the
+IP class of argument <i>address</i> to determine whether the
+network part of the address occupies 1, 2, or 3 bytes, and
+it zeros the remaining bytes. <i>Netnum</i> always returns
+OK.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SEE
+ALSO</small></b> <br>
+getaddr(2), getnet(2)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>BUGS</small></b>
+<i><br>
+Netnum</i> does not understand subnets or subnet masks.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

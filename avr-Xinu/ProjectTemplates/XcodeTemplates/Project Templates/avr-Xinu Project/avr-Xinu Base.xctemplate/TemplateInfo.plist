@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Definitions</key>
+	<dict/>
+	<key>Identifier</key>
+	<string>com.xinu.dt.unit.macBase</string>
+	<key>Kind</key>
+	<string>Xcode.Xcode3.ProjectTemplateUnitKind</string>
+	<key>Project</key>
+	<dict>
+		<key>Configurations</key>
+		<dict>
+			<key>Debug</key>
+			<dict>
+				<key>ONLY_ACTIVE_ARCH</key>
+				<string>YES</string>
+			</dict>
+			<key>Release</key>
+			<dict/>
+		</dict>
+	</dict>
+	<key>Targets</key>
+	<array>
+		<dict>
+			<key>Configurations</key>
+			<dict>
+				<key>Debug</key>
+				<dict/>
+				<key>Release</key>
+				<dict/>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>

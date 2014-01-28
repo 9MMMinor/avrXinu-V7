@@ -1,0 +1,26 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt RECVCLR \&2 \*[xinu-platform]
+.Sh NAME
+recvclr \- clear incoming message buffer asynchronously
+.Sh SYNOPSIS
+.nf
+.Em int recvclr()
+.fi
+.Sh DESCRIPTION
+A process executes \f2recvclr\f1 to clear its message buffer of
+any waiting message in preparation for receiving messages.
+If a message is waiting, \f2recvclr\f1 returns it to the caller.
+If no messages are waiting,
+.Ar recvclr
+returns OK.
+.Sh SEE ALSO
+receive(2), send(2), preceive(2), psend(2)

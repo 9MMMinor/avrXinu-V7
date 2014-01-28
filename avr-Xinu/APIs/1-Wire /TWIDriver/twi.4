@@ -1,0 +1,84 @@
+.\"
+.\"  twi.4
+.\"  TWIDriver
+.\"
+.\"  Created by Michael Minor on 1/6/12.
+.\"  Copyright (c) 2012. All rights reserved.
+.\"
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date 1/6/12
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt TWI(I2C) \&4 \*[xinu-platform]      \" Program name and manual section number 
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm twi
+.Nd Twi (I2C) driver functions
+.Sh SYNOPSIS
+.In avr-Xinu.h
+.In twi.h
+.Ft void Fn twi_init "void"
+.Ft int Fn twi_doCommand "struct twi_Command *twiCommandBlock"
+.Sh DESCRIPTION
+The Two-Wire driver software does not easily fall into the Xinu read-write
+get-put device driver paradigm, although it could certainly written with just init() and control() functions.
+For this reason, it has been kept simple with just two function calls. All of the difficult work is done in the
+AVR-TWI module and most of the software is done in interrupt service.
+.Pp
+.Ar twi_init
+Initializes the TWI (Two-Wire, I2C) Serial Interface and enables the AVR Microprocessor's
+twi module.  The twi interrupt is enabled.
+.Pp
+.Ar twi_doCommand
+Initiates a single or chained command in Master Mode on the twi bus pins, SCL and SDA.
+The function blocks until a STOP is transmitted on the bus, i.e. the calling process is
+put in a RECEIVING state until the interrupt service routine does a send.
+Twi_doCommand returns OK if the addressed slave responds as commanded, or SYSERR.
+A single argument is a pointer to a twi_Command structure:
+.Bd -literal
+struct twi_Command {
+	uint8_t slarw;
+	uint8_t *data;
+	uint8_t dataLength;
+	struct twi_Command *chain;
+	};
+.Ed
+Slarw is the slave address of a Two-Wire module on the bus in bits 7:1 and TW_WRITE (0) or
+TW_READ (1) in bit 0.  The contents of slarw is often referred to a SLA+W or SLA+R in device
+datasheets. Data contains the data bytes to be transmitted if the operation is TW_WRITE, or
+the array to receive bytes from the slave for a TW_READ operation.
+DataLength is the number of bytes to write or read.
+Chain is a pointer to
+a subsequent command block or 0 if there are no further command blocks to execute. Two-Wire (I2C)
+slave devices frequently need to receive commands or addresses before they can send data. 
+.Sh EXAMPLES
+.Bd -literal
+#include "twi.h"
+#include <util/twi.h>
+
+void clear_PageEEPROM(int address)
+{
+	struct twi_Command cb;
+	uint8_t *buffer;
+	
+	buffer = (uint8_t *)calloc(66, sizeof(uint8_t));
+	buffer[0] = address>>8;		//address high byte
+	buffer[1] = address&0xFF;	//address low byte
+	cb.slarw = EEPROM24LC256_ADDRESS<<1|TW_WRITE;
+	cb.data = buffer;
+	cb.dataLength = 66;
+	cb.chain = (struct twi_Command *)0;
+	
+	printf("clear return: %d\n", twi_doCommand(&cb));
+	free(buffer);
+}
+.Ed
+.Sh SEE ALSO
+.Xr DS2482 4
+.Xr 24LC256 4
+.Xr 1-Wire 4

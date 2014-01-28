@@ -1,0 +1,64 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:30 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">BLKEQU(3) Xinu
+Programmer&rsquo;s Manual BLKEQU(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+blkequ &minus; compare two contiguous blocks of memory for
+equality</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+Bool blkequ(first, second, nbytes) <br>
+char *first; <br>
+char *second; <br>
+int nbytes;</b></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<i><br>
+Blkequ</i> compares two blocks of memory for equality. Each
+block contains exactly <i>nbytes</i> bytes. <i>Blkequ</i>
+returns FALSE if the two blocks differ, and TRUE if the
+blocks are equal. <i>Blkequ</i> compares all byte values
+including null (zero).</p>
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SEE
+ALSO</small></b> <br>
+blkcopy(3), string(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>BUGS</small></b>
+<i><br>
+Blkequ</i> does not check for valid memory addresses.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

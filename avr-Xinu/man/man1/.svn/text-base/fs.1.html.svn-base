@@ -1,0 +1,67 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:29 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">FS(1) Xinu
+Programmer&rsquo;s Manual FS(1)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+fs &minus; invoke server side of Xinu remote file system</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+fs</b> [ <b>&minus;p</b>port ]</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<i><br>
+Fs</i> invokes the Xinu remote file system server on a
+<small>UNIX</small> host. The server executes with
+permissions set to that of the invoking user, or user
+&lsquo;&lsquo;xinu&rsquo;&rsquo; if it is able to change
+user id. Typically, the host machine invokes <i>fs</i> at
+system startup, making it available always.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Option
+<b>&minus;p</b> allows the user to specify a <i>UDP</i> port
+number to which the server will respond. If <b>&minus;p</b>
+is omitted, <i>fs</i> uses a default port number. Thus, it
+is possible to have several versions of the server in use
+simultaneously, with each version using a unique UDP
+port.</p>
+
+<p style="margin-left:8%; margin-top: 1em">When started,
+<i>fs</i> forks a child in background to become the file
+server. The background process executes forever, but the
+foreground process exits. Thus, the <i>fs</i> command
+appears to complete instantly even though the server is
+still executing.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

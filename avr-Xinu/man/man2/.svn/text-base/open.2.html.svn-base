@@ -1,0 +1,73 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:47 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">OPEN(2) avr-Xinu OPEN(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">open &minus; device independent
+open routine</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int open(dev, name, mode)
+<br>
+int dev; <br>
+char *name; <br>
+char *modes;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Open</i> will establish
+connection with the device given by <i>dev</i> using the
+null-terminated string <i>name</i> to name an object on that
+device, and null-terminated string <i>mode</i> to specify
+the access mode for that object. Valid access mode
+characters include <b>r</b> (read), <b>w</b> (write),
+<b>o</b> (old), and <b>n</b> (new) as specified in
+ACCESS(2).</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>Open</i>
+returns SYSERR if <i>dev</i> is incorrect or cannot be
+opened. If successful, the value returned by <i>open</i>
+depends on the device. Most calls to open return a device
+descriptor that can be used in subsequent calls to <i>readf1
+or write</i>. For example, calling <i>open</i> on a disk
+device with a file name as an argument produces a descriptor
+by which that file can be accessed.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">access(2), close(2), ckmode(3),
+namespace(4)</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;">Not all devices produce
+meaningful return values for <i>open</i>.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

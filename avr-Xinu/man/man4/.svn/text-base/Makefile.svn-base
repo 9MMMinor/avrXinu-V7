@@ -1,0 +1,60 @@
+#
+#  Make Xinu Manual Pages - only FILES change between man[01234]
+#
+
+DIR	=	../..
+MACROS	=	$(DIR)/lib/tmac.an
+NROFF = groff
+
+.SUFFIXES:	.ms .ps .1 .2 .3 .4
+
+.ms.ps:
+		$(NROFF) -ms $< > $*.ps
+
+.1.ps:
+		$(NROFF) -mdoc $< >$*.ps
+		$(NROFF) -mdoc -Thtml $< >$*.2.html
+
+.2.ps:
+		$(NROFF) -mdoc $< >$*.ps
+		$(NROFF) -mdoc -Thtml $< >$*.2.html
+
+.3.ps:
+		$(NROFF) -mdoc $< >$*.ps
+		$(NROFF) -mdoc -Thtml $< >$*.2.html
+
+.4.ps:
+		$(NROFF) -mdoc $< >$*.ps
+		$(NROFF) -mdoc -Thtml $< >$*.2.html
+
+FILES	=	Intro4.ps	\
+			ether.ps	\
+			internet.ps	\
+			namespace.ps	\
+			rfilsys.ps	\
+			tty.ps
+
+all:		$(FILES)
+
+install:
+		@echo no installation possible - use "'make print'"
+
+clean:
+		rm -rf *.html core ,* *.ps
+
+#Intro1.ps:	Intro1.1
+#		$(NROFF) -mdoc Intro1.1 >Intro1.ps
+
+#Intro2.ps:	Intro2.2
+#		$(NROFF) -mdoc Intro1.1 >Intro1.ps
+
+#Intro3.ps:	Intro3.3
+#		$(NROFF) -mdoc Intro1.1 >Intro1.ps
+
+Intro4.ps:	Intro4.4
+		$(NROFF) -mdoc Intro4.4 >Intro4.ps
+
+print:		listings
+
+listings:	$(FILES)
+#		cat *.html | sed '1,2d;s/^/	/' | lpr

@@ -1,0 +1,46 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt WRITE \&2 \*[xinu-platform]
+.Sh NAME
+.Nm write
+.Nd write a sequence of characters from a buffer
+.Sh SYNOPSIS
+.Ft int Fn write "int dev" "char *buff" "int count"
+.Sh DESCRIPTION
+.Nm Write
+writes
+.Ar count
+characters to the I/O device given by
+.Ar dev,
+from sequential locations of the buffer,
+.Ar buff.
+.Nm Write
+returns SYSERR if
+.Ar dev
+or
+.Ar count
+is invalid, OK for a successful write.
+.Nm Write
+normally returns when it is safe for the user
+to change the contents of the buffer.
+For some devices this means
+.Nm write
+will wait for I/O to complete before returning.
+On other devices, the data is copied into a kernel buffer
+and the write returns while it is being transferred.
+.Sh SEE ALSO
+.Xr close 2 ,
+.Xr control 2 ,
+.Xr getc 2 , Xr open 2 , Xr putc 2 , Xr read 2 , Xr seek 2
+.Sh BUGS
+.Nm Write
+may not have exclusive use of the I/O device, so output from
+other processes may be mixed in.

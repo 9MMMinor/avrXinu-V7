@@ -1,0 +1,35 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:29 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+
+<p align=center style="margin-top: 1em" valign="top">Section
+1: Cross-Development Commands</p>
+
+<p style="margin-top: 1em" valign="top"><small><small>This
+section of the manual describes the program development
+commands that run on the host computer. They are used to
+prepare programs for execution under Xinu, transfer the
+memory image into the micro, and monitor execution. None of
+these programs (e.g., the C compiler) executes on the micro
+itself.</small></small></p>
+<hr>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:46 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">KILL(2) avr-Xinu KILL(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">kill &minus; terminate a
+process</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int kill(pid) <br>
+int pid;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Kill</i> will stop process
+<i>pid</i> and remove it from the system, returning SYSERR
+if the process id is invalid, OK otherwise. <i>Kill</i>
+terminates a process immediately. If the process has been
+queued on a semaphore, it is removed from the queue and the
+semaphore count is incremented as if the process had never
+been there. Processes waiting to send a message to a full
+port disappear without affecting the port. If the process is
+waiting for I/O, the I/O is stopped (if possible).</p>
+
+<p style="margin-left:8%; margin-top: 1em">One can kill a
+process in any state, including a suspended one. Once
+killed, a process cannot recover.</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;">At present there is no way to
+recover space allocated dynamically when a process
+terminates. However, <i>kill</i> does recover the stack
+space allocated to a process when it is created.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

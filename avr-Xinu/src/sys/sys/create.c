@@ -88,10 +88,10 @@ SYSCALL create(int (*procaddr)(), int ssize, int priority, char *name, int nargs
 
 	*saddr-- = lobyte((unsigned)INITRET);	/* push on initial return address*/
 	*saddr-- = hibyte((unsigned)INITRET);
-	*saddr-- = 0;	/* 256Kb memory device */
+//	*saddr-- = 0;	/* 256Kb memory device */ /*TODO make conditional*/
 	*saddr-- = lobyte((unsigned)procaddr);	/* push on procedure address	*/
 	*saddr-- = hibyte((unsigned)procaddr);
-	*saddr-- = 0;	/* 256Kb memory device */
+//	*saddr-- = 0;	/* 256Kb memory device */ /*TODO make conditional*/
 	pptr->pregs[SSP_L] = lobyte((unsigned) saddr);
 	pptr->pregs[SSP_H] = hibyte((unsigned) saddr);
 

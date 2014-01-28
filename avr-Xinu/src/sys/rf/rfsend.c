@@ -45,9 +45,8 @@ rfsend(struct fphdr *fptr, int reqlen, int rplylen)
 	return(SYSERR);
 }
 
-#endif // ndef
+#endif /* ndef */
 
-/**************************************************************
 #ifdef WLP_API_WIRELESS
 #define RFILESERVER 192,168,1,100
 #define RFILEPORT 2001
@@ -70,7 +69,7 @@ rfsend(struct fphdr *fptr, int reqlen, int rplylen)
 	struct ip_addr rfserver;
 	int message;
 	
-// Clear server queue, and send packet to it 
+	/* Clear server queue, and send packet to it */
 	
 	if (Rf.device == RCLOSED) {
 		if ( (Rf.device = wlp_socket(WLP_SOCK_DGRAM, 0)) <= 0 )	{
@@ -87,14 +86,14 @@ rfsend(struct fphdr *fptr, int reqlen, int rplylen)
 		wlp_set_recv_cb(Rf.device, rfsend_callBack, &rf_ctx);
 	}
 			
-	recvclr();	// clear incomming message buffer
+	recvclr();	/* clear incomming message buffer */
 
 	for (trys=0 ; trys<RMAXTRY ; trys++) {
 		if ( wlp_send(Rf.device, (const char *)fptr, reqlen) <= 0) {
 			return(SYSERR);
 		}
 		ret = 0;
-		message = recvtim(5*TICK); // receive or time-out in 5 seconds
+		message = recvtim(5*TICK); /* receive or time-out in 5 seconds */
 		if (message > 0)	{
 			ret = wlp_recv(Rf.device, (char *)fptr, message);
 		}
@@ -114,6 +113,4 @@ rfsend_callBack(void *ctx, int sockid, int len)
 	send(ctx_ptr->pid, len);
 }
 
-#endif // WLP_API_WIRELESS
-
-******************************************************************/
+#endif /* WLP_API_WIRELESS */

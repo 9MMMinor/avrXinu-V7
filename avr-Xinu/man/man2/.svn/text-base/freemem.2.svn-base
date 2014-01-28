@@ -1,0 +1,36 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt FREEMEM \&2 \*[xinu-platform]
+.Sh NAME
+.Nm freemem
+.Nd deallocate a block of heap memory
+.Sh SYNOPSIS
+.Ft int Fn freemem "char *addr" "int len"
+.Sh DESCRIPTION
+.Nm Freemem
+deallocates a contiguous block of memory
+previously obtained with GETMEM(2),
+and returns it to the free list.
+Argument \f2addr\f1 specifies the lowest address
+of the block being deallocated, and argument \f2len\f1 specifies the
+length of the block in bytes.
+In this version, memory is allocated in  multiples of four bytes to guarantee
+that sufficient space is available in each block to link it onto the free
+list.
+However, the length passed to both \f2getmem\f1 and \f2freemem\f1 is
+rounded automatically, so the user need not be aware of any extra space in
+the allocated block.
+.Sh SEE ALSO
+.Xr getbuf 2 ,
+.Xr getmem 2 ,
+.Xr getstk 2 ,
+.Xr freebuf 2 ,
+.Xr freestk 2

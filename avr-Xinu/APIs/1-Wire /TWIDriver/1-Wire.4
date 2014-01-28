@@ -1,0 +1,227 @@
+.\"
+.\"  1-Wire.4
+.\"  TWIDriver
+.\"
+.\"  Created by Michael Minor on 1/4/12.
+.\"  Copyright (c) 2012. All rights reserved.
+.\"
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date 1/4/12
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt 1-Wire \&4 \*[xinu-platform]      \" Program name and manual section number 
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm 1-Wire
+.Nd 1-Wire Network Software
+.Sh SYNOPSIS
+.In avr-Xinu.h
+.In DS2482.h
+.In twi.h
+.Pp
+The following operations are used to set up and configure the DS2482.
+Some of these operations are called as subroutines by the 1-Wire operations.
+.Ft int Fn DS2482_detect "unsigned char addr"
+.Ft int Fn DS2482_reset "void"
+.Ft int Fn DS2482_write_config "unsigned char config"
+.Ft unsigned char Fn DS2482_search_triplet "int search_direction"
+.Pp
+1-Wire Application Programming Interface (API)
+.Pp
+.Ft int Fn OWReset "void"
+.Ft void Fn OWWriteByte "unsigned char sendbyte"
+.Ft unsigned char Fn OWReadByte "void"
+.Ft unsigned char Fn OWTouchByte "unsigned char sendbyte"
+.Ft unsigned char Fn OWTouchBit "unsigned char sendbit"
+.Ft void Fn OWWriteBit "unsigned char sendbit"
+.Ft unsigned char Fn OWReadBit "void"
+.Ft void Fn OWBlock "unsigned char *tran_buf" "int tran_len"
+.Ft int Fn OWFirst "void"
+.Ft int Fn OWNext "void"
+.Ft int Fn OWVerify "void"
+.Ft void Fn OWTargetSetup "unsigned char family_code"
+.Ft void Fn OWFamilySkipSetup "void"
+.Ft int Fn OWSearch "void"
+.Pp
+Extended 1-Wire functions
+.Pp
+.Ft int Fn OWSpeed "int new_speed"
+.Ft int Fn OWLevel "int level"
+.Ft int Fn OWWriteBytePower "int sendbyte"
+.Ft int Fn OWReadBitPower "int applyPowerResponse"
+.Sh DESCRIPTION
+The DS2482 is an I²C to 1-Wire bridge. The DS2482 allows an avr-Xinu host to use the TWI/I²C
+interface to generate properly timed and slew-controlled 1-Wire waveforms. A 1-Wire network
+consists of a single master and one or more slave devices. The software described here,
+implement a basic and extended set of 1-Wire operations using the DS2482. Following a reset
+on the 1-Wire bus, all the slave devices are activated and ready to respond to the master.
+The key to the software is that it must first cause all but a single slave device to enter
+an inactive wait state. Thereafter, until the next reset, the master communicates with a single slave device.
+.Pp
+.Ar DS2482_detect
+DS2428 detect routine that sets the I²C address and then performs a device reset followed by
+writing the configuration byte to default values:
+        1-Wire speed (c1WS) = standard (0)
+        Strong pullup (cSPU) = off (0)
+        Presence pulse masking (cPPM) = off (0)
+        Active pullup (cAPU) = on (CONFIG_APU = 0x01)
+.Pp
+Returns TRUE if device was detected and written or FALSE if device was not detected or the
+configuration byte could not be written.
+.Ar DS2482_reset
+Perform a device reset on the DS2482.
+Returns TRUE if device was reset or FALSE if device was not detected or failed to reset.
+.Pp
+.Ar DS2482_write_config
+Write the configuration register in the DS2482.
+The configuration options are provided in the lower nibble of the provided config byte.
+The uppper nibble is bitwise inverted when written to the DS2482.
+Returns TRUE when config is written and the DS2482 response is correct or FALSE otherwise.
+.Pp
+.Ar DS2482_search_triplet
+Use the DS2482 help command '1-Wire triplet' to perform one bit of a 1-Wire search.
+This command does two read bits and one write bit.
+The write bit is either the default direction (all device have same bit) or in case of a discrepancy,
+the 'search_direction' parameter is used. Returns the DS2482 status byte result from the triplet command.
+This function is called from OWSearch() and is not likely to be used otherwise.
+.Pp
+.Ar OWReset
+Reset all of the devices on the 1-Wire Net and return TRUE (1) if a presence pulse is detected;
+return FALSE (0) otherwise.
+.Pp
+.Ar OWWriteByte
+Write a single byte to the 1-Wire network.
+.Pp
+.Ar OWReadByte
+Return a single byte read from the 1-Wire network.
+.Pp
+.Ar OWWriteBit
+Send 1 bit of data to the 1-Wire network.
+.Pp
+.Ar OWReadBit
+Return 1 bit of data from the 1-Wire network.
+.Pp
+.Ar OWBlock
+Sends and receives multiple bytes of data from the 1-Wire Net by alternately calling OWReadByte()
+or OWWriteByte().
+When a byte from tran_buf is initialized to 0XFF, that byte is read and overwritten,
+otherwise the byte is written. tran_len bytes are read or written.
+.Pp
+.Ar OWSearch
+The 1-Wire search is used to discover the 64-bit unique registration number of the devices on a 1-Wire network.
+The unique registration number is often referred to as the ROM number in the 1-Wire data sheets
+since it is in Read-Only Memory. The search begins with a 1-Wire reset followed by a search command.
+This function does a general search and continues from the previous search state.
+The search state can be reset by using the OWFirst() function.
+OWSearch() returns TRUE (1) when a 1-Wire device is found; the device’s Serial Number is placed in the global ROM.
+The function returns FALSE (0) when no new device is found;
+either the last search was the last device, or there are no devices on the 1-Wire network.
+Note: If this function is rewritten using the find alarm command 0xEC instead of the normal search command 0xF0,
+the search will be limited to only 1-Wire devices that are in an ’alarm’ state.
+.Pp
+.Ar OWVerify
+Verify the device with the Serial Number in ROM_NO buffer is present.
+Return TRUE if device verified present or FALSE if device not present.
+.Pp
+.Ar OWTargetSetup
+Setup the search to find the device type family_code on the next call to OWNext() if it is present.
+Note: If no devices of the desired family are currently on the 1-Wire, then another type will be found,
+so the family code in the resulting ROM_NO must be verified after the search. See EXAMPLES below.
+.Pp
+.Ar OWFamilySkipSetup
+Setup the search to skip the current device type on the next call to OWNext().
+.Pp
+.Ar OWSpeed
+Set the 1-Wire Network communication speed. new_speed is the new speed defined as MODE_STANDARD (0x00)
+or MODE_OVERDRIVE (0x01). Returns  the current 1-Wire Network speed.
+.Pp
+.Ar OWLevel
+Set the 1-Wire Network line level pull-up to normal.
+The DS2482 only allows enabling strong pull-up on a bit or byte event.
+Consequently this function only allows the MODE_STANDARD argument.
+To enable strong pull-up use OWWriteBytePower() or OWReadBitPower().
+new_level is the new level defined as MODE_STANDARD (0x00).
+Returns the current 1-Wire Network level.
+.Pp
+.Ar OWWriteBytePower
+Immediately configure the DS2482 to strong pullup (DS2482_CONFIG_SPU),
+then send the least significant 8 bits of argument sendbyte to the 1-Wire Network.
+Returns FALSE if the DS2482 was unable to be configured, otherwise TRUE.
+.Pp
+.Ar OWReadBitPower
+Immediately configure the DS2482 to strong pullup (DS2482_CONFIG_SPU),
+then read a single bit response from the 1-Wire Network.
+If the response is not equal to the argument, applyPowerResponse,
+set pull up levels to MODE_STANDARD and return FALSE else return TRUE.
+.Sh EXAMPLES
+The following finds all of the devices on the 1-Wire network:
+.Bd -literal
+#include "twi.h"
+#include "DS2482.h"
+
+void main(void)
+{
+	int rslt;
+	int cnt=0;
+	
+	twi_init();
+	
+	// verify DS2482 is present on default address (0x30)
+	if (!DS2482_detect(0x30))
+	{
+		printf("Failed to find and setup DS2482\\n");
+		return;
+	}
+	
+	printf("\\nFIND ALL\\n");
+
+	for (cnt = 0, rslt = OWFirst(); rslt; rslt = OWNext())
+	{
+		// print device found
+		for (i = 7; i >= 0; i--)
+			printf("%02X", ROM_NO[i]);
+		printf("  %d\\n",++cnt);
+	}
+}
+.Ed
+.Pp
+The following example is a workaround for the bizarre nature of OWTargetSetup()
+and OWNext() when searching for 1-Wire devices of a specific type.
+.Pp
+.Bd -literal
+uint8_t OWFirstType(unsigned char type)
+{
+    uint8_t ret;
+
+    OWTargetSetup(type);
+    ret = OWNext();
+    // check for incorrect type
+    if (ROM_NO[0] != type)
+        return FALSE;
+    return ret;
+}
+
+uint8_t OWNextType(unsigned char type)
+{
+    uint8_t ret;
+   
+    ret = OWNext();
+    // check for incorrect type
+    if (ROM_NO[0] != type)
+        return FALSE;
+    return ret;
+}
+.Ed
+.Sh SEE ALSO
+.Xr twi 4
+.Sh BUGS
+OWSearch should have an Alarm argument, set to YES or NO, in order to search 1-Wire
+devices that are in an 'alarm' state.
+.Sh AUTHORS
+MAXIM Application Note 3684, Dec 17, 2008.
+Adapted and modified for avr-Xinu, Michael Minor, January 4, 2012.

@@ -1,0 +1,31 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt SCOUNT \&2 \*[xinu-platform]
+.Sh NAME
+scount \- return the count associated with a semaphore
+.Sh SYNOPSIS
+.nf
+.Em int scount(sem)
+.Em int sem;
+.fi
+.Sh DESCRIPTION
+.Ar Scount
+returns the current count associated with semaphore
+.Ar sem.
+A count of negative p means that there are p processes waiting
+on the semaphore; a count of positive p means that at most p more
+calls to WAIT(2) can occur before a process will be blocked (assuming
+no intervening sends occur).
+.Sh SEE ALSO
+screate(2), sdelete(2), signal(2), sreset(2), wait(2)
+.Sh BUGS
+In this version, there is no way to distinguish SYSERR
+from a legal semaphore count of \-1.

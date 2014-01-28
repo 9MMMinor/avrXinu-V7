@@ -1,0 +1,71 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:32 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">HALT(3) Xinu
+Programmer&rsquo;s Manual HALT(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+halt, pause &minus; pause or halt the processor</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+#include &lt;kernel.h&gt;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b>halt(); <br>
+pause();</b></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<i><br>
+Halt</i> stops the processor immediately without affecting
+devices or direct-memory-access (DMA) operations on the bus.
+Once halted, the processor will not respond to interrupts.
+<i>Halt</i> is useful for debugging the operating
+system.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>Pause</i>
+stops the processor until an interrupt occurs, allowing it
+to continue at the instruction following the <i>pause</i>
+when the interrupt returns. <i>Pause</i> is used in the null
+process instead of an infinite loop to avoid taking bus
+bandwidth needlessly.</p>
+
+<p style="margin-left:8%; margin-top: 1em">In the current
+implementation, both <i>halt</i> and <i>pause</i> are macros
+that expand to the assembler language <i>halt</i> and
+<i>pause</i> instructions. Thus, they can only be executed
+in kernel mode.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SEE
+ALSO</small></b> <br>
+disable(3), wait(2)</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

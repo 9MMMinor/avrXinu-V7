@@ -1,0 +1,65 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:31 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">FPUTC(3) Xinu
+Programmer&rsquo;s Manual FPUTC(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+fputc, putchar &minus; put character to a device</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+#include &lt;io.h&gt;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b>int
+fputc(device, c) <br>
+int device; <br>
+char c; <br>
+putchar(c)</b></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<br>
+These procedures are included for compatibility with
+<small>UNIX</small> . <i>Fputc</i> appends the character
+<i>c</i> to the named output <i>device</i>, and returns
+SYSERR if device is invalid; it is defined to be
+<i>putc(device, c).</i></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><i>Putchar(c)</i>
+is also defined to be <i>putc(CONSOLE, c).</i></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SEE
+ALSO</small></b> <br>
+putc(2), puts(3), printf(3)</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

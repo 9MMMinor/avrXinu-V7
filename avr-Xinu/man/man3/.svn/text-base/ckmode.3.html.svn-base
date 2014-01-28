@@ -1,0 +1,79 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:30 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">CKMODE(3) Xinu
+Programmer&rsquo;s Manual CKMODE(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+ckmode &minus; check a file mode string and convert to
+integer representation</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+#include &lt;file.h&gt;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b>int
+chmode(mode) <br>
+char *mode;</b></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<i><br>
+Ckmode</i> parses a null-terminated string, <i>mode</i>,
+containing characters that represent file modes, and
+produces an integer with mode bits set. The possible mode
+characters are: <b>r</b></p>
+
+<p style="margin-left:15%;">The file is to be opened for
+reading (i.e., input). <b>w</b><br>
+The file is to be opened for writing (i.e., output).
+<b>n</b><br>
+The file must be new. That is, it must not already exist.
+<b>o</b><br>
+The file must be old. That is, it must already exist.</p>
+
+<p style="margin-left:8%; margin-top: 1em">The file mode
+string, <i>mode</i>, can specify that the file is to be
+accessed for both reading and writing, but it cannot specify
+the mode to be both old and new. If neither reading nor
+writing is specified, <i>ckmode</i> assumes the file will be
+used for both. Similarly, if neither old or new files are
+specified, <i>ckmode</i> assumes either is allowed.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Given a legal
+mode string, <i>ckmode</i> returns an integer with bits
+<i>FLREAD</i>, FLWRITE, FLOLD, and FLNEW set according to
+the argument, <i>mode</i>. <i>Ckmode</i> returns SYSERR if
+it finds illegal or duplicated characters in the argument
+string, or if the mode string specifies that the file must
+be both old and new.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

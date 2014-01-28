@@ -1,0 +1,58 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:44 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">CLOSE(2) avr-Xinu CLOSE(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;"><b>close</b> &mdash; device
+independent close routine</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int</i></p>
+
+
+<p style="margin-left:14%;"><b>close</b>(<i>int&nbsp;dev</i>);</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><b>Close</b> will disconnect I/O
+from the device given by <i>dev.</i> It returns SYSERR if
+<i>dev</i> is incorrect, or is not opened for I/O.
+Otherwise, <b>close</b> returns OK.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Normally tty
+devices like the console do not have to be opened and
+closed.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">control(2), getc(2), open(2),
+putc(2), read(2), seek(2), write(2)</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:31 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">FGETC(3) Xinu
+Programmer&rsquo;s Manual FGETC(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+fgetc, getchar &minus; get character from a device</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+#include &lt;io.h&gt;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b>int
+fgetc(dev) <br>
+int dev;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b>int
+getchar()</b></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<br>
+These procedures are included for compatibility with
+<small>UNIX</small> . <i>Fgetc</i> returns the next
+character from the named input <i>device</i>.</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><i>Getchar()</i>
+is identical to <i>getc(CONSOLE)</i>.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Note that
+<i>fgetc</i> is exactly equivalent to <i>getc.</i></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SEE
+ALSO</small></b> <br>
+getc(2), putc(2), gets(3), scanf(3),</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DIAGNOSTICS</small></b>
+<br>
+These functions return SYSERR to indicate an illegal device
+or read error.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

@@ -1,127 +1,171 @@
 /* initialize.c - nulluser, sysinit */
 
+#include <stdio.h>
+
 #include <conf.h>
 #include <kernel.h>
 #include <proc.h>
 #include <sem.h>
 #include <sleep.h>    
 #include <mem.h>
+#include <USART.h>
 #include <tty.h>
 #include <q.h>
 #include <io.h>
-#include <network.h>    
+#include <mark.h>
+#include <ports.h>
+#include <network.h>
+#include <spi.h>
+#include <external_interrupt.h>
 
-extern	int	main();			/* address of user's main prog	*/
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <stdint.h>
 
-extern	int	start();		/* startup code */
+#include <stdlib.h>                     /* FOR malloc() */
+#include <avr/pgmspace.h>
+
+#define FOSC F_CPU					// default fuse setting CKDIV8=0
+#define BAUD 9600L
+#define STK500_UBRR (FOSC)/(BAUD*8L)-1L		// U2X0 set for doubling
+
+
+SYSCALL create(int (*procaddr)(), int ssize, int priority, char *name, int nargs, ...);
+SYSCALL poolinit(void);
+SYSCALL pinit(int maxmsgs);
+void naminit(void);
+SYSCALL namopen(struct devsw *devptr, char *filenam, char *mode);
+void _mkinit(void);
+extern int main();		/* address of user's main prog	*/
+extern void USART_Init();	/* initialize for kprintf polled output */
+
+extern char __bss_end;
+extern char __data_end;
+extern char __heap_start;
+extern char __heap_end;
+extern void _etext();
+
+extern SYSCALL resume();
+extern int newqueue();
+extern int init();
+extern void clkinit();
+extern void dump_Stack();
+extern char *getSP(void);
+
+/* memory locations */
+
+char *__malloc_heap_start = &__heap_start;
+char *__malloc_heap_end = &__heap_end;
+
+#include <confisr.c>
 
 /* Declarations of major kernel variables */
 
-struct	pentry	proctab[NPROC]; /* process table			*/
-int	nextproc;		/* next process slot to use in create	*/
-struct	sentry	semaph[NSEM];	/* semaphore table			*/
-int	nextsem;		/* next sempahore slot to use in screate*/
-struct	qent	q[NQENT];	/* q table (see queue.c)		*/
-int	nextqueue;		/* next slot in q structure to use	*/
-WORD	*maxaddr;		/* max memory address (set by sizmem)	*/
-#ifdef	NDEVS
-struct	intmap	intmap[NDEVS];	/* interrupt dispatch table		*/
-#endif
-struct	mblock	memlist;	/* list of free memory blocks		*/
+struct pentry proctab[NPROC];	/* process table						*/
+int nextproc;					/* next process slot to use in create	*/
+struct sentry semaph[NSEM];		/* semaphore table						*/
+int nextsem;					/* next sempahore slot to use in screate*/
+struct qent q[NQENT];			/* q table (see queue.c)				*/
+int nextqueue;					/* next slot in q structure to use		*/
+//#ifdef	NDEVS
+//struct intmap intmap[NDEVS];		/* interrupt dispatch table		*/
+//#endif
+struct mblock memlist;			/* list of free memory blocks		*/
 #ifdef	Ntty
-struct  tty     tty[Ntty];	/* SLU buffers and mode control		*/
+struct tty tty[Ntty];			/* USART buffers and mode control	*/
 #endif
 
 /* active system status */
 
-int	numproc;		/* number of live user processes	*/
-int	currpid;		/* id of currently running process	*/
-int	reboot = 0;		/* non-zero after first boot		*/
+int numproc;	/* number of live user processes	*/
+int currpid;	/* id of currently running process	*/
+unsigned int reboot;		/* MCUSR after boot	*/
 
-int	rdyhead,rdytail;	/* head/tail of ready list (q indicies)	*/
-char	vers[] = VERSION;	/* Xinu version printed at startup	*/
+int rdyhead, rdytail;		/* head/tail of ready list (q indicies)	*/
+char vers[]  = VERSION;		/* Xinu version printed at startup	*/
 
-/* These variables were defined in usrmain. */
+LOCAL sysinit();
 
-int	sem;
-int	pid1, pid2;
-int	ptid;
+#include <conf.c>
 
+void _startup (void) __attribute__ ((naked)) __attribute__ ((section (".init3")));
+void nulluser(void) __attribute__ ((naked)) __attribute__ ((section (".init8")));
 
-/************************************************************************/
-/***				NOTE:				      ***/
-/***								      ***/
-/***   This is where the system begins after the C environment has    ***/
-/***   been established.  Interrupts are initially DISABLED, and      ***/
-/***   must eventually be enabled explicitly.  This routine turns     ***/
-/***   itself into the null process after initialization.  Because    ***/
-/***   the null process must always remain ready to run, it cannot    ***/
-/***   execute code that might cause it to be suspended, wait for a   ***/
-/***   semaphore, or put to sleep, or exit.  In particular, it must   ***/
-/***   not do I/O unless it uses kprintf for polled output.           ***/
-/***								      ***/
-/************************************************************************/
-
-/*------------------------------------------------------------------------
- *  nulluser  -- initialize system and become the null process (id==0)
- *------------------------------------------------------------------------
- */
-nulluser()				/* babysit CPU when no one home */
+void _startup(void)
 {
-        int userpid;
-
-	kprintf("\n\nXinu Version %s", vers);
-	if (reboot++ < 1)
-		kprintf("\n");
-	else
-		kprintf("   (reboot %d)\n", reboot);
-
-	initevec();
+    /*
+	 *	Very early startup stuff goes here. Especially anything that might
+	 *	cause an interrupt.
+	 *	The Watchdog always on (WDTON) fuse, if programmed, will force the
+	 *	Watchdog Timer to System Reset mode.
+	 *
+     *	If external memory, enable it here.
+     */
 	
-	sysinit();
+	reboot = (unsigned int)MCUSR;
+	__asm__ __volatile__ ("wdr" ::);		/* Watchdog Reset */
+	MCUSR = 0;								/* Clear WDRF in MCUSR */
+	/* Write logical one to WDCE and WDE */
+	/* Keep old prescaler setting to prevent unintentional time-out */
+	WDTCSR |= (1 << WDCE) | (1 << WDE);
+	WDTCSR = 0x00;							/* Turn off Watch Dog Timer */
+}
 
-	kprintf("%d bytes real mem\n",
-		(unsigned long) maxaddr+1);
-#ifdef DETAIL	
-	kprintf("    %d", (unsigned long) 0);
-	kprintf(" to %d\n", (unsigned long) (maxaddr) );
-#endif	
+/**************************************************************************/
+/***				NOTE:												***/
+/***																	***/
+/***   This is where the system begins after the C environment has		***/
+/***   been established.  Interrupts are initially DISABLED, and		***/
+/***   must eventually be enabled explicitly.  This routine turns		***/
+/***   itself into the null process after initialization.  Because		***/
+/***   the null process must always remain ready to run, it cannot		***/
+/***   execute code that might cause it to be suspended, wait for a		***/
+/***   semaphore, or put to sleep, or exit.  In particular, it must		***/
+/***   not do I/O unless it uses kprintf for polled output.				***/
+/***																	***/
+/**************************************************************************/
 
-	kprintf("%d bytes Xinu code\n",
-		(unsigned long) ((unsigned long) &end - (unsigned long) start));
-#ifdef DETAIL	
-	kprintf("    %d", (unsigned long) 0x4000);
-	kprintf(" to %d\n", (unsigned long) &end );
-#endif
+/* babysit CPU when no one home */
 
-#ifdef DETAIL	
-	kprintf("%d bytes user stack/heap space\n",
-		(unsigned long) ((unsigned long) maxaddr - (unsigned long) &end));
-	kprintf("    %d", (unsigned long) &end);
-	kprintf(" to %d\n", (unsigned long) maxaddr);
-#endif	
-	
-	kprintf("clock %sabled\n", clkruns == 1?"en":"dis");
+void nulluser(void)
+{
+    int userpid;
+	int ubrr = STK500_UBRR;
+	unsigned int flash = (unsigned int)&_etext;
+    
+    PORTB = 0x01;
+    DDRB = 0x01;			/* make the LED pin an output */    
+    USART_Init(0, ubrr);	/* initialize USART transmitter for kprintf */
 
-	enable();		/* enable interrupts */
+    kprintf_P(PSTR("\n\nXinu Version %s"), vers);	
+	kprintf_P(PSTR("   MCUCSR=%x\n"), reboot);
 
+    sysinit();
+    kprintf_P(PSTR("%u bytes Xinu code, SP=%p\n"), flash<<1, getSP());
+    kprintf_P(PSTR("clock %sabled\n\n"),clkruns==1?"en":"dis");
 
-	/* create a process to execute the user's main program */
-	userpid = create(main,INITSTK,INITPRIO,INITNAME,INITARGS);
-
+    enable();		/* enable interrupts */
+    
+	/* create a process to execute the user's avr-main program, "Xinu_main" */
+    userpid = create(main,INITSTK,INITPRIO,INITNAME,0);
+//	kprintf("main: created %d\n", userpid);
 
 #ifdef	NETDAEMON
 	/* start the network input daemon process */
 	resume(
-	  create(NETIN, NETISTK, NETIPRI, NETINAM, NETIARGC, userpid)
+	  create(NETIN, NETISTK, NETIPRI, NETINAM, 1, userpid)
 	);
 #else
-	resume( userpid );
+    resume( userpid );
 #endif
-	
-	while (TRUE) {		/* run forever without actually */
-	    pause();		/* executing instructions */
-	}
+
+    while ( 1 )
+        {
+//		SMCR |= (1<<SE);	/* enable sleep idle mode */
+//		pause();
+//		SMCR &= ~(1<<SE);
+//		PORTB ^= 1;
+        }
 }
 
 /*------------------------------------------------------------------------
@@ -131,10 +175,10 @@ nulluser()				/* babysit CPU when no one home */
 LOCAL	sysinit()
 {
 
-	int	i,j;
-	struct	pentry	*pptr;
-	struct	sentry	*sptr;
-	struct	mblock	*mptr;
+	int i,j,len;
+	struct pentry *pptr;	 /* null process entry */
+	struct sentry *sptr;
+	struct mblock *volatile mptr;
 
 	numproc = 0;			/* initialize system variables */
 	nextproc = NPROC-1;
@@ -142,53 +186,68 @@ LOCAL	sysinit()
 	nextqueue = NPROC;		/* q[0..NPROC-1] are processes */
 
 	memlist.mnext = mptr =		/* initialize free memory list */
-	  (struct mblock *) roundmb(&end);
+	    (struct mblock *volatile) roundmb(__malloc_heap_start);
 	mptr->mnext = (struct mblock *)NULL;
-	mptr->mlen = (int) truncew((unsigned)maxaddr
-	      -NULLSTK-(unsigned)&end);
+	mptr->mlen = len = (int) truncmb(RAMEND - NULLSTK - (unsigned)&__bss_end);
+	__malloc_heap_start = (char *)mptr;
+	__malloc_heap_end = __malloc_heap_start + len;
+	kprintf_P(PSTR("Heap: %p of length %d\n"), mptr, len);
 	
-
 	for (i=0 ; i<NPROC ; i++)	/* initialize process table */
 		proctab[i].pstate = PRFREE;
 
-	pptr = &proctab[NULLPROC];	/* initialize null process entry */
+	/* initialize null process entry */
+	pptr = &proctab[NULLPROC];
 	pptr->pstate = PRCURR;
-	for (j=0; j<7; j++)
-		pptr->pname[j] = "prnull"[j];
-	pptr->plimit = (WORD)(maxaddr + 1) - NULLSTK;
-	pptr->pbase = (WORD) maxaddr;
-	*( (int *)pptr->pbase ) = MAGIC;
-	pptr->paddr = (WORD) nulluser;
+	for (j=0; j<6; j++)
+		pptr->pname[j] = "nullp"[j];	/* strcpy(pptr->pname,"nullp"); */
+	pptr->plimit = (unsigned char *)(RAMEND + 1) - NULLSTK;
+	pptr->pbase = (unsigned char *) RAMEND;
+	*pptr->pbase = (unsigned char)MAGIC; 	/* clobbers return, but proc 0 doesn't return */
+	pptr->paddr = (int *) main;
 	pptr->pargs = 0;
 	pptr->pprio = 0;
-	pptr->pregs[SSP] = pptr->plimit;	/* for error checking */
+	pptr->pregs[SSP_L] = lobyte((unsigned int)pptr->plimit);	/* for error checking */
+	pptr->pregs[SSP_H] = hibyte((unsigned int)pptr->plimit);	/* for error checking */
+	
 	currpid = NULLPROC;
 
 	for (i=0 ; i<NSEM ; i++) {	/* initialize semaphores */
 		(sptr = &semaph[i])->sstate = SFREE;
+		
 		sptr->sqtail = 1 + (sptr->sqhead = newqueue());
+		
 	}
 
-	rdytail = 1 + (rdyhead=newqueue());/* initialize ready list */
+	rdytail = 1 + (rdyhead=newqueue());	/* initialize ready list */
+	kprintf(".\n");
 
 	
 #ifdef	MEMMARK
+	kprintf("Memory marking\n");
 	_mkinit();			/* initialize memory marking */
+#else
+	kprintf("Pool init\n");
+	poolinit();			/* explicitly */
+	pinit(MAXMSGS);
 #endif
 
 #ifdef	RTCLOCK
+	kprintf("init RTC\n");
 	clkinit();			/* initialize r.t.clock	*/
 #endif
 
 #ifdef NDEVS
 	for ( i=0 ; i<NDEVS ; i++ ) {
+		if (i>0) kprintf("init dev %d\n", i);
 	    init(i);
 	}
 #endif
 
 #ifdef	NNETS
+	kprintf("net init\n");
 	netinit();
 #endif
 
-	return(OK);
+	return (OK);
 }

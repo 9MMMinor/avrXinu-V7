@@ -1,0 +1,32 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt SETDEV \&2 \*[xinu-platform]
+.Sh NAME
+setdev \- set the standard input and output device ids for a process
+.Sh SYNOPSIS
+.nf
+.Em int setdev(pid, dev1, dev2)
+.Em int pid;
+.Em int dev1;
+.Em int dev2;
+.fi
+.Sh DESCRIPTION
+.Ar Setdev
+records the device ids \f2dev1\f1 and \f2dev2\f1 in the process table
+entry for process \f2pid\f1 so the system will
+automatically close the devices when the process exits.
+It is used primarily by the shell to record the process' standard
+input and standard output device ids.
+.Sh SEE ALSO
+close(2), kill(2)
+.Sh BUGS
+The limit of two device ids per process is fixed, and
+both must be set in a single call.

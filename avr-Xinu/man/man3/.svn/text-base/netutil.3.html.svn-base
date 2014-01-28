@@ -1,0 +1,82 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:32 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">NETUTIL(3) Xinu
+Programmer&rsquo;s Manual NETUTIL(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+netutil &minus; Network utilities hs2net, net2hs, hl2net,
+net2hl, vax2hl, hl2vax</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+short net2hs(s) <br>
+short hs2net(s) <br>
+long net2hl(l) <br>
+long hl2net(l) <br>
+long vax2hl(l) <br>
+long hl2vax(l)</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><b>short s; <br>
+long l;</b></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<br>
+These routines map binary integer data between network
+standard byte order and local host byte order. In the
+description, the term <i>short</i> refers to a 2-octet
+(16-bit) binary value, whether two&rsquo;s complement signed
+or unsigned, and the term <i>long refers to a 4-octet
+(32-bit) value. The individual routines are:</i>
+<b>net2hs</b></p>
+
+<p style="margin-left:15%;">Converts a short item from
+network byte order to host byte order. <b>hs2net</b> <br>
+Converts a short item from host byte order to network byte
+order. <b>net2hl</b> <br>
+Converts a long item from network byte order to host byte
+order. <b>hl2net</b> <br>
+Converts a long item from host byte order to network byte
+order. <b>vax2hl</b> <br>
+Converts a long item from <small>VAX</small> byte order to
+host byte order (used in communication with a file server
+running on a <small>VAX</small> ). <b>hl2vax</b> <br>
+Converts a long from host byte order to <small>VAX</small>
+byte order (used in communication with a file server running
+on a <small>VAX</small> ).</p>
+
+<p style="margin-left:8%; margin-top: 1em">No conversion is
+needed for character strings because the local host order on
+most machines agrees with network standard byte order (i.e.,
+the string extends upward in the memory address space).</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

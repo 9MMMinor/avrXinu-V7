@@ -1,0 +1,61 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:48 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">PRECEIVE(2) avr-Xinu PRECEIVE(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">preceive &minus; get a message
+from a port</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>char *preceive(portid) <br>
+int portid;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Preceive</i> retrieves the
+next message from the port <i>portid,</i> returning a
+pointer to the message if successful, or SYSERR if
+<i>portid</i> is invalid. (The sender and receiver must
+agree on a convention for passing the message length.)</p>
+
+<p style="margin-left:8%; margin-top: 1em">The calling
+process is blocked if there are no messages available (and
+reawakened as soon as a message arrives). The only ways to
+be released from a port queue are for some other process to
+send a message to the port with PSEND(2) or for some other
+process to delete or reset the port with PDELETE(2) or
+PRESET(2).</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">pcount(2), pcreate(2),
+pdelete(2), preset(2), psend(2)</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

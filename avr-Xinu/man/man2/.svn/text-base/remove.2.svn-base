@@ -1,0 +1,33 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt REMOVE \&2 \*[xinu-platform]
+.Sh NAME
+remove \- remove a file from the file system
+.Sh SYNOPSIS
+.nf
+.Em int remove(filename, key)
+.Em char *filename;
+.Em int key;
+.fi
+.Sh DESCRIPTION
+.Ar Remove
+takes a file name as an argument and destroys the named file (i.e.,
+removes it from the file system).
+Argument \f2filename\f1 specifies the name of a file to remove, and
+the optional argument \f2key\f1 gives a one-word protection key.
+.Pp
+\f2Remove\f1 uses the namespace to map the given file name to a new
+name, and invokes CONTROL(2) on the underlying device to destroy the file.
+It returns SYSERR if the name is illegal or cannot be mapped to
+an underlying device.
+It returns whatever CONTROL(2) returns otherwise.
+.Sh SEE ALSO
+control(2), nammap(2), namespace(4)

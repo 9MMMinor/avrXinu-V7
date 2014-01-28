@@ -1,0 +1,52 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt GETMEM \&2 \*[xinu-platform]
+.Sh NAME
+getmem, getstk \- get a block of main memory
+.Sh SYNOPSIS
+.Em char *getmem(int nbytes)
+.br
+.sp
+.Em char *getstk(int nbytes)
+.br
+.fi
+.Sh DESCRIPTION
+In either form,
+.Ar getmem
+rounds the number of bytes,
+.Ar nbytes,
+to an even-word multiple, and
+allocates a block of
+.Ar nbytes
+bytes of memory for the caller.
+.Ar Getmem
+returns the lowest word address in the allocated block;
+.Ar getstk
+returns the highest word address in the allocated block.
+If less than
+.Ar nbytes
+bytes remain, the call returns SYSERR.
+.Pp
+.Ar Getmem
+allocates memory starting with the end of the loaded program.
+.Ar Getstk
+allocates memory from the stack area downward.
+The routines cooperate so they never allocate overlapping
+regions.
+.Sh SEE ALSO
+freemem(2) getbuf(2), freebuf(2)
+.Sh BUGS
+There is no way to protect memory, so the active stack may write into
+regions returned by
+either call; allocations returned by
+.Ar getstk
+are more prone to disaster because they lie closest to the
+dynamic stack areas of other processes.

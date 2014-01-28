@@ -1,0 +1,103 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sun Feb  6 21:17:11 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">ETHER(4) avr-Xinu ETHER(4)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;"><b>ether</b> &mdash; standard
+10/100 Mbps Ethernet network interface device driver (type
+eth)</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><b>#include &lt;wiz5300.h&gt;
+<br>
+#include &lt;ether.h&gt;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>int</i></p>
+
+
+<p style="margin-left:14%;"><b>read</b>(<i>int&nbsp;device</i>,
+<i>char&nbsp;*buffer</i>, <i>int&nbsp;length</i>);</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>int</i></p>
+
+
+<p style="margin-left:14%;"><b>write</b>(<i>int&nbsp;device</i>,
+<i>char&nbsp;*buffer</i>, <i>int&nbsp;length</i>);</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>void</i></p>
+
+
+<p style="margin-left:14%;"><b>init</b>(<i>int&nbsp;device</i>);</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;">The <i>eth</i> device driver
+provides input and output for a 10/100 Mbps Ethernet local
+area network. The standard Xinu device name for Ethernet
+devices is <i>ETHER</i>.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Implemented on a
+WIZnet W5300 Ethernet controller, the <i>eth</i> driver
+handles input and output at the physical network level,
+transmitting complete frames between user processes and the
+device. The driver uses Socket0 and MACRAW mode only.</p>
+
+<p style="margin-left:8%; margin-top: 1em">The driver
+honors the following operations:</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>read</b>(<i>device</i>,
+<i>buffer</i>, <i>length</i>)</p>
+
+<p style="margin-left:35%;">Reads one frame into
+<i>buffer</i>, copying no more than <i>length</i>
+characters. It returns the length of the frame read; the
+count includes the 14-octet header.</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>write</b>(<i>device</i>,
+<i>buffer</i>, <i>length</i>)</p>
+
+<p style="margin-left:35%;">Writes a frame of <i>length</i>
+characters found in <i>buffer</i>. It returns <i>OK</i> if
+the frame was acceptable, <i>SYSERR</i> otherwise. The call
+to <i>write</i> will return once output has been started,
+but the buffer will be in use until the device finishes. The
+driver calls FREEBUF(2) to dispose of the buffer once the
+device finishes using it.</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>init</b>(<i>device</i>)</p>
+
+<p style="margin-left:35%; margin-top: 1em">Initializes the
+device and driver. The driver sets the device to accept only
+those packets addressed directly to the devices&rsquo; MAC
+address and broadcast packets (all 1&rsquo;s address).</p>
+
+<p valign="top">XINU V7 February&nbsp;8, 2011 XINU V7</p></table>
+<hr>
+</body>
+</html>

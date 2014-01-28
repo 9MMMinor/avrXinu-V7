@@ -1,0 +1,73 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:48 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">PRESET(2) avr-Xinu PRESET(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">preset &minus; reset a port</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int preset(portid, dispose)
+<br>
+int portid; <br>
+int (*dispose)();</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Preset</i> flushes all
+messages from a port and releases all processes waiting to
+send or receive messages. <i>Preset</i> returns SYSERR if
+<i>portid</i> is not a valid port id.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>Preset</i>
+has several effects, depending on the state of the port at
+the time the call is issued. If processes are blocked
+waiting to receive messages from port <i>portid,</i> they
+are all made ready; each returns SYSERR to caller. If
+messages are in the port they are disposed of by passing
+them to function If process are blocked waiting to send
+messages they are made ready; each returns SYSERR to its
+caller (as though the port never existed).</p>
+
+<p style="margin-left:8%; margin-top: 1em">The effects of
+<i>preset</i> are the same as PDELETE(2) followed by
+PCREATE(2), except that the port is not deallocated. The
+maximum message count remains the same as it was.</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;">There is no way to change the
+maximum message count when the port is reset.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">pcount(2), pcreate(2),
+pdelete(2), preceive(2), psend(2)</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sun Feb  6 21:17:11 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">internet &minus; IP-level Internet
+interface pseudo-device driver (types dgm, dg)</p>
+
+<p style="margin-top: 1em" valign="top">The <i>dgm</i> and
+<i>dg</i> device drivers, which operate as a related <br>
+pair, provide a network interface at the IP datagram level.
+<br>
+They accept datagrams from user processes and send them out
+on <br>
+the DARPA Internet, or receive datagrams from the Internet
+and deliver <br>
+them to user processes. <br>
+The standard Xinu device name for the datagram master
+pseudo-device <br>
+is <i>INTERNET</i>, and the standard name for individual
+connection <br>
+pseudo-devices is <i>DGRAM</i>. <br>
+The drivers cooperate so that users can initiate connection
+by calling <br>
+OPEN(2) on the datagram master device. <br>
+If successful, the call to OPEN(2) returns the device
+descriptor of a <i><br>
+dg</i> pseudo-device that can be used with READ(2) or
+WRITE(2) to <br>
+transfer data. <br>
+Finally, when finished with the connection, <br>
+the user process calls CLOSE(2) on the <i>dg</i> device.
+<br>
+The <i>dgm</i> driver consists of routines that implement
+OPEN(2) <br>
+and CONTROL(2), while the <i>dg</i> driver consists of
+routines for <br>
+READ(2), WRITE(2), CLOSE(2), and CONTROL(2). <br>
+Primitives READ(2) and WRITE(2) operate in one of two basic
+modes. <br>
+Either they transfer data in Xinugram format complete with
+an address <br>
+header, or they transfer just the data portion of the
+datagram. <br>
+Used with the master device to open a datagram
+pseudo-device. <br>
+Name is a string that gives an IP address and UDP port <br>
+number in the form <i>i1.i2.i3.i4:u</i>. <br>
+Used with master device to set the default gateway for
+nonlocal <br>
+IP datagram traffic. The only function supported is
+<i>DGM_GATE</i> <br>
+which takes an IP address as an argument and sets the
+default gateway <br>
+to that address. <br>
+Used with a <i>dg</i> pseudo-device to set the transfer
+mode. <br>
+The valid operations include <i>DG_CLEAR</i>, which clears
+<br>
+any UDP datagrams that happen to be in the receive queue,
+and <i><br>
+DG_SETMODE</i>, which sets the pseudo-device mode. <br>
+The mode argument composed of a word in which the first two
+bits <br>
+control the transfer mode and sixth bit controls timeout.
+<br>
+The symbolic constants for these bits are:</p>
+
+<p style="margin-left:3%;">DG_NMODE (001) &minus; Normal
+mode <br>
+DG_DMODE (002) &minus; Data-only mode <br>
+DG_TMODE (040) &minus; Timeout all reads</p>
+
+<p valign="top">Note that timeout can be applied to either
+transfer mode. <br>
+Used with a <i>dg</i> pseudo-device to await the arrival of
+a UDP datagram <br>
+and transfer it to the user in the form of a Xinugram. <br>
+Used with a <i>dg</i> pseudo-device to transfer a xinugram
+into a <br>
+UDP datagram and send it on the Internet. <br>
+Closes a <i>dg</i> pseudo-device. <br>
+When applied to <i>dg</i> pseudo-devices initializes each to
+<br>
+mark it not in use.</p>
+<hr>
+</body>
+</html>

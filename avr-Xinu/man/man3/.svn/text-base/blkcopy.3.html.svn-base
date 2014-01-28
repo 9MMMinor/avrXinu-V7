@@ -1,0 +1,63 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Tue Dec 28 14:52:29 2010 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p style="margin-top: 1em" valign="top">Printed 12/28/2010
+1</p>
+
+<p style="margin-top: 1em" valign="top">BLKCOPY(3) Xinu
+Programmer&rsquo;s Manual BLKCOPY(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>NAME</small></b>
+<br>
+blkcopy &minus; copy a contiguous block of bytes</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SYNOPSIS</small>
+<br>
+int blkcopy(to, from, nbytes) <br>
+char *to; <br>
+char *from; <br>
+int nbytes;</b></p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>DESCRIPTION</small></b>
+<i><br>
+Blkcopy</i> copies a block of <i>nbytes</i> contiguous bytes
+starting at location <i>from</i> into the area starting at
+location <i>to</i>. <i>Blkcopy</i> returns <i>OK</i> to the
+caller. <i>Blkcopy</i> will copy any byte value including
+the null character (zero).</p>
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>SEE
+ALSO</small></b> <br>
+blkequ(3), string(3)</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><b><small>BUGS</small></b>
+<i><br>
+Blkcopy</i> does not check for valid memory addresses.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Version 7
+avr-Xinu Printed 12/28/2010 1</p>
+<hr>
+</body>
+</html>

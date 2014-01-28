@@ -1,0 +1,13 @@
+# This Makefile contains rules to build files in the /platform/AVR-P40-USB directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = platform/AVR-P40-USB
+
+# Source files for this component
+
+# platform dependent files
+C_FILES = clkinit.c clkint.c create.c initialize.c kprintf.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_FILES:%=${DIR}/%}

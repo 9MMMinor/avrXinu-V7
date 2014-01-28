@@ -1,0 +1,70 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:50 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">SETNOK(2) avr-Xinu SETNOK(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">setnok &minus; set next-of-kin
+for a specified process</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int setnok(nok, pid) <br>
+int nok; <br>
+int pid;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Setnok</i> sets <i>nok</i> to
+be the next-of-kin for process <i>pid</i> by recording
+<i>nok</i> in the process table entry for process
+<i>pid</i>. A call to <i>setnok</i> overwrites any previous
+information in the process table entry.</p>
+
+<p style="margin-left:8%; margin-top: 1em">The next-of-kin
+for a process, <i>P</i>, is another process, <i>Q</i>, that
+the system notifies when <i>P</i> dies (i.e., exits).
+Notification consists of a message sent to <i>Q</i>
+containing only the process id, <i>P</i>.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Both arguments
+to <i>setnok</i> must be valid process ids. <i>Setnok</i>
+returns SYSERR to report errors in its arguments, and OK
+otherwise.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">kill(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;">There is no check to ensure that
+the next-of-kin remains in existence between the call to
+<i>setnok</i> and the termination of a process.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

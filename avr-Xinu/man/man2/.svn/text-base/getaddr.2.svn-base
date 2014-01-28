@@ -1,0 +1,32 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt GETADDR \&2 \*[xinu-platform]
+.Sh NAME
+getaddr \- obtain the local machine's Internet (IP) address
+.Sh SYNOPSIS
+.nf
+.Em int getaddr(ip)
+.Em IPaddr ip;
+.fi
+.Sh DESCRIPTION
+.Ar Getaddr
+obtains the local machine's primary Internet (IP) address and places
+it in the 4-byte array specified by argument \f2ip\f1.
+Calling \f2getaddr\f1 may trigger a Reverse Address Resolution Protocol
+(RARP) broadcast to find the address.
+If RARP succeeds, the address is kept locally for successive lookup
+requests.
+If RARP fails, \f2getaddr\f1 calls \f2panic\f1 to halt processing.
+.Sh SEE ALSO
+getname(2), getnet(2)
+.Sh BUGS
+There is no provision to obtain multiple addresses for machines that
+connect to multiple networks.

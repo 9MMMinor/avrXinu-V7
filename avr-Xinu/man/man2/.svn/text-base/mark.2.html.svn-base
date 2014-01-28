@@ -1,0 +1,87 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:47 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">MARK(2) avr-Xinu MARK(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">mark, unmarked &minus; set and
+check initialization marks efficiently</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>#include
+&lt;mark.h&gt;</i></p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>int mark(mk)
+<br>
+MARKER mk;</i></p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>int
+unmarked(mk) <br>
+MARKER mk;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Mark</i> sets <i>mk</i> to
+&quot;initialized&quot;, and records its location in the
+system. It returns 0 if the location is already marked, OK
+if the marking was successful, and SYSERR if there are too
+many marked locations.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>Unmarked</i>
+checks the contents and location of <i>mk</i> to see if it
+has been previously marked with the <i>mark</i> procedure.
+It returns OK if and only if <i>mk</i> has not been marked,
+0 otherwise. The key is that they work correctly after a
+reboot, no matter what was left in the marked locations when
+the system stopped.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Both <i>mark</i>
+and <i>unmarked</i> operate efficiently (in a few
+instructions) to correctly determine whether a location has
+been marked. They are most useful for creating
+self-initializing procedures when the system will be
+restarted. Both the value in <i>mk</i> as well as its
+location are used to tell if it has been marked.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Memory marking
+can be eliminated from Xinu by removing the definition of
+the symbol MEMMARK from the Configuration file.
+Self-initializing library routines may require manual
+initialization if MEMMARK is disabled (e.g., see
+BUFFER(3)).</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;">Mark does not verify that the
+location given lies in the static data area before marking
+it; to avoid having the system retain marks for locations on
+the stack after procedure exit, do not mark automatic
+variables.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

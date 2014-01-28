@@ -1,0 +1,15 @@
+# This Makefile contains rules to build files in the src/lib/libxc directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = src/lib/libxc
+
+# Source files for this component
+
+# Files for libxc
+C_Files = fopen.c fclose.c
+C_Files += printf.c printf_p.c
+C_Files += scanf.c scanf_p.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_Files:%=${DIR}/%}

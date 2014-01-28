@@ -1,0 +1,69 @@
+# Makefile.TQFP44
+#
+#  Platform-specific Makefile definitions for the
+#  avr-Xinu operating system.
+#
+
+# This makefile contains all the platform/board definitions
+
+# PLATFORM is informational only and is defined here.
+PLATFORM = ME-PB-SM-TQFP44-80 Proto Board with 11.0592 MHz clock and Sparkfun USB FTDI basic
+
+//MCU=atmega8
+//MCU=atmega8515
+//MCU=atmega644
+//MCU=atmega328p
+//MCU=atmega16
+//MCU=atmega32
+MCU = atmega1284p
+TARGET_ARCH = $(MCU)
+
+# 11.0592 Mhz external crystal (CKDIV8=1)
+CLOCK      = 11059200L
+32kCLOCK = YES
+#----------------------------------------------------------------------------
+# Edit host serial line device (Serial Port to programmer)
+#----------------------------------------------------------------------------
+HOST_SERIAL = /dev/tty.usbserial-FTSMQBJS
+#----------------------------------------------------------------------------
+# Edit target serial line device (Serial Port to target board)
+# This may also be the upload (boot) device
+#----------------------------------------------------------------------------
+USB_SERIAL = /dev/tty.usbserial-FTSMQBJS
+
+FUSES      = -U hfuse:w:0x99:m -U lfuse:w:0xEC:m
+# ATmega1284 fuse bits (fuse bits for other devices are different!):
+# Example for external oscillator
+# Fuse high byte:
+# 0x99 = 1 0 0 1   1 0 0 1 <-- BOOTRST (boot reset vector at 0x0000)
+#        ^ ^ ^ ^   ^ ^ ^------ BOOTSZ0
+#        | | | |   | +-------- BOOTSZ1
+#        | | | |   +---------- EESAVE (set to 0 to preserve EEPROM over chip erase)
+#        | | | +-------------- WDTON (if set to 0, watchdog timer always on)
+#        | | +---------------- SPIEN (if set to 0, serial programming is enabled)
+#        | +------------------ JTAGEN (if set to 0, enable JTAG)
+#        +-------------------- OCDEN (if set to 0, enable OCD)
+# Fuse low byte:
+# 0xec = 1 1 1 0   1 1 0 0
+#        ^ ^ \ /   \--+--/
+#        | |  |       +------- CKSEL 3..0 ( 0010 default, set to 1100 for external crystal)
+#        | |  +--------------- SUT 1..0 (slowly rising power)
+#        | +------------------ CKOUT (clock output on Port B0 if 0)
+#        +-------------------- CKDIV8 (initial divide clock by 8 if 0)
+
+#  Fuses for Optiboot Bootloader
+HFUSE = 0xDE
+LFUSE = 0xFF
+EFUSE = 0xFD
+UNLOCK_BITS = 0x3F
+LOCK_BITS = 0x0F
+
+#  Bootloader fuse settings
+#  AVRDUDE write fuses
+BOOTFUSES      = -U hfuse:w:$(HFUSE):m -U lfuse:w:$(LFUSE):m -U efuse:w:$(EFUSE):m
+BOOTLOADER_BAUDRATE = 115200
+
+# .data, .bss, heap in internal 16K RAM:
+EXTERNAL_RAM =
+
+

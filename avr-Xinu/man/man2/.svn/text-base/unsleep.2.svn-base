@@ -1,0 +1,28 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt UNSLEEP \&2 \*[xinu-platform]
+.Sh NAME
+unsleep \- remove a sleeping process from the clock queue prematurely
+.Sh SYNOPSIS
+.nf
+.Em int unsleep(pid)
+.Em int pid;
+.fi
+.Sh DESCRIPTION
+.Ar Unsleep
+allow one process to take another out of the sleeping state before
+the time limit has expired.
+usually, only system routines like RECVTIM(2) and KILL(2) call
+\f2unsleep\f1.
+User-level processes can avoid using \f2unsleep\f1 by arranging
+processes to cooperate using message passing primitives.
+.Sh SEE ALSO
+sleep(2), kill(2), recvtim(2)

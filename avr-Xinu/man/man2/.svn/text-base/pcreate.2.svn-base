@@ -1,0 +1,40 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt PCREATE \&2 \*[xinu-platform]
+.Sh NAME
+pcreate \- create a new port
+.Sh SYNOPSIS
+.Em int
+.Em pcreate(count)
+.br
+.Em int count;
+.Sh DESCRIPTION
+.Ar Pcreate
+creates a port with
+.Ar count
+locations for storing message pointers.
+.Pp
+.Ar Pcreate
+returns an integer identifying  the port if
+successful.  If no more ports can be allocated,
+or if
+.Ar count
+is nonpositive,
+.Ar pcreate
+returns
+SYSERR.
+.Pp
+Ports are manipulated with
+PSEND(2) and PRECEIVE(2).
+Receiving from a port returns a pointer to a message that was previously
+sent to the port.
+.Sh SEE ALSO
+pcount(2), pdelete(2), preceive(2), preset(2), psend(2)

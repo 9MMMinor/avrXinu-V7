@@ -1,0 +1,287 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Fri Jan  6 15:25:14 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">TWI(I2C)(4) avr-Xinu TWI(I2C)(4)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;"><b>twi</b> &mdash; Twi (I2C)
+driver functions</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><b>#include &lt;avr-Xinu.h&gt;
+<br>
+#include &lt;twi.h&gt;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>void</i></p>
+
+
+<p style="margin-left:14%;"><b>twi_init</b>(<i>void</i>);</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>int</i></p>
+
+
+<p style="margin-left:14%;"><b>twi_doCommand</b>(<i>struct&nbsp;twi_Command&nbsp;*twiCommandBlock</i>);</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;">The Two-Wire driver software
+does not easily fall into the Xinu read-write get-put device
+driver paradigm, although it could certainly written with
+just init() and control() functions. For this reason, it has
+been kept simple with just two function calls. All of the
+difficult work is done in the AVR-TWI module and most of the
+software is done in interrupt service.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>twi_init</i>
+Initializes the TWI (Two-Wire, I2C) Serial Interface and
+enables the AVR Microprocessor&rsquo;s twi module. The twi
+interrupt is enabled.</p>
+
+
+<p style="margin-left:8%; margin-top: 1em"><i>twi_doCommand</i>
+Initiates a single or chained command in Master Mode on the
+twi bus pins, SCL and SDA. The function blocks until a STOP
+is transmitted on the bus, i.e. the calling process is put
+in a RECEIVING state until the interrupt service routine
+does a send. Twi_doCommand returns OK if the addressed slave
+responds as commanded, or SYSERR. A single argument is a
+pointer to a twi_Command structure:</p>
+
+<p style="margin-left:8%; margin-top: 1em">struct
+twi_Command {</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">uint8_t slarw;</p></td>
+<td width="68%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">uint8_t *data;</p></td>
+<td width="68%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">uint8_t dataLength;</p></td>
+<td width="68%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">struct twi_Command *chain;</p></td>
+<td width="68%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">};</p></td>
+<td width="68%">
+</td>
+</table>
+
+<p style="margin-left:8%;">Slarw is the slave address of a
+Two-Wire module on the bus in bits 7:1 and TW_WRITE (0) or
+TW_READ (1) in bit 0. The contents of slarw is often
+referred to a SLA+W or SLA+R in device datasheets. Data
+contains the data bytes to be transmitted if the operation
+is TW_WRITE, or the array to receive bytes from the slave
+for a TW_READ operation. DataLength is the number of bytes
+to write or read. Chain is a pointer to a subsequent command
+block or 0 if there are no further command blocks to
+execute. Two-Wire (I2C) slave devices frequently need to
+receive commands or addresses before they can send data.</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>EXAMPLES</b></p>
+
+<p style="margin-left:8%;">#include &quot;twi.h&quot; <br>
+#include &lt;util/twi.h&gt;</p>
+
+<p style="margin-left:8%; margin-top: 1em">void
+clear_PageEEPROM(int address) <br>
+{</p>
+
+<table width="100%" border=0 rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">struct twi_Command cb;</p></td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">uint8_t *buffer;</p></td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">buffer = (uint8_t *)calloc(66,
+sizeof(uint8_t));</p> </td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">buffer[0] = address&gt;&gt;8;</p></td>
+<td width="25%"></td>
+<td width="12%">
+</td>
+<td width="13%">
+
+
+<p valign="top">//address high byte</p></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">buffer[1] = address&amp;0xFF;</p></td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%">
+
+
+<p valign="top">//address low byte</p></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">cb.slarw =
+EEPROM24LC256_ADDRESS&lt;&lt;1|TW_WRITE;</p> </td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">cb.data = buffer;</p></td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">cb.dataLength = 66;</p></td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">cb.chain = (struct twi_Command *)0;</p></td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">printf(&quot;clear return: %d0,
+twi_doCommand(&amp;cb));</p> </td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="12%">
+
+
+<p valign="top">free(buffer);</p></td>
+<td width="25%"></td>
+<td width="12%"></td>
+<td width="13%"></td>
+<td width="18%">
+</td>
+</table>
+
+<p style="margin-left:8%;">}</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">DS2482(4) 24LC256(4)
+1-Wire(4)</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+January&nbsp;6, 2012 XINU V7</p>
+<hr>
+</body>
+</html>

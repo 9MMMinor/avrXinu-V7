@@ -1,0 +1,62 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:50 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">WAIT(2) avr-Xinu WAIT(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;"><b>wait</b> &mdash; block and
+wait until semaphore signalled</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int</i></p>
+
+
+<p style="margin-left:14%;"><b>wait</b>(<i>int&nbsp;sem</i>);</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><b>Wait</b> decrements the count
+of semaphore <i>sem</i>, blocking the calling process if the
+count goes negative by enqueuing it in the queue for
+<i>sem</i>. The only ways to get free from a semaphore queue
+are for some other process to signal the semaphore, or for
+some other process to delete or reset the semaphore.
+<b>Wait</b> and signal(2) are the two basic synchronization
+primitives in the system.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><b>Wait</b>
+returns SYSERR if <i>sem</i> is invalid. Otherwise, it
+returns OK once freed from the queue.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">scount(2), screate(2),
+sdelete(2), signal(2), sreset(2)</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

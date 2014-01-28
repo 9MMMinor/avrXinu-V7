@@ -1,0 +1,117 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:45 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">CREATE(2) avr-Xinu CREATE(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;"><b>create</b> &mdash; create a
+new process</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><b>#include
+&lt;avr-Xinu.h&gt;</b></p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>int</i></p>
+
+<p valign="top"><b>create</b>(<i>char&nbsp;*caddr</i>,
+<i>int&nbsp;ssize</i>, <i>int&nbsp;prio</i>,
+<i>char&nbsp;*name</i>, <i>int&nbsp;nargs</i>,
+<i>[int&nbsp;argument]...</i>);</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Create</i> creates a new
+process that will begin execution at location <i>caddr,</i>
+with a stack of <i>ssize</i> bytes, initial priority
+<i>prio,</i> and identifying name <i>name. Caddr</i> should
+be the address of a procedure or main program. If the
+creation is successful, the (nonnegative) process id of the
+new process is returned to the caller. The created process
+is left in the suspended state; it will not begin execution
+until started by a resume command. If the arguments are
+incorrect, or if there are no free process slots, the value
+SYSERR is returned. The new process has its own stack, but
+shares global data with other processes according to the
+scope rules of C. If the procedure attempts to return, its
+process will be terminated (see KILL(2)).</p>
+
+<p style="margin-left:8%; margin-top: 1em">The caller can
+pass a variable number of arguments to the created process.
+The integer <i>nargs</i> specifies how many integer argument
+values follow. When the created process is resumed, it is
+called with two arguments. The first argument, <i>argc,</i>
+is the number of arguments the process was invoked with; the
+second ( <i>argv,</i> for argument vector) is an array of
+pointers to the <i>Nargs</i> arguments.</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>EXAMPLES</b></p>
+
+<p style="margin-left:8%;">#include &lt;avr-Xinu.h&gt;</p>
+
+<p style="margin-left:8%; margin-top: 1em">int A(int argc,
+int *argv);</p>
+
+<p style="margin-left:8%; margin-top: 1em">int
+Xinu_main(int argc, int *argv) <br>
+{ <br>
+int i, pidA;</p>
+
+
+<p style="margin-left:8%; margin-top: 1em">printf(&quot;Xinu_main,
+%d arguments:\n&quot;, argc); <br>
+for (i = 0; i &lt; argc; i++) <br>
+printf(&quot; %d&quot;, argv[i]); <br>
+printf(&quot;\n&quot;);</p>
+
+<p style="margin-left:8%; margin-top: 1em">resume(pidA =
+create(A, 500, 22, &quot;A_Thread&quot;, 2, 99, 0xce));</p>
+
+<p style="margin-left:8%; margin-top: 1em">return 0; <br>
+}</p>
+
+<p style="margin-left:8%; margin-top: 1em">int A(int nargs,
+int *argv) <br>
+{ <br>
+int i;</p>
+
+<p style="margin-left:8%; margin-top: 1em">printf(&quot;A,
+%d arguments:\n&quot;, nargs); <br>
+for (i = 0; i &lt; nargs; i++) <br>
+printf(&quot; %d&quot;, argv[i]); <br>
+printf(&quot;\n&quot;);</p>
+
+<p style="margin-left:8%; margin-top: 1em">return 0; <br>
+}</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">kill(2)</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

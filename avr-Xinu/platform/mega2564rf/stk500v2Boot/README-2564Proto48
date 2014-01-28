@@ -1,0 +1,57 @@
+mmm-iMac:stk500v2_new Xinu$ make clean
+
+-------- begin --------
+
+Cleaning project:
+rm -f *.hex
+rm -f *.eep
+rm -f *.cof
+rm -f *.elf
+rm -f *.map
+rm -f *.sym
+rm -f *.lss
+rm -f stk500boot.o  
+rm -f stk500boot.lst  
+rm -f stk500boot.s
+rm -f stk500boot.d
+rm -f .dep/*
+-------- end --------
+
+mmm-iMac:stk500v2_new Xinu$ make 2564Proto48
+
+-------- begin --------
+avr-gcc (GCC) 4.7.3
+Copyright (C) 2012 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Compiling: stk500boot.c
+avr-gcc -c -mmcu=atmega2564rfr2 -I. -gdwarf-2 -DF_CPU=16000000UL  -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -finline-limit=1  -Wall -Wstrict-prototypes -Wa,-adhlns=stk500boot.lst  -std=gnu99 -D_AVR_44Proto_BOARD_ -DBAUDRATE=57600 -MD -MP -MF .dep/stk500boot.o.d stk500boot.c -o stk500boot.o 
+stk500boot.c:403:22: warning: 'recchar' defined but not used [-Wunused-function]
+
+Linking: stk500boot.elf
+avr-gcc -mmcu=atmega2564rfr2 -I. -gdwarf-2 -DF_CPU=16000000UL  -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -finline-limit=1  -Wall -Wstrict-prototypes -Wa,-adhlns=stk500boot.o  -std=gnu99 -D_AVR_44Proto_BOARD_ -DBAUDRATE=57600 -MD -MP -MF .dep/stk500boot.elf.d stk500boot.o --output stk500boot.elf -Wl,-Map=stk500boot.map,--cref    -lm -Wl,--section-start=.text=3E000
+
+Creating load file for Flash: stk500boot.hex
+avr-objcopy -O ihex -R .eeprom stk500boot.elf stk500boot.hex
+
+Creating load file for EEPROM: stk500boot.eep
+avr-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" \
+	--change-section-lma .eeprom=0 -O ihex stk500boot.elf stk500boot.eep
+avr-objcopy: --change-section-lma .eeprom=0x0000000000000000 never used
+
+Creating Extended Listing: stk500boot.lss
+avr-objdump -h -S stk500boot.elf > stk500boot.lss
+
+Creating Symbol Table: stk500boot.sym
+avr-nm -n stk500boot.elf > stk500boot.sym
+
+Size after:
+   text	   data	    bss	    dec	    hex	filename
+   2282	      4	      0	   2286	    8ee	stk500boot.elf
+
+-------- end --------
+
+cp stk500boot.hex stk500boot_v2_2564Proto48.hex
+mmm-iMac:stk500v2_new Xinu$ 

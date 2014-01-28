@@ -1,0 +1,36 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt SEND \&2 \*[xinu-platform]
+.Sh NAME
+send \- send a (one-word) message to a process
+.Sh SYNOPSIS
+.nf
+.Em int send(pid, msg)
+.Em int pid;
+.Em int msg;
+.fi
+.Sh DESCRIPTION
+.Ar Send
+sends the one-word message
+.Ar msg
+to the process with id
+.Ar pid.
+A process may have at most one outstanding message that has
+not been received.
+.Pp
+.Ar Send
+returns SYSERR if
+.Ar pid
+is invalid or if the process already has a message waiting
+that has not been received.
+Otherwise, it sends the message and returns OK.
+.Sh SEE ALSO
+receive(2), sendf(2), preceive(2), psend(2)

@@ -1,0 +1,61 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:49 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">SEEK(2) avr-Xinu SEEK(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">seek &minus; device independent
+position seeking routine</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int seek(dev, position) <br>
+int dev; <br>
+char *buffer; <br>
+long position;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Seek</i> will position the
+device given by <i>dev</i> after the <i>position</i> byte.
+It returns SYSERR if <i>dev</i> is incorrect, or if it is
+not possible to position <i>dev</i> as specified.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>Seek</i>
+cannot be used with devices connected to terminals.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Note that the
+position argument is declared <i>long</i> rather than
+<i>int.</i></p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">close(2), control(2), getc(2),
+open(2), putc(2), read(2), write(2)</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

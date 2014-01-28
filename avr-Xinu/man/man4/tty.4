@@ -1,0 +1,102 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt TTY \&4 \*[xinu-platform]		\" Program name and manual section number 
+.Sh NAME                            \" Section Header - required - don't modify 
+.Nm tty
+.Nd general-purpose terminal I/O device driver (type tty)
+.Sh SYNOPSIS
+.In USART.h
+.In tty.h
+.sp
+.Ft int Fn read "int device" "char *buffer" "int length"
+.Ft int Fn write "int device" "char *buffer" "int length"
+.Ft int Fn open device  "char *name" "char *mode"
+.Fn close device
+.Fn control device  function  arg1  arg2
+.Fn init device
+.Sh DESCRIPTION
+The \f2tty\f1 device driver provides input and output for
+a full-duplex ascii terminal device.
+On most Xinu systems, device \f2CONSOLE\f1 is of type tty.
+.Pp
+Implemented on the built in USART,
+the driver expects one interrupt per character on both input
+and output.
+.Pp
+The \f2tty\f1 driver operates in one of three modes, with switching
+between the modes determined dynamically.
+In \f2raw mode\f1, it passes incoming characters to the reading
+process without further processing.
+In \f2cbreak mode\f1, the driver honors XON-XOFF flow control,
+character echo, and mapping between carriage return and line feed.
+In \f2cooked mode\f1 the driver behaves like cbreak mode, but
+also handles line editing with backspace and line kill keys.
+Characters are processed according to the driver mode when they arrive,
+and are placed in a queue from which upper-half routines extract them.
+Echoing, presentation of control characters, and editing are controlled
+by several fields in the driver control structure,
+and may be changed dynamically.
+.Pp
+The upper-half routines behave as follows:
+.Bl -tag
+.It Fn read device buffer length
+Reads up to one line into the user's \f2buffer\f1, stopping on
+an END-OF-FILE or NEWLINE character, or after \f2length\f1
+characters have been supplied.
+As a special case, if \f2length\f1 is zero, the driver reads
+whatever characters are available in the input buffer (possibly zero).
+In cooked mode, \f2read\f1 blocks until a line has been typed.
+.It Fn write device buffer length
+Writes \f2length\f1 characters from the user's \f2buffer\f1,
+mapping CARRIAGE RETURN to NEWLINE as specified by field \f2ocrlf\f1
+of the driver control structure.
+Write may block if the output exceeds the currently available
+buffer space.
+.It Fn getc device
+Reads a single character and returns it as the function value.
+.It Fn putc device char
+Writes character \f2char\f1.
+.It Fn open "int device" "char *name" "char *mode"
+This routine is not normally used  to open tty devices,
+but is provided so that automatic calls to open do not
+fail.  It returns
+.Ar device
+when called with a null name or SYSERR otherwise.
+.It Fn close device
+Returns \f2OK\f1 without taking any action.
+.It Fn init device
+Initializes the driver.
+Note: for historical reasons,
+device \f2CONSOLE\f1 is initialized to cooked
+mode with echo, visual control character printing, and line editing
+enabled, while other devices are initialized to raw mode.
+.It Fn control device function
+Controls the driver and provides non-transfer operations.
+The valid functions are:
+.Bl -ohang
+.It TCNEXTC \- lookahead one character without reading it.
+.It TCMODER \- change the driver to raw mode.
+.It TCMODEC \- change the driver to cooked mode.
+.It TCMODEK \- change the driver to cbreak mode.
+.It TCECHO \- turn on character echo.
+.It TCNOECHO \- turn off character echo.
+.It TCCRLF \- turn on NEWLINE and RETURN echo on input.
+.It TCNOCRLF \- turn off NEWLINE and RETURN echo on input.
+.It TCICHARS \- return a count of characters in the input buffer.
+.El
+.El
+.Sh DIAGNOSTICS
+Character errors are reported by turning on the high-order bit
+of the character.
+.Sh NOTES
+The version 6 driver used buffer counts as exact requests; version
+7 is line oriented.
+Error reporting should be improved.

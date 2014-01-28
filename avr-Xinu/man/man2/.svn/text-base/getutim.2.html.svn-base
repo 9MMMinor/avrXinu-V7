@@ -1,0 +1,73 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:46 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">GETUTIM(2) avr-Xinu GETUTIM(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;"><b>getutim</b> &mdash; obtain
+current universal time in seconds past the epoch</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int</i></p>
+
+
+<p style="margin-left:14%;"><b>getutim</b>(<i>long&nbsp;*timvar</i>);</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><b>Getutim</b> obtains the
+current time measured in seconds past the epoch date, and
+places it in the longword pointed to by argument
+<i>timvar</i>. The correct time is usually kept by the
+real-time clock, but gettime(2) may contact a time server on
+the network if the local time has not been initialized.</p>
+
+<p style="margin-left:8%; margin-top: 1em">The epoch is
+taken to be zero seconds past Jan 1, 1970. Universal time,
+formerly called Greenwich Mean Time, is the mean solar time
+of the meridian in Greenwich, England, and is used
+throughout the world as a standard for measuring time.</p>
+
+<p style="margin-left:8%; margin-top: 1em">If
+<b>getutim</b> cannot obtain the current time, it returns
+SYSERR to the caller. Otherwise, <b>getutim</b> returns
+OK.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">gettime(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;">The local clock may drift,
+especially under heavy CPU activity or activities that
+require the operating system to mask interrupts for extended
+periods.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

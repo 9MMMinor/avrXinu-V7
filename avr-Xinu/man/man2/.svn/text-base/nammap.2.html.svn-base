@@ -1,0 +1,70 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:47 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">NAMMAP(2) avr-Xinu NAMMAP(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">nammap &minus; map a name
+through the syntactic namespace</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int nammap(name, newname)
+<br>
+char *name; <br>
+char *newname;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Nammap</i> uses the syntactic
+namespace to translate a name into a new name and returns
+the id of a device to which the name maps. Names are mapped
+iteratively until they map to a device other than the
+<i>NAMESPACE</i>.</p>
+
+<p style="margin-left:8%; margin-top: 1em">Argument
+<i>name</i> points to a null-terminated string containing
+the name to be mapped. Argument <i>newname</i> points to a
+string area large enough to hold the mapped version of the
+name. If successful, <i>nammap</i> returns the device id of
+the device to which the mapping corresponds. Otherwise, it
+returns SYSERR.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">namrepl(2), open(2), mount(2),
+unmount(2), namespace(4)</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;"><i>Nammap</i> writes the mapped
+name into <i>newname</i> without checking to make sure it
+fits. There is no way to distinguish errors such as string
+overflow from names that map to device SYSERR.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

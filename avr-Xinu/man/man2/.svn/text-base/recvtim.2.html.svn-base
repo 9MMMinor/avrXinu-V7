@@ -1,0 +1,66 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:49 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">RECVTIM(2) avr-Xinu RECVTIM(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">recvtim &minus; receive a
+message with timeout</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int recvtim(maxwait) <br>
+int maxwait;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Recvtim</i> allows a process
+to specify a maximum time limit it is willing to wait for a
+message to arrive. Like RECEIVE(2), <i>recvtim</i> blocks
+the calling process until a message arrives from SEND(2).
+Argument <i>maxwait</i> gives the maximum time to wait for a
+message, specified in tenths of seconds.</p>
+
+<p style="margin-left:8%; margin-top: 1em"><i>Recvtim</i>
+returns integer SYSERR if the argument is incorrect or if no
+clock is present. It returns integer TIMEOUT if the time
+limit expires before a message arrives. Otherwise, it
+returns the message.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">receive(2), recvclr(2), send(2),
+sleep10(2), sleep(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;">There is no way to distinguish
+between messages that contain TIMEOUT or SYSERR and errors
+reported by <i>recvtim</i>.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

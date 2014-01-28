@@ -1,0 +1,69 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:46 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">GETTIME(2) avr-Xinu GETTIME(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;">gettime &minus; obtain the
+current local time in seconds past the epoch date</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int gettime(timvar) <br>
+long *timvar;</i></p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><i>Gettime</i> obtains the local
+time measured in seconds past the epoch date, and places it
+in the longword pointed to by argument <i>timvar</i>. The
+epoch is taken to be zero seconds past Jan 1, 1970.</p>
+
+<p style="margin-left:8%; margin-top: 1em">The correct time
+is usually kept by the real-time clock, but <i>gettime</i>
+may contact a time server on the network if the local time
+has not been initialized.</p>
+
+<p style="margin-left:8%; margin-top: 1em">If
+<i>gettime</i> cannot obtain the current time, it returns
+SYSERR to the caller. Otherwise, <i>gettime</i> returns
+OK.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">getutim(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;">Local time computation does not
+take daylight savings into account. The local clock may
+drift, especially under heavy CPU activity or activities
+that require the operating system to mask interrupts for
+extended periods.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

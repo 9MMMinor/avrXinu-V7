@@ -1,0 +1,43 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt CHPRIO \&2 \*[xinu-platform]      \" Program name and manual section number 
+.Sh NAME
+.Nm chprio
+.Nd change the priority of a process
+.Sh SYNOPSIS
+.Ft int Fn chprio "int pid" "int newprio"
+.Sh DESCRIPTION
+.Nm Chprio
+changes the scheduling priority of process
+.Ar pid
+to
+.Ar newprio.
+Priorities are positive integers.
+At any instant, the highest priority process  that is ready
+will be running.
+A set of processes with equal priority is scheduled round-robin.
+.Pp
+If the new priority is invalid, or the process id is invalid
+.Nm chprio
+returns SYSERR.
+Otherwise, it returns the old process priority.
+It is forbidden to change the priority of the null process, which
+always remains zero.
+.Sh SEE ALSO
+.Xr create 2 ,
+.Xr getprio 2 ,
+.Xr resume 2
+.Sh BUGS
+Because
+.Nm chprio
+changes priorities without rearranging processes on the ready list,
+it should only be used on waiting, sleeping, suspended, or current
+processes.

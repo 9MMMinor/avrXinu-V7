@@ -1,0 +1,38 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt GETTIME \&2 \*[xinu-platform]
+.Sh NAME
+gettime \- obtain the current local time in seconds past the epoch date
+.Sh SYNOPSIS
+.nf
+.Em int gettime(timvar)
+.Em long *timvar;
+.fi
+.Sh DESCRIPTION
+.Ar Gettime
+obtains the local time measured in seconds past the epoch date, and places
+it in the longword pointed to by argument \f2timvar\f1.
+The epoch is taken to be zero seconds past Jan 1, 1970.
+.Pp
+The correct time is usually kept by the real-time clock, but
+\f2gettime\f1  may contact a time server on the network if the local
+time has not been initialized.
+.Pp
+If \f2gettime\f1 cannot obtain the current time, it returns SYSERR
+to the caller.
+Otherwise, \f2gettime\f1 returns OK.
+.Sh SEE ALSO
+getutim(2)
+.Sh BUGS
+Local time computation does not take daylight savings into account.
+The local clock may drift, especially under heavy CPU activity or
+activities that require the operating system to mask interrupts for
+extended periods.

@@ -1,0 +1,67 @@
+<!-- Creator     : groff version 1.19.2 -->
+<!-- CreationDate: Sat Jan  8 15:17:51 2011 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p     { margin-top: 0; margin-bottom: 0; }
+       pre   { margin-top: 0; margin-bottom: 0; }
+       table { margin-top: 0; margin-bottom: 0; }
+</style>
+<title></title>
+</head>
+<body>
+
+<hr>
+
+
+<p valign="top">WRITE(2) avr-Xinu WRITE(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>NAME</b></p>
+
+<p style="margin-left:8%;"><b>write</b> &mdash; write a
+sequence of characters from a buffer</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>SYNOPSIS</b></p>
+
+<p style="margin-left:8%;"><i>int</i></p>
+
+
+<p style="margin-left:14%;"><b>write</b>(<i>int&nbsp;dev</i>,
+<i>char&nbsp;*buff</i>, <i>int&nbsp;count</i>);</p>
+
+
+<p style="margin-top: 1em" valign="top"><b>DESCRIPTION</b></p>
+
+<p style="margin-left:8%;"><b>Write</b> writes <i>count</i>
+characters to the I/O device given by <i>dev,</i> from
+sequential locations of the buffer, <i>buff.</i>
+<b>Write</b> returns SYSERR if <i>dev</i> or <i>count</i> is
+invalid, OK for a successful write. <b>Write</b> normally
+returns when it is safe for the user to change the contents
+of the buffer. For some devices this means <b>write</b> will
+wait for I/O to complete before returning. On other devices,
+the data is copied into a kernel buffer and the write
+returns while it is being transferred.</p>
+
+<p style="margin-top: 1em" valign="top"><b>SEE ALSO</b></p>
+
+<p style="margin-left:8%;">close(2), control(2), getc(2),
+open(2), putc(2), read(2), seek(2)</p>
+
+<p style="margin-top: 1em" valign="top"><b>BUGS</b></p>
+
+<p style="margin-left:8%;"><b>Write</b> may not have
+exclusive use of the I/O device, so output from other
+processes may be mixed in.</p>
+
+<p style="margin-left:8%; margin-top: 1em">XINU V7
+February&nbsp;8, 2011 XINU V7</p>
+<hr>
+</body>
+</html>

@@ -1,0 +1,44 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.ds release-date February 8, 2011
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt PANIC \&2 \*[xinu-platform]
+.Sh NAME
+panic \- abort processing due to severe error
+.Sh SYNOPSIS
+.nf
+.Em int panic(message)
+.Em char *message;
+.fi
+.Sh DESCRIPTION
+.Ar Panic
+will print the character string
+.Ar message
+on the console, dump the machine registers and top few stack locations,
+and halt the processor.
+It uses
+.Ar kprintf
+rather than
+.Ar printf,
+so it may be called anywhere in
+the kernel (e.g., from an interrupt routine that may be executed
+by the null process).
+Typing
+.Em P
+after the processor halts will cause panic to restore the machine
+state and continue, so it is
+possible to examine locations with ODT after the processor halts, and
+still restart processing.
+.Pp
+There are alternate entry points to
+.Ar panic
+that are invoked by branch to location zero, illegal interrupts,
+or processor exceptions (traps).
+.Sh SEE ALSO
+kprintf(3), printf(3)
