@@ -1,0 +1,80 @@
+# Makefile.256rfr2XplainPro
+
+# This makefile contains all the platform/board definitions
+
+# PLATFORM is informational only and is defined here.
+PLATFORM = Atmel 256rfr2 Xplained Pro Board with stk500v2 bootloader
+# EXT5 JUMPERS:
+# 		J204 (13) >--------------UART_RX-----------< RS232 SPARE (RXD)
+# 		J204 (14) >--------------UART_TX-----------< RS232 SPARE (TXD)
+
+
+//MCU=atmega8
+//MCU=atmega8515
+//MCU=atmega644
+//MCU=atmega328p
+//MCU=atmega16
+//MCU=atmega32
+//MCU = atmega1284p
+MCU=atmega256rfr2
+TARGET_ARCH = $(MCU)
+
+#  16.000 Mhz external crystal (CKDIV8=1)
+CLOCK		= 16000000
+#----------------------------------------------------------------------------
+# Edit host serial line device (Serial Port to programmer)
+#----------------------------------------------------------------------------
+HOST_SERIAL = /dev/tty.usbserial-FTSMQBJS
+#----------------------------------------------------------------------------
+# Edit target serial line device (Serial Port to target board)
+# This may also be the upload (boot) device
+#----------------------------------------------------------------------------
+USB_SERIAL = /dev/tty.usbserial-FTSMQBJS
+
+
+FUSES      = -U hfuse:w:0x99:m -U lfuse:w:0xE6:m
+
+# Atmega2564rfr2 fuse bits used above (fuse bits for other devices are different!):
+# Example for 16 MHz external oscillator
+# Extended Fuse byte:
+# 0xFE = 1 1 1 1   1 1 1 0 <-- BODLEVEL0 (Brown-Out Reset 1.8V)
+#        ^ ^ ^ ^   ^ ^ ^------ BODLEVEL1
+#        | | | |   | +-------- BODLEVEL2
+#        | | | |   +---------- reserved
+#        | | | +-------------- "
+#        | | +---------------- "
+#        | +------------------ "
+#        +-------------------- "
+# Fuse high byte:
+# 0x99 = 1 0 0 1   1 0 0 1 <-- BOOTRST (boot reset vector at 0x0000)
+#        ^ ^ ^ ^   ^ ^ ^------ BOOTSZ0
+#        | | | |   | +-------- BOOTSZ1
+#        | | | |   +---------- EESAVE (set to 0 to preserve EEPROM over chip erase)
+#        | | | +-------------- WDTON (if set to 0, watchdog is always on)
+#        | | +---------------- SPIEN (if set to 0, serial programming enabled)
+#        | +------------------ JTAGEN (if set to 0, JTAG enabled)
+#        +-------------------- OCDEN (if set to 0, enable On-Chip Debug)
+# Fuse low byte:
+# 0xE6 = 1 1 1 0   0 1 1 0
+#        ^ ^ \ /   \--+--/
+#        | |  |       +------- CKSEL 3..0 (0010 default set to 0110 for 16MHz crystal)
+#        | |  +--------------- SUT 1..0 (slowly rising power)
+#        | +------------------ CKOUT (if 0 output the system clock on the CLKO pin)
+#        +-------------------- CKDIV8 (initial divide clock by 8 if 0)
+#
+# For computing fuse byte values for other devices and options see
+# the fuse bit calculator at http://www.engbedded.com/fusecalc/
+
+#  Fuses for STK500boot/Optiboot Bootloader
+HFUSE = 0x98
+LFUSE = 0xE6
+EFUSE = 0xFE
+UNLOCK_BITS = 0x3F
+LOCK_BITS = 0x0F
+
+#  Bootloader fuse settings
+#  AVRDUDE write fuses
+BOOTFUSES      = -U hfuse:w:$(HFUSE):m -U lfuse:w:$(LFUSE):m -U efuse:w:$(EFUSE):m
+
+#  .data, .bss, heap in internal 16K RAM:
+EXTERNAL_RAM =
