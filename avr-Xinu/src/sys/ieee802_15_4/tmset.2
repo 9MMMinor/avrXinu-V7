@@ -1,0 +1,48 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.\"groff -mdoc <tmset.2 >tmset.ps
+.\"groff -mdoc -Thtml <tmset.2 >tmset.html
+.ds release-date December 31, 2013
+.ds xinu-platform avr-Xinu
+.\"
+.Os XINU V7
+.Dd \*[release-date] 
+.Dt TMSET \&2 \*[xinu-platform]
+.Sh NAME
+tmset \- set a fast timer
+.Sh SYNOPSIS
+.Em int
+.Em tmset(uint8_t port, void *msg, uint32_t time, INTPROC *callThru);
+.br
+.Em uint8_t port;
+.Sh DESCRIPTION
+The following Timer is modeled after The TCP Timer Process [Comer 1991].
+Here, hardware enables us to enter timed events into a linked list in
+absolute time order. When a time expires, the interrupt service resumes
+the radioTimer process, which runs at high priority. The timer process sends
+the message that the event contains (tq_msg) to the port that the message
+specifies (tq_port) and removes the event from the head of the list. The queue
+can contain at most MAXTIMERMESSAGES unique events (port & msg). Before an
+event is placed in the time queue, any old events (with the same port and
+message) are removed. It is possible to have more than one event trigger at the
+same compare time, but only a single interrupt occurs. Time critical events
+may specify a INTPROC to be called from interrupt service. User processes
+could use the message, which is type (void *), to pass callback routines through
+the port.
+.Pp
+.Ar tmset
+enters a time event into a linked list in time order. The
+.Ar time
+argument
+is the relative time (in symbol time units) from the execution of
+.Ar tmset
+until a compare interrupt is set to occur.
+.Pp
+.Ar tmset
+returns OK
+.Pp
+.Sh SEE ALSO
+tmclear(2), tmleft(2)
