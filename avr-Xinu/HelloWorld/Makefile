@@ -13,13 +13,10 @@ all: $(XINU_PROJECT)
 #############################################################################
 # Edit to change default Directory                                          #
 #############################################################################
-#XINU_DIRECTORY = /Users/Xinu
-XINU_DIRECTORY = /Users/mmm/XinuV7
+XINU_DIRECTORY = $(HOME)/XinuV7
 
-#AVR_XINUDIR = $(XINU_DIRECTORY)/avr-XinuExperimentalRoot
 AVR_XINUDIR = $(XINU_DIRECTORY)/avr-Xinu
-HOME = $(AVR_XINUDIR)
-XINU = $(HOME)
+XINU = $(AVR_XINUDIR)
 
 SYSCOMPS = src/sys/sys src/sys/tty
 
