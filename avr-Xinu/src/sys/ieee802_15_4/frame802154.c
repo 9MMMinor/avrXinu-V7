@@ -7,28 +7,43 @@
 //
 
 #include <avr-Xinu.h>
+#include <avr/io.h>
+#include <string.h>
 #include "frame802154.h"
 
 static int printable(char);
 
-#define NOT_YET (frameReturn_t)SYSERR
-#define BAD_FRAME_CREATE (frameReturn_t)SYSERR
+#define NOT_YET (frame802154_t *)0
+#define BAD_FRAME_CREATE (frame802154_t *)0
 
-frameReturn_t
-frame802154_create(frame802154_t *p, frame_t *frame)
+frame802154_t *
+frame802154_create(uint8_t type)
 {
-	uint8_t type = p->fcf.frameType;
+	frame802154_t *p;
 	
 	switch (type)	{
 		case FRAME_TYPE_BEACON:
 			return (NOT_YET);
 		case FRAME_TYPE_DATA:
-			p->payload = makeTXFrameHdr(p, frame->data);
-			return ( (frameReturn_t)OK );
+			p = (frame802154_t *)getmem(sizeof(frame802154_t));
+			p->fcf.frameType = type;
+			p->fcf.frameSecurity = 0;
+			p->fcf.frameAckRequested = 0;
+			p->fcf.frameVersion = FRAME_VERSION_2006;
+			p->fcf.frameDestinationAddressMode = FRAME_ADDRESS_MODE_SHORT;
+			p->fcf.frameSourceAddressMode = FRAME_ADDRESS_MODE_SHORT;
+			p->seq = 0;
+			p->dest_pid = 0xab;
+			p->dest_addr[0] = 0xbe;
+			p->dest_addr[1] = 0xba;
+			p->src_addr[0] = 0xa0;
+			p->src_addr[1] = 0xa1;
+			p->src_pid = 0x1234;
+			return ( p );
 		case FRAME_TYPE_ACK:
 			return (NOT_YET);
 		case FRAME_TYPE_MAC_COMMAND:
-			p->payload = makeMACCommandHdr(p, frame->data);
+			makeMACCommandHdr(p);
 			return ( NOT_YET);
 		default:
 			break;
@@ -36,20 +51,27 @@ frame802154_create(frame802154_t *p, frame_t *frame)
 	return (BAD_FRAME_CREATE);
 }
 
-octet_t *
-makeMACCommandHdr(frame802154_t *p, octet_t *frameBuffer)
+frame802154_t *
+makeMACCommandHdr(frame802154_t *p)
 {
-	return frameBuffer;
+	return p;
 }
 
-octet_t *
-makeTXFrameHdr(frame802154_t *p, octet_t *frameBuffer)
+
+/**
+ *	packFrame() -- pack a frameBuffer from the prototype in p
+ *
+ */
+
+void
+packTXFrame(frame802154_t *p)
 {
-	octet_t *q = frameBuffer;
+	octet_t *q = (octet_t *)&TRXFBST;
 	frameControlField_t fcf = p->fcf;
 	
-	q = copyOctets(q, HEADERVARPTR(p->fcf), 2);	/* fcf */
-	q = copyOctets(q, HEADERVARPTR(p->seq), 1);	/* seq */
+	*q++ = p->header_len + p->data_len + FTR_LEN;	/* length of TX buffer */
+	q = copyOctets(q, HEADERVARPTR(p->fcf), 2);		/* fcf */
+	q = copyOctets(q, HEADERVARPTR(p->seq), 1);		/* seq */
 	if (fcf.frameDestinationAddressMode)	{
 		q = copyOctets(q, HEADERVARPTR(p->dest_pid), 2);
 	}
@@ -98,9 +120,14 @@ makeTXFrameHdr(frame802154_t *p, octet_t *frameBuffer)
 				break;
 		}
 	}
-	
-	return (q);		/* where the payload goes */
+	blkcopy(q, p->data, p->data_len);				/* copy the payload */
 }
+
+/**
+ *	copyOctets() -- copy nbytes from to
+ *
+ *	return pointer to next "to"
+ */
 
 octet_t *
 copyOctets(octet_t *to, octet_t *from, int nbytes)
@@ -109,6 +136,160 @@ copyOctets(octet_t *to, octet_t *from, int nbytes)
 		*to++ = *from++;
 	return (to);
 }
+
+/**
+ *	copyRXOctets() -- copy nbytes from to
+ *
+ *	return pointer to next "from"
+ */
+
+octet_t *
+copyRXOctets(octet_t *to, octet_t *from, int nbytes)
+{
+	while (--nbytes >= 0)
+		*to++ = *from++;
+	return (from);
+}
+
+/**
+ *	unpackRXFrame() -- unpack the RX buffer into the fixed length frame802154_t *p
+ *
+ *	stores receive buffer info into the prototype add header_len and data_len
+ */
+
+void
+unpackRXFrame(frame802154_t *p)
+{
+	octet_t *q = (octet_t *)&TRXFBST;
+	
+	q = copyRXOctets(HEADERVARPTR(p->fcf), q, 2);		/* fcf */
+	q = copyRXOctets(HEADERVARPTR(p->seq), q, 1);		/* seq */
+	if (p->fcf.frameDestinationAddressMode)	{
+		q = copyRXOctets(HEADERVARPTR(p->dest_pid), q, 2);
+	}
+	switch (p->fcf.frameDestinationAddressMode)	{
+		case FRAME_ADDRESS_MODE_SHORT:
+			q = copyRXOctets(HEADERVARPTR(p->dest_addr[0]), q, 2);
+			memset(HEADERVARPTR(p->dest_addr[2]), 0, 6);
+			break;
+		case FRAME_ADDRESS_MODE_EXTENDED:
+			q = copyRXOctets(HEADERVARPTR(p->dest_addr[0]), q, 8);
+			break;
+		case FRAME_ADDRESS_MODE_NONE:
+		default:
+			break;
+	}
+	if(!p->fcf.framePanIDCompress) {
+		q = copyRXOctets(HEADERVARPTR(p->src_pid), q, 2);
+	}
+	switch (p->fcf.frameSourceAddressMode)	{
+		case FRAME_ADDRESS_MODE_SHORT:
+			q = copyRXOctets(HEADERVARPTR(p->src_addr[0]), q, 2);
+			memset(HEADERVARPTR(p->src_addr[2]), 0, 6);
+			break;
+		case FRAME_ADDRESS_MODE_EXTENDED:
+			q = copyRXOctets(HEADERVARPTR(p->src_addr[0]), q, 8);
+			break;
+		case FRAME_ADDRESS_MODE_NONE:
+		default:
+			break;
+	}
+	/* Aux security header */
+	if	(p->fcf.frameSecurity) {
+//		securityControlField_t scf = p->aux_hdr.scf;
+		q = copyRXOctets(HEADERVARPTR(p->aux_hdr.scf), q, 1);
+		q = copyRXOctets(HEADERVARPTR(p->aux_hdr.frameCounter), q, 4);
+		switch (p->aux_hdr.scf.keyIdMode) {
+			case 1:
+				q = copyRXOctets(p->aux_hdr.key, q, 1);
+				break;
+			case 2:
+				q = copyRXOctets(p->aux_hdr.key, q, 5);
+				break;
+			case 3:
+				q = copyRXOctets(p->aux_hdr.key, q, 9);
+				break;
+			case 0:
+			default:
+				break;
+		}
+	}
+	p->header_len = q - &TRXFBST;							/* header length	*/
+	p->data_len = TST_RX_LENGTH - p->header_len - FTR_LEN;	/* data length		*/
+	q = copyRXOctets(p->data, q, p->data_len);
+	uint8_t hibyte = *q++;
+	uint8_t lobyte = *q;
+	p->crc = (hibyte<<8) | lobyte;
+}
+
+uint8_t
+getFrameHdrLength(frame802154_t *p)
+{
+	uint8_t ret;
+	
+	if (p->header_len)	{
+		return ( p->header_len );
+	}
+	
+	ret = 3;		/* fcf */
+					/* seq */
+	if (p->fcf.frameDestinationAddressMode)	{
+		ret += 2;
+	}
+	switch (p->fcf.frameDestinationAddressMode)	{
+		case FRAME_ADDRESS_MODE_SHORT:
+			ret += 2;
+			break;
+		case FRAME_ADDRESS_MODE_EXTENDED:
+			ret += 8;
+			break;
+		case FRAME_ADDRESS_MODE_NONE:
+		default:
+			break;
+	}
+	if(!p->fcf.framePanIDCompress) {
+		ret += 2;
+	}
+	switch (p->fcf.frameSourceAddressMode)	{
+		case FRAME_ADDRESS_MODE_SHORT:
+			ret += 2;
+			break;
+		case FRAME_ADDRESS_MODE_EXTENDED:
+			ret += 8;
+			break;
+		case FRAME_ADDRESS_MODE_NONE:
+		default:
+			break;
+	}
+	/* Aux security header */
+	if	(p->fcf.frameSecurity) {
+		//		securityControlField_t scf = p->aux_hdr.scf;
+		ret += 5;
+		switch (p->aux_hdr.scf.keyIdMode) {
+			case 1:
+				ret += 1;
+				break;
+			case 2:
+				ret += 5;
+				break;
+			case 3:
+				ret += 9;
+				break;
+			case 0:
+			default:
+				break;
+		}
+	}
+	p->header_len = ret;
+	return (ret);
+}
+
+
+/**
+ *	frameHeaderDump() -- dump the header from the frame with pointer, "fptr."
+ *
+ *	"routine" is a string identifying the dump.
+ */
 
 void frameHeaderDump(char *routine, frame802154_t *fptr, int len)
 {

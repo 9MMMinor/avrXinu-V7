@@ -50,12 +50,13 @@ struct rfDeviceControlBlock	{
 	int writeSemaphore;					/* mutual exclusion semaphore */
 	int readPid;						/* process ID with a read in progress */
 	int writePid;						/* process ID with a write in progress */
-	frame_t *TX_frame;					/* transmit frame buffer */
-	frame_t *RX_frame;					/* receive frame buffer */
+	frame802154_t *TX_frame;			/* transmit (unpacked) frame buffer */
+	frame802154_t *RX_frame;			/* receive (unpacked) frame buffer */
 	uint8_t TX_saveState;				/* transmit state */
 	uint8_t operatingMode;				/* tranceiver op mode (basic, extended) */
+	uint8_t freeTXFrame;				/* frame is malloced, free the frame after write() */
 	uint8_t transactionStatus;			/* status return */
-	int errorCode;					/* SYSERR reason */
+	int errorCode;						/* SYSERR reason */
 	uint8_t writeRetrys;				/* number of write attempts */
 #if RADIOSTATS
 	int RADIO_RXfail;
@@ -78,7 +79,9 @@ enum operating_mode	{
 enum contol_functions	{
 	RADIO_RESET,
 	RADIO_SET_BASIC_OPERATING_MODE,
-	RADIO_SET_EXTENDED_OPERATING_MODE
+	RADIO_SET_EXTENDED_OPERATING_MODE,
+	RADIO_SET_FREE_TX_FRAME,
+	RADIO_CLEAR_FREE_TX_FRAME
 };
 
 typedef enum radioReturnValues	{
@@ -102,8 +105,8 @@ typedef enum radioReturnValues	{
 extern struct rfDeviceControlBlock radio[];
 
 DEVCALL radioInit(struct devsw *);
-DEVCALL radioRead(struct devsw *, frame_t *, int);
-DEVCALL radioWrite(struct devsw *, frame_t *, int);
+DEVCALL radioRead(struct devsw *, frame802154_t *, int);
+DEVCALL radioWrite(struct devsw *, frame802154_t *, int);
 DEVCALL radioCntl(struct devsw *, int);
 INTPROC radioIInt(struct rfDeviceControlBlock *);
 INTPROC	radioOInt(struct rfDeviceControlBlock *);

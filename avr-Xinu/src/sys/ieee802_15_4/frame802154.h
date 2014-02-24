@@ -11,6 +11,8 @@
 
 #define MAX_FRAME_LENGTH 127
 #define MIN_FRAME_LENGTH 3
+#define FTR_LEN 2
+#define MAX_DATA_LENGTH MAX_FRAME_LENGTH-MIN_FRAME_LENGTH
 
 /* Frame Control Field (FCF) */
 #define FRAME_TYPE_BEACON		0
@@ -87,24 +89,29 @@ typedef struct auxSecurityHeader {
  *	x.fcf.frameType = FRAME_TYPE_DATA;
  */
 typedef struct {
-	frameControlField_t fcf;	/* Frame control field  (2)				*/
-	uint8_t seq;				/* Sequence number		(1)				*/
-	uint16_t dest_pid;			/* Destination PAN ID	(0/2)			*/
-	uint8_t dest_addr[8];		/* Destination address	(0/2/8)			*/
-	uint16_t src_pid;			/* Source PAN ID		(0/2)			*/
-	uint8_t src_addr[8];		/* Source address		(0/2/8)			*/
-	auxSecurityHeader_t aux_hdr;/* Aux security header	(0/5/6/10/14)	*/
-	uint8_t *payload;			/* Pointer to 802.15.4 frame payload	*/
-	uint8_t payload_len;		/* Length of payload field				*/
+	frameControlField_t fcf;		/* Frame control field  (2)				*/
+	uint8_t seq;					/* Sequence number		(1)				*/
+	uint16_t dest_pid;				/* Destination PAN ID	(0/2)			*/
+	uint8_t dest_addr[8];			/* Destination address	(0/2/8)			*/
+	uint16_t src_pid;				/* Source PAN ID		(0/2)			*/
+	uint8_t src_addr[8];			/* Source address		(0/2/8)			*/
+	auxSecurityHeader_t aux_hdr;	/* Aux security header	(0/5/6/10/14)	*/
+	uint8_t header_len;				/* Actual header length (0)				*/
+	uint8_t data_len;				/* Payload length		(0)				*/
+	octet_t data[MAX_DATA_LENGTH];	/* Payload				(0 - 122)		*/
+	uint16_t crc;					/* FCS = MFR			(2)				*/
 } frame802154_t;
 
 #define HEADERVARPTR(var) (octet_t *)(&(var))
 
 /*============================ PROTOTYPES =======================================*/
-frameReturn_t frame802154_create(frame802154_t *, frame_t *);
-octet_t *makeTXFrameHdr(frame802154_t *, octet_t *);
-octet_t *makeMACCommandHdr(frame802154_t *, octet_t *);
+frame802154_t * frame802154_create(uint8_t);
+uint8_t getFrameHdrLength(frame802154_t *);
+void packTXFrame(frame802154_t *);
+void unpackRXFrame(frame802154_t *);
+frame802154_t *makeMACCommandHdr(frame802154_t *);
 octet_t *copyOctets(octet_t *, octet_t *, int);
+octet_t *copyRXOctets(octet_t *, octet_t *, int);
 void frameDump(char *, uint8_t *, int);
 void frameHeaderDump(char *, frame802154_t *, int);
 

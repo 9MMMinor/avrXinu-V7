@@ -44,23 +44,17 @@
 
 PROCESS frameInput(int nvar, int *pvar)
 {
-	frame_t *myFrame;
-	uint8_t *data;
-	int i,len;
+	frame802154_t *parsedFrame;
+	int len;
 	uint8_t radioChannel = 11;
 	
-	myFrame = (frame_t *)getmem(130);
-	data = (uint8_t *)myFrame;
-	for (i=0; i<130; i++)	{
-		data[i] = 0;
-	}
+	parsedFrame = (frame802154_t *)getmem(sizeof(frame802154_t));
 	radio_set_operating_channel(radioChannel);
 	ASSERT(radio_get_operating_channel()==11);
 	kprintf("frameInput is running.\n");
 	kprintf("Sniff channel 11\n");
 	while (1)	{
-		len = read(RADIO, (unsigned char *)myFrame, MAX_FRAME_LENGTH+1);
-//		kprintf("len = %d\n", len);
+		len = read(RADIO, (unsigned char *)parsedFrame, MAX_FRAME_LENGTH);
 		if (len == SYSERR)	{
 			kprintf("Can't read RADIO\n");
 			kprintf("Exiting frameInput process\n");
@@ -69,8 +63,13 @@ PROCESS frameInput(int nvar, int *pvar)
 			kprintf(".");
 		} else	{
 			kprintf("\nlen = %d\n", len);
-			frameHeaderDump("frameInput", (frame802154_t *)myFrame->data, 127);
-			frameDump("frameInput", (uint8_t *)myFrame, 130);
+			kprintf("header length = %d\n", parsedFrame->header_len);
+			kprintf("data length = %d\n", parsedFrame->data_len);
+			kprintf("Source Address = <%02x%02x%02x%02x%02x%02x%02x%02x>\n",  parsedFrame->src_addr[7],
+					parsedFrame->src_addr[6], parsedFrame->src_addr[5], parsedFrame->src_addr[4],
+					parsedFrame->src_addr[3], parsedFrame->src_addr[2], parsedFrame->src_addr[1],
+																		parsedFrame->src_addr[0]);
+			frameDump("frameInput",(uint8_t *)parsedFrame->data,parsedFrame->data_len);
 		}
 	}
 }

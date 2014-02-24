@@ -44,11 +44,8 @@
 
 PROCESS frameOutput(int nvar, int *pvar)
 {
-	frame_t myFrame;
 	frame802154_t frameStructure;
 	uint8_t radioChannel = 11;
-	uint8_t *payload;
-	frame802154_t *header;
 	
 	radio_set_operating_channel(radioChannel);
 	ASSERT(radio_get_operating_channel()==11);
@@ -60,30 +57,26 @@ PROCESS frameOutput(int nvar, int *pvar)
 	frameStructure.fcf.frameVersion = FRAME_VERSION_2006;
 	frameStructure.fcf.frameDestinationAddressMode = FRAME_ADDRESS_MODE_SHORT;
 	frameStructure.fcf.frameSourceAddressMode = FRAME_ADDRESS_MODE_SHORT;
-	
 	frameStructure.seq = 0;
 	frameStructure.dest_pid = 0xab;
 	frameStructure.dest_addr[0] = 0xbe;
 	frameStructure.dest_addr[1] = 0xba;
-	
 	frameStructure.src_addr[0] = 0xa0;
 	frameStructure.src_addr[1] = 0xa1;
-
 	frameStructure.src_pid = 0x1234;
 
-	payload = makeTXFrameHdr(&frameStructure, (octet_t *)&myFrame.data);
-	memcpy( (void *)payload, "this is my payload", 18);
-	myFrame.length = MAX_FRAME_LENGTH;
+	memcpy(frameStructure.data, "this is my payload", 18);
+	frameStructure.data_len = 18;
+	frameStructure.header_len = 0;
+	frameStructure.header_len = getFrameHdrLength(&frameStructure);
 	
-	frameHeaderDump("frameOutput", (frame802154_t *)&myFrame.data, 40);
-	frameDump("frameOutput", (uint8_t *)&myFrame, 40);
-	header = (frame802154_t *)&myFrame.data;
+//	frameHeaderDump("frameOutput", (frame802154_t *)&myFrame.data, 40);
+//	frameDump("frameOutput", (uint8_t *)&myFrame, 40);
 	
 	for (;;)	{
-		write(RADIO, (unsigned char *)&myFrame, MAX_FRAME_LENGTH);
-		kprintf("write sequence = %d\n",header->seq);
-		header->seq++;
+		write(RADIO, (unsigned char *)&frameStructure, frameStructure.header_len + frameStructure.data_len + 2);
+		kprintf("write sequence = %d\n",frameStructure.seq);
+		frameStructure.seq++;
 		sleep(30);
 	}
-	return (0);
 }

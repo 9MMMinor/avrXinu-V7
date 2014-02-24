@@ -99,7 +99,7 @@ uint32_t		macResponseWaitTimeMs; // MAC response wait time in !!!milliseconds!!!
 /** \brief Our own long address. This needs to be read from EEPROM or
  *  other secure memory storage.
  */
-uint64_t macLongAddr = 0x000000A0BAD0BABE;
+uint64_t macLongAddr = 0x000425191801058C;				/* my Xplained Pro */
 volatile uint8_t macLongAddrBuf[8];		/* for debug? */
 
 /*

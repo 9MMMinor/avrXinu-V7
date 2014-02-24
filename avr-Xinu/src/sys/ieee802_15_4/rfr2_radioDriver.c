@@ -91,6 +91,7 @@ DEVCALL radioInit(struct devsw *devptr)
 	rfPtr->transactionStatus = 0;
 	rfPtr->writeRetrys = 0;	/* NO retry for now */
 	rfPtr->operatingMode = BASIC;
+	rfPtr->freeTXFrame = 0;			/* FALSE - free() TX frame				*/
 	ANT_div.ANT_DIV_En = 0;			/* Antenna Diversity algorithm disabled */
 	ANT_div.ANT_EXT_SW_En = 0;		/* Disable Antenna Switch */
 //	ANT_div.ANT_Sel = 1;			/* 2->Antenna0, 1->Antenna1 */
@@ -142,6 +143,18 @@ int radioCntl(struct devsw *devptr, int func)
 			 */
 			rfPtr->operatingMode = EXTENDED;
 			break;
+			
+		case RADIO_SET_FREE_TX_FRAME:
+			/** This function forces the driver to free() the TX frame
+			 *	after transmission.
+			 */
+			rfPtr->freeTXFrame = TRUE;
+			
+		case RADIO_CLEAR_FREE_TX_FRAME:
+			/** This function forces the driver to free() the TX frame
+			 *	after transmission.
+			 */
+			rfPtr->freeTXFrame = FALSE;
 
 		default:
 			restore(ps);
@@ -153,12 +166,12 @@ int radioCntl(struct devsw *devptr, int func)
 
 /*
  *------------------------------------------------------------------------
- *  radioRead - read a single frame from the radio interface
+ *  radioRead - read a single frame from the radio interface and UNPACK
  *		read(RADIO, buff, len);  comes here
  *------------------------------------------------------------------------
  */
 
-DEVCALL radioRead(struct devsw *devptr, frame_t *frame, int len)
+DEVCALL radioRead(struct devsw *devptr, frame802154_t *frame, int len)
 {
 	STATWORD ps;
 	struct rfDeviceControlBlock *rfPtr;
@@ -180,11 +193,9 @@ DEVCALL radioRead(struct devsw *devptr, frame_t *frame, int len)
 		return(SYSERR);
 	}
 	rfPtr->RX_frame = frame;
-//	rfPtr->RX_frameBuffer = frame->data;
-//	rfPtr->RX_frameLength = frame->length = len;  /* changed in ISR to actual length received */
-	rfPtr->RX_frame->length = len;	/* changed in ISR to actual length received */
-	frame->lqi = 0;
-	frame->crc = FALSE;
+
+//	frame->lqi = 0;
+//	frame->crc = FALSE;
 	IRQ_status.RX_End = 1;					/* clears RX_End bit   */
 	IRQ_mask.RX_END_Enable = 1;				/* enable RX interrupt */
 	
@@ -200,7 +211,7 @@ DEVCALL radioRead(struct devsw *devptr, frame_t *frame, int len)
 		ret = RADIO_TIMEOUT;
 	} else	{
 		tmclear(timerPortID, rfPtr);	/* clear time-out */
-		ret = rfPtr->RX_frame->length;
+		ret = rfPtr->RX_frame->header_len + rfPtr->RX_frame->data_len;
 	}
 	signal(rfPtr->readSemaphore);
 	
@@ -230,19 +241,17 @@ INTPROC cancelRead(void *p)
 
 INTPROC radioIInt(struct rfDeviceControlBlock *rfPtr)
 {
-	uint8_t *to = (uint8_t *)rfPtr->RX_frame->data;
-	uint8_t *from = (uint8_t *)&TRXFBST;
-	int8_t nbytes = TST_RX_LENGTH;
-	
-	rfPtr->RX_frame->length = (uint8_t)nbytes;
-	/* read */
-	while (--nbytes >= 0)	{
-		*to++ = *from++;
+
+
+	if (isbadpid(rfPtr->readPid)) {
+		return;							/* no read pending */
 	}
+	
+	unpackRXFrame(rfPtr->RX_frame);
 	/* add lqi and crc to the end of the frame */
-	rfPtr->RX_frame->lqi = PHY_rssi.Rssi;		/* LQI can be much more sophisticated! */
-	rfPtr->RX_frame->crc = PHY_rssi.CRC_Valid;	/* CRC flag */
-//	TRX_state.TRX_Cmd = CMD_PLL_ON;				/* Why?? and not here */
+//	rfPtr->RX_frame->lqi = PHY_rssi.Rssi;		/* LQI can be much more sophisticated! */
+//	rfPtr->RX_frame->crc = PHY_rssi.CRC_Valid;	/* CRC flag */
+
 	IRQ_mask.RX_END_Enable = 0;					/* disable RX interrupt */
 	ready(rfPtr->readPid, RESCHYES);
 }
@@ -254,15 +263,15 @@ INTPROC radioIInt(struct rfDeviceControlBlock *rfPtr)
  *------------------------------------------------------------------------
  */
 
-DEVCALL radioWrite(struct devsw *devptr, frame_t *frame, int dataLen)
+DEVCALL radioWrite(struct devsw *devptr, frame802154_t *frame, int dataLen)
 {
 	struct rfDeviceControlBlock *rfPtr;
 	radio_status_t status = 0;
 	STATWORD ps;
 	
 	rfPtr = &radio[devptr->dvminor];
-	if (dataLen > MAX_FRAME_LENGTH)	{
-//		kprintf("rfr2write: Bad len %d\n", dataLen);
+	/* it's OK to write less than all the data, but not less than a full header */
+	if (dataLen > MAX_FRAME_LENGTH || dataLen < frame->header_len)	{
 		rfPtr->errorCode = RADIO_INVALID_ARGUMENT;
 		return (SYSERR);
 	}
@@ -270,37 +279,27 @@ DEVCALL radioWrite(struct devsw *devptr, frame_t *frame, int dataLen)
 	wait(rfPtr->writeSemaphore);	/* wait (possibly) for previous TX to finish  */
 	
 	disable(ps);
-	if (dataLen < MIN_FRAME_LENGTH)	{
-		dataLen = MIN_FRAME_LENGTH;
-	}
-	
+		
 	rfPtr->TX_saveState = TRX_status.TRX_Status;	/* save state */
 	
 	if ( (rfPtr->operatingMode == BASIC) && ((status = radio_set_trx_state(CMD_PLL_ON)) != RADIO_SUCCESS))	{
 		rfPtr->errorCode = RADIO_WRONG_STATE;
-//		kprintf("radioWrite status = %x\n", status);
 		restore(ps);
 		return(SYSERR);
 	} else if ( (rfPtr->operatingMode == EXTENDED) && ((status = radio_set_trx_state(CMD_TX_ARET_ON)) != RADIO_SUCCESS))	{
 		rfPtr->errorCode = RADIO_WRONG_STATE;
-//		kprintf("radioWrite status = %x\n", status);
 		restore(ps);
 		return(SYSERR);
 	}
 	
 	rfPtr->writePid = currpid;
-	uint8_t *to = (uint8_t *)&TRXFBST;
-	*to++ = dataLen;
-	uint8_t *from = (uint8_t *)frame->data;
-	int8_t nbytes = dataLen;
 	
 	IRQ_status.TX_End = 1;					/* clears TX_End bit   */
 	IRQ_mask.TX_END_Enable = 1;				/* enable TX interrupt */
 
+	/* you can change the order of the following two statements */
+	packTXFrame(frame);
 	TRX_state.TRX_Cmd = CMD_TX_START;
-	while (--nbytes >= 0)	{
-		*to++ = *from++;
-	}
 
 	suspend( (rfPtr->writePid = currpid) );
 
