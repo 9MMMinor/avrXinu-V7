@@ -25,6 +25,8 @@
 #include <stdlib.h>                     /* FOR malloc() */
 #include <avr/pgmspace.h>
 
+#include "frameIO.h"
+
 #define FOSC F_CPU					// default fuse setting CKDIV8=0
 #define BAUD 9600L
 #define STK500_UBRR (FOSC)/(BAUD*8L)-1L		// U2X0 set for doubling
@@ -133,15 +135,10 @@ void nulluser(void)
     userpid = create(main,INITSTK,INITPRIO,INITNAME,0);
 //	kprintf("main: created %d\n", userpid);
 
-#ifdef	NETDAEMON
-	/* start the network input daemon process */
+	/* start the frameIO input daemon process */
 	resume(
-	  create(NETIN, NETISTK, NETIPRI, NETINAM, 1, userpid)
-	);
-#else
-	PORTB = 0;
-    resume( userpid );
-#endif
+		   create(RADIOIN, RADIOISTK, RADIOIPRI, RADIOINAM, 1, userpid)
+		   );
 
     while ( 1 )	{
 //		SMCR |= (1<<SE);	/* enable sleep idle mode */
