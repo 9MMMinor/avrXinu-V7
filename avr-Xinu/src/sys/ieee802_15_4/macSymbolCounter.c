@@ -144,7 +144,7 @@ radioTimerEventInit(void)
 	SCCR0 &= ~(1<<SCCMP1);		/* absolute compare (SCOCR1 == SCCNT) */
 	/* create a port with maximum counts of messages */
 	timerPortID = pcreate(MAXTIMERMESSAGES);
-	tqPid = create(radioTimer, 200, 105, "radioTimer", 0);
+	tqPid = create(radioTimer, 600, 105, "radioTimer", 0);
 	resume(tqPid);
 }
 
@@ -343,6 +343,34 @@ radioKick(void)
 {
 	return OK;
 }
+
+/**
+ *------------------------------------------------------------------------
+ *  pauseMicroSeconds -  set a fast timer and wait for it
+ *------------------------------------------------------------------------
+ */
+
+void pauseMicroSeconds(void *message, uint32_t usec)
+{
+	uint32_t time = usec/16;	/* convert to symbol times */
+	
+	tmset(timerPortID, message, time, (void *)0);
+	preceive(timerPortID);		/* blocks until time event */
+}
+
+/**
+ *------------------------------------------------------------------------
+ *  pauseSymbolTimes -  set a fast timer and wait for it
+ *------------------------------------------------------------------------
+ */
+
+void pauseSymbolTimes(void *message, uint32_t stime)
+{
+	
+	tmset(timerPortID, message, stime, (void *)0);
+	preceive(timerPortID);		/* blocks until time event */
+}
+
 
 /**
  *------------------------------------------------------------------------

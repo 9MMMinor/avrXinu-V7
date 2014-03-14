@@ -160,13 +160,13 @@ main( void )
 }
 
 
-void pauseMicroSeconds(void *message, uint32_t usec)
-{ 
-	uint32_t time = usec/16;	/* convert to symbol times */
+//void pauseMicroSeconds(void *message, uint32_t usec)
+//{
+//	uint32_t time = usec/16;	/* convert to symbol times */
 	
-	tmset(timerPortID, message, time, &printNow);
-	preceive(timerPortID);	/* blocks until time event */
-}
+//	tmset(timerPortID, message, time, &printNow);
+//	preceive(timerPortID);	/* blocks until time event */
+//}
 
 INTPROC printNow(void *message)
 {

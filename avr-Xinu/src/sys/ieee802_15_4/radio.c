@@ -230,15 +230,18 @@ radio_init(void)
         RADIO_radio_on = 1;
 #endif
     }
+	IRQ_status.TX_End = 1;					/* clears TX_End bit   */
+	IRQ_mask.TX_END_Enable = 1;				/* enable TX interrupt */
+	
+	ASSERT(TRX_status.TRX_Status == STATUS_TRX_OFF);
 
-    //  set callbacks for events.  Save user's rx_event, which we will
-    //  call from radio_rx_start_event().  Same with trx_end
-//    user_rx_event = rx_event;
-//    user_trx_end_event = trx_end_event;
-//    hal_set_rx_start_event_handler(radio_rx_start_event);
-//    hal_set_trx_end_event_handler(radio_trx_end_event);
-
-//    rx_frame_callback = rx_callback;
+//		set callbacks for events.  Save user's rx_event, which we will
+//		call from radio_rx_start_event().  Same with trx_end
+//		user_rx_event = rx_event;
+//		user_trx_end_event = trx_end_event;
+//		hal_set_rx_start_event_handler(radio_rx_start_event);
+//		hal_set_trx_end_event_handler(radio_trx_end_event);
+//		rx_frame_callback = rx_callback;
 
     return init_status;
 }

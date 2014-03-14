@@ -60,7 +60,16 @@ uint8_t         phySHRDuration;
 uint8_t         phySymbolsPerOctet;
 
 /* MAC global variables */
-uint32_t		macAckWaitDuration;
+uint32_t		macAckWaitDuration		= 20000;			/* symbol times */
+/*		The read-only attribute macAckWaitDuration is dependent on a combination of constants and PHY PIB
+		attributes. The PHY PIB attributes are listed in Table 71. The formula for relating the constants and attributes
+		is:
+			macAckWaitDuration = aUnitBackoffPeriod + aTurnaroundTime + phySHRDuration + ceiling (6
+																					  × phySymbolsPerOctet)
+		where the number 6 comes from the number of PHY header octets plus the number of PSDU octets in an
+		acknowledgment frame and ceiling() is a function that returns the smallest integer value greater than or equal
+		to its argument value.
+ */
 Bool			macAssociationPermit;
 Bool			macAutoRequest;
 //Bool			macBattLifeExt;
@@ -77,7 +86,7 @@ Bool			macGTSPermit;
 uint8_t			macMaxCsmaBackoffs;
 uint8_t			macMinBE;
 PanId_t			macPANId;
-Bool			macPromiscuousMode;
+Bool			macPromiscuousMode	= FALSE;
 Bool			macRxOnWhenIdle;
 ShortAddr_t		macShortAddress = 0xbabe;
 ExtAddr_t		macExtAddress;                   // Additional parameter. NOT described in the standard.
@@ -88,7 +97,7 @@ uint16_t		macTransactionPersistenceTime;
 uint32_t		macTransactionPersistenceTimeInMs;
 Bool			macAssociatedPanCoord;
 uint8_t			macMaxBE;
-//uint8_t		macMaxFrameTotalWaitTime;
+uint8_t			macMaxFrameTotalWaitTime;
 uint8_t			macMaxFrameRetries;
 uint8_t			macResponseWaitTime;
 Bool			macTimestampSupported;
@@ -106,7 +115,7 @@ volatile uint8_t macLongAddrBuf[8];		/* for debug? */
  *-------------------------------------------------------------------------------------------------------------------------
  *	mib_info -- contains an entry for every MIB variable and some PHY variables. Each entry contains all information needed
  *	to access or modify the variable. The mib-info table is searchable by mib_objectID.
- *	Entries in the mib[] must be in numerical order by mib_objectID (ieee802.15.4 mib identifier (2003-Table 71)).
+ *	Entries in the mib[] must be in numerical order by mib_objectID (ieee802.15.4 pib identifier (2003-Table 71, p135)).
  *-------------------------------------------------------------------------------------------------------------------------
  */
 struct mib_info mib[] = {
@@ -156,7 +165,51 @@ struct mib_info mib[] = {
 
 int mib_entries = sizeof(mib) / sizeof(struct mib_info);
 
+
+/* FROM SICS: */
 /*
+ *
+ *  Copyright (c) 2008, Swedish Institute of Computer Science
+ *  All rights reserved.
+ *
+ *  Additional fixes for AVR contributed by:
+ *
+ *	Colin O'Flynn coflynn@newae.com
+ *	Eric Gnoske egnoske@gmail.com
+ *	Blake Leverett bleverett@gmail.com
+ *	Mike Vidales mavida404@gmail.com
+ *	Kevin Brown kbrown3@uccs.edu
+ *	Nate Bohlmann nate@elfwerks.com
+ *
+ *   All rights reserved.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ *   * Neither the name of the copyright holders nor the names of
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+/* SICS: FIRST PART OF frame_tx_create()
 void
 field_len(frame802154_t *p, field_length_t *flen)
 {
@@ -212,13 +265,19 @@ int mib_Function(void * mib_var)
 	return 0;
 }
 
-
 /**
  * @brief Gets the MIB table entry
  *
  * @param Binary search mib-table for pib identifier.
  *
  * @return Pointer to the MIB record
+ *
+ *	While this works fine and relatively quickly, it does not allow the mib[]
+ *	database to be dynamic. We can never add entries to the mib[].  The mib structure,
+ *	mib_info, is designed to be a list which would have to be linked-up at network
+ *	initialize. If we did that, the routine below would have to traverse the list
+ *	until it found the entry for the pib identifier.
+ *
  */
 struct mib_info *
 get_MibEntry(int pib_attribute_id)
@@ -246,7 +305,7 @@ get_MibEntry(int pib_attribute_id)
 
 
 /* Implementation */
-
+/* SICS: */
 /** \brief Initializes the (quasi) 802.15.4 MAC.  This function should
  * be called only once on startup.
  */
@@ -289,6 +348,7 @@ mac_init(void)
 	/* Convert expected byte order */
 	//mmm	byte_reverse((uint8_t *)uip_lladdr.addr, 8);
 }
+/* end SICS: */
 
 
 
@@ -316,8 +376,8 @@ struct sap_info sapFuncTab[] = {
 };
 
 
-
-/*------------------------------------------------------------------------
+/*
+ *------------------------------------------------------------------------
  * SAP_function - call function to access primatives through the SAP
  *------------------------------------------------------------------------
  */

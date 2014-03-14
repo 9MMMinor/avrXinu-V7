@@ -102,6 +102,12 @@ typedef struct {
 	uint16_t crc;					/* FCS = MFR			(2)				*/
 } frame802154_t;
 
+typedef struct {
+	frameControlField_t fcf;
+	uint8_t seq;
+	octet_t data[2];
+} ackFrame_t;
+
 #define HEADERVARPTR(var) (octet_t *)(&(var))
 
 /*============================ PROTOTYPES =======================================*/

@@ -72,7 +72,7 @@ packTXFrame(frame802154_t *p)
 	*q++ = p->header_len + p->data_len + FTR_LEN;	/* length of TX buffer */
 	q = copyOctets(q, HEADERVARPTR(p->fcf), 2);		/* fcf */
 	q = copyOctets(q, HEADERVARPTR(p->seq), 1);		/* seq */
-	if (fcf.frameDestinationAddressMode)	{
+	if (fcf.frameDestinationAddressMode != FRAME_ADDRESS_MODE_NONE)	{
 		q = copyOctets(q, HEADERVARPTR(p->dest_pid), 2);
 	}
 	switch (fcf.frameDestinationAddressMode)	{
@@ -86,7 +86,7 @@ packTXFrame(frame802154_t *p)
 		default:
 			break;
 	}
-	if(!fcf.framePanIDCompress) {
+	if (fcf.framePanIDCompress == 0) {
 		q = copyOctets(q, HEADERVARPTR(p->src_pid), 2);
 	}
 	switch (fcf.frameSourceAddressMode)	{
@@ -101,7 +101,7 @@ packTXFrame(frame802154_t *p)
 			break;
 	}
 	/* Aux security header */
-	if	(fcf.frameSecurity) {
+	if	(fcf.frameSecurity == 1) {
 		securityControlField_t scf = p->aux_hdr.scf;
 		q = copyOctets(q, HEADERVARPTR(scf), 1);
 		q = copyOctets(q, HEADERVARPTR(p->aux_hdr.frameCounter), 4);
@@ -164,7 +164,7 @@ unpackRXFrame(frame802154_t *p)
 	
 	q = copyRXOctets(HEADERVARPTR(p->fcf), q, 2);		/* fcf */
 	q = copyRXOctets(HEADERVARPTR(p->seq), q, 1);		/* seq */
-	if (p->fcf.frameDestinationAddressMode)	{
+	if (p->fcf.frameDestinationAddressMode != FRAME_ADDRESS_MODE_NONE)	{
 		q = copyRXOctets(HEADERVARPTR(p->dest_pid), q, 2);
 	}
 	switch (p->fcf.frameDestinationAddressMode)	{
@@ -179,7 +179,7 @@ unpackRXFrame(frame802154_t *p)
 		default:
 			break;
 	}
-	if(!p->fcf.framePanIDCompress) {
+	if (p->fcf.framePanIDCompress == 0) {
 		q = copyRXOctets(HEADERVARPTR(p->src_pid), q, 2);
 	}
 	switch (p->fcf.frameSourceAddressMode)	{
@@ -195,7 +195,7 @@ unpackRXFrame(frame802154_t *p)
 			break;
 	}
 	/* Aux security header */
-	if	(p->fcf.frameSecurity) {
+	if	(p->fcf.frameSecurity == 1) {
 //		securityControlField_t scf = p->aux_hdr.scf;
 		q = copyRXOctets(HEADERVARPTR(p->aux_hdr.scf), q, 1);
 		q = copyRXOctets(HEADERVARPTR(p->aux_hdr.frameCounter), q, 4);
@@ -227,13 +227,13 @@ getFrameHdrLength(frame802154_t *p)
 {
 	uint8_t ret;
 	
-	if (p->header_len)	{
-		return ( p->header_len );
-	}
+//	if (p->header_len)	{
+//		return ( p->header_len );
+//	}
 	
 	ret = 3;		/* fcf */
 					/* seq */
-	if (p->fcf.frameDestinationAddressMode)	{
+	if (p->fcf.frameDestinationAddressMode != FRAME_ADDRESS_MODE_NONE)	{
 		ret += 2;
 	}
 	switch (p->fcf.frameDestinationAddressMode)	{
@@ -247,7 +247,7 @@ getFrameHdrLength(frame802154_t *p)
 		default:
 			break;
 	}
-	if(!p->fcf.framePanIDCompress) {
+	if(p->fcf.framePanIDCompress == 0) {
 		ret += 2;
 	}
 	switch (p->fcf.frameSourceAddressMode)	{
@@ -262,7 +262,7 @@ getFrameHdrLength(frame802154_t *p)
 			break;
 	}
 	/* Aux security header */
-	if	(p->fcf.frameSecurity) {
+	if	(p->fcf.frameSecurity == 1) {
 		//		securityControlField_t scf = p->aux_hdr.scf;
 		ret += 5;
 		switch (p->aux_hdr.scf.keyIdMode) {
@@ -297,9 +297,10 @@ void frameHeaderDump(char *routine, frame802154_t *fptr, int len)
 	octet_t *p = (octet_t *)fptr;
 	int i;
 	
-	kprintf("frame_Dump (%s):",routine);
+	kprintf("frame_Dump (%s):", routine);
+	kprintf(" packet length = %d", fptr->header_len+fptr->data_len+2);
 	
-	kprintf("\n FCF = <%02x%02x> ", *(p+1), *p);
+	kprintf(" FCF = <%02x%02x> ", *(p+1), *p);
 	p += 2;
 	kprintf("Seq = %02x\n", *p++);
 	if (fcf.frameDestinationAddressMode)	{
@@ -367,6 +368,8 @@ void frameHeaderDump(char *routine, frame802154_t *fptr, int len)
 		}
 		kprintf(">\n");
 	}
+	frameDump("data", fptr->data, fptr->data_len);
+	kprintf("CRC = <%04x>\n", fptr->crc);
 }
 
 void frameDump(char *routine, uint8_t *p, int len)
@@ -374,7 +377,7 @@ void frameDump(char *routine, uint8_t *p, int len)
 	uint8_t ch[16];
 	int i,j;
 	
-	kprintf("DATA:\n");
+	kprintf("%s:\n", routine);
 	for (i=0 ; i<len ; i+=16)	{
 		kprintf("%04X ", i);
 		for (j=0; j<16; j++)	{

@@ -18,6 +18,13 @@
 #define DIG1 PING1
 #define DIG2 PINF2
 
+#define TMASK 0x07
+#define EVENT(x) ((x)&TMASK)
+#define UNIT(x)  ((x) >> 3)
+#define MKEVENT(timer,unit) ( ((unit)<<3) | ( ((timer) & TMASK)) )
+#define READ_WITH_TIMEOUT	1			/* timer EVENT */
+#define WRITE_WITH_ACK		2
+
 typedef enum	{	/* Time[us], typ. 				STATE TRANSITION		*/
 /*					   --------------				----------------		*/
     TTR2	=			240,					/*   SLEEP->TRX_OFF			*/
@@ -43,6 +50,7 @@ typedef enum	{	/* Time[us], typ. 				STATE TRANSITION		*/
 #define TIME_CMD_FORCE_TRX_OFF		TTR12	/**<  Time it takes to execute the FORCE_TRX_OFF command. */
 #define TIME_TRX_OFF_TO_PLL_ACTIVE	TTR4	/**<  Transition time from TRX_OFF to PLL_ON	*/
 #define TIME_STATE_TRANSITION_PLL_ACTIVE TTR14
+#define TIME_SIFS_WITH_BACKOFF		200000	/* macSIFSPeriod+aUnitBackoffPeriod	*/
 
 struct rfDeviceControlBlock	{
 	struct devsw *rfDevice;				/* switch table entry */
@@ -55,9 +63,16 @@ struct rfDeviceControlBlock	{
 	uint8_t TX_saveState;				/* transmit state */
 	uint8_t operatingMode;				/* tranceiver op mode (basic, extended) */
 	uint8_t freeTXFrame;				/* frame is malloced, free the frame after write() */
+	Bool doRXTimeout;					/* cancel read() after TIME_OUT_TIME seconds (10)	*/
 	uint8_t transactionStatus;			/* status return */
 	int errorCode;						/* SYSERR reason */
 	uint8_t writeRetrys;				/* number of write attempts */
+	Bool ackTXPending;					/* TRUE if an ack is being TXed */
+	uint8_t ackTXSeq;					/* sequence for ACK frame */
+	ackFrame_t ackTXFrame;				/* an initialized ACK */
+	Bool ackRXPending;					/* TRUE if an ack is expected */
+	uint8_t ackRXSeq;					/* sequence for ACK frame */
+	ackFrame_t *ackRXFrame;				/* a received frame POINTER */
 #if RADIOSTATS
 	int RADIO_RXfail;
 	int RADIO_TXfail;
@@ -81,7 +96,9 @@ enum contol_functions	{
 	RADIO_SET_BASIC_OPERATING_MODE,
 	RADIO_SET_EXTENDED_OPERATING_MODE,
 	RADIO_SET_FREE_TX_FRAME,
-	RADIO_CLEAR_FREE_TX_FRAME
+	RADIO_CLEAR_FREE_TX_FRAME,
+	RADIO_SET_READ_WITH_TIMEOUT,
+	RADIO_CLEAR_READ_WITH_TIMEOUT
 };
 
 typedef enum radioReturnValues	{
