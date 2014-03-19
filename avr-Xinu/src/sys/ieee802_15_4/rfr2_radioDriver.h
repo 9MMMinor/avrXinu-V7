@@ -25,17 +25,17 @@
 #define READ_WITH_TIMEOUT	1			/* timer EVENT */
 #define WRITE_WITH_ACK		2
 
-typedef enum	{	/* Time[us], typ. 				STATE TRANSITION		*/
-/*					   --------------				----------------		*/
-    TTR2	=			240,					/*   SLEEP->TRX_OFF			*/
-    TTR3	=			 22,					/* TRX_OFF->SLEEP (16 MHz)	*/
-	TTR4	=			110,					/* TRX_OFF->PLL_ON			*/
-	TTR6	=			110,					/* TRX_OFF->RX_ON			*/
-	TTR10	=			 16,					/*  PLL_ON->BUSY_TX			*/
-	TTR11	=			 32,					/* BUSY_TX->PLL_ON			*/
-	TTR12	=			  1,					/* FORCE_TRX_OFF->ALL		*/
-	TTR13	=			 37,					/*   RESET->TRX_OFF			*/
-	TTR14	=			  1,					/*  VARIOUS->PLL_ON			*/
+typedef enum	{	/* Time[us], typ. 				STATE TRANSITION				*/
+/*					   --------------				----------------				*/
+    TTR2	=			240,					/*         SLEEP->TRX_OFF			*/
+    TTR3	=			 22,					/*       TRX_OFF->SLEEP (16 MHz)	*/
+	TTR4	=			110,					/*       TRX_OFF->PLL_ON			*/
+	TTR6	=			110,					/*       TRX_OFF->RX_ON				*/
+	TTR10	=			 16,					/*        PLL_ON->BUSY_TX			*/
+	TTR11	=			 32,					/*       BUSY_TX->PLL_ON			*/
+	TTR12	=			  1,					/* FORCE_TRX_OFF->ALL				*/
+	TTR13	=			 37,					/*         RESET->TRX_OFF			*/
+	TTR14	=			  1,					/*       VARIOUS->PLL_ON			*/
 } radio_trx_timing_t;
 
 #define TIME_TO_ENTER_P_ON			510		/**<  Transition time from VCC is applied to P_ON. */
@@ -61,6 +61,7 @@ struct rfDeviceControlBlock	{
 	frame802154_t *TX_frame;			/* transmit (unpacked) frame buffer */
 	frame802154_t *RX_frame;			/* receive (unpacked) frame buffer */
 	uint8_t TX_saveState;				/* transmit state */
+	uint8_t IRQ_save;					/* IRQ_mask RX_END_Enable save/restore */
 	uint8_t operatingMode;				/* tranceiver op mode (basic, extended) */
 	uint8_t freeTXFrame;				/* frame is malloced, free the frame after write() */
 	Bool doRXTimeout;					/* cancel read() after TIME_OUT_TIME seconds (10)	*/

@@ -13,6 +13,7 @@
 #define MIN_FRAME_LENGTH 3
 #define FTR_LEN 2
 #define MAX_DATA_LENGTH MAX_FRAME_LENGTH-MIN_FRAME_LENGTH
+#define MAX_HDR_LENGTH 38			/* +1 for header_len */
 
 /* Frame Control Field (FCF) */
 #define FRAME_TYPE_BEACON		0

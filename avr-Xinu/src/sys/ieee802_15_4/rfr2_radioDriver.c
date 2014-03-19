@@ -44,6 +44,7 @@
 #include <macSymbolCounter.h>
 #include <mib.h>
 #include <radio.h>
+#include <frameIO.h>
 
 #define __ASSERT_USE_STDERR
 #include <assert.h>
@@ -54,6 +55,7 @@
 struct rfDeviceControlBlock radio[Nradio];
 #endif
 extern uint8_t radio_TIMER;
+extern struct radioinfo Radio;
 #define RADIO_TIMER &radio_TIMER
 
 int freebuf(int *);
@@ -92,22 +94,23 @@ DEVCALL radioInit(struct devsw *devptr)
 	rfPtr->readPid = 0;
 	rfPtr->writePid = 0;
 	rfPtr->TX_saveState = 0;
+	rfPtr->IRQ_save = 0;
 	rfPtr->transactionStatus = 0;
 	rfPtr->writeRetrys = 0;	/* NO retry for now */
 	rfPtr->operatingMode = BASIC;
 	rfPtr->freeTXFrame = 0;			/* FALSE - free() TX frame				*/
 	rfPtr->doRXTimeout = FALSE;		/* FALSE - enable RX cancel				*/
 	rfPtr->ackTXPending = FALSE;		/* no BASIC mode TX ack pending			*/
-	rfPtr->ackTXFrame.fcf.frameType = FRAME_TYPE_ACK;	/* initialize ackTXFrame	*/
-	rfPtr->ackTXFrame.fcf.frameSecurity = 0;
-	rfPtr->ackTXFrame.fcf.frameAckRequested = 0;		/* don't ack the ack */
-	rfPtr->ackTXFrame.fcf.frameVersion = FRAME_VERSION_2006;
-	rfPtr->ackTXFrame.fcf.frameDestinationAddressMode = 0;
-	rfPtr->ackTXFrame.fcf.frameSourceAddressMode = 0;
-	rfPtr->ackTXFrame.seq = 1;
+//	rfPtr->ackTXFrame.fcf.frameType = FRAME_TYPE_ACK;	/* initialize ackTXFrame	*/
+//	rfPtr->ackTXFrame.fcf.frameSecurity = 0;
+//	rfPtr->ackTXFrame.fcf.frameAckRequested = 0;		/* don't ack the ack */
+//	rfPtr->ackTXFrame.fcf.frameVersion = FRAME_VERSION_2006;
+//	rfPtr->ackTXFrame.fcf.frameDestinationAddressMode = 0;
+//	rfPtr->ackTXFrame.fcf.frameSourceAddressMode = 0;
+//	rfPtr->ackTXFrame.seq = 1;
 	rfPtr->ackTXSeq = 0;
 	rfPtr->ackRXPending = FALSE;	/* no BASIC mode RX ack pending			*/
-	rfPtr->ackRXSeq = 0;
+//	rfPtr->ackRXSeq = 0;
 	ANT_div.ANT_DIV_En = 0;			/* Antenna Diversity algorithm disabled */
 	ANT_div.ANT_EXT_SW_En = 0;		/* Disable Antenna Switch */
 //	ANT_div.ANT_Sel = 1;			/* 2->Antenna0, 1->Antenna1 */
@@ -235,7 +238,7 @@ DEVCALL radioRead(struct devsw *devptr, frame802154_t *frame, int len)
 	
 //	ASSERT(TRX_status.TRX_Status == STATUS_RX_ON);
 	
-	/* set a time-out EVENT if we don"t want to block forever */
+	/* set a time-out EVENT if we don't want to block forever */
 	if (rfPtr->doRXTimeout)	{
 		timer_event = MKEVENT(READ_WITH_TIMEOUT, devptr->dvminor);
 		tmset(timerPortID, &timer_event, TIME_OUT_TIME, &cancelRead);
@@ -258,11 +261,11 @@ DEVCALL radioRead(struct devsw *devptr, frame802154_t *frame, int len)
 			rfPtr->RX_frame->fcf.frameAckRequested &&
 			ret != RADIO_TIMEOUT)						{
 		/* send an ACK Frame out - wait only for TX_END */
+//		pauseSymbolTimes(RADIO_TIMER, TIME_SIFS_WITH_BACKOFF);
+		pauseSymbolTimes(RADIO_TIMER, 12);	/* 2, 6 12 Symbol Times */
 		radio_set_trx_state(CMD_PLL_ON);
-		pauseSymbolTimes(RADIO_TIMER, 12);
 		
 		sendAckFrame(rfPtr);
-		suspend(currpid);			/* wait for TX_END with ackPending */
 	}
 
 //	signal(rfPtr->readSemaphore);
@@ -294,13 +297,13 @@ INTPROC cancelRead(void * timed_event)
 INTPROC radioIInt(struct rfDeviceControlBlock *rfPtr)
 {
 	frame802154_t *frame = rfPtr->RX_frame;
-	octet_t *q = (octet_t *)&TRXFBST;
+//	octet_t *q = (octet_t *)&TRXFBST;
 	
 	if (rfPtr->ackRXPending)	{
 		rfPtr->ackRXPending = FALSE;
-		kprintf("resume from ackRXPending\n");
+//		kprintf("resume from ackRXPending\n");
 //		ready(rfPtr->writePid, RESCHYES);
-		frameDump("radioIInt",q,40);
+//		frameDump("radioIInt",q,TST_RX_LENGTH);
 		resume(rfPtr->writePid);
 		return;
 	}
@@ -321,25 +324,36 @@ INTPROC radioIInt(struct rfDeviceControlBlock *rfPtr)
 	ready(rfPtr->readPid, RESCHYES);
 }
 
-
 void
 sendAckFrame(struct rfDeviceControlBlock *rfPtr)
 {
-	octet_t *q = (octet_t *)&TRXFBST;
+	frame802154_t *frame = (frame802154_t *)getbuf(Radio.radiopool);	/* get a frame for the ack */
+	uint16_t temp_pid;
+	uint8_t temp_addr[8];
 	
-	IRQ_status.TX_End = 1;					/* clears TX_End bit   */
-	IRQ_mask.TX_END_Enable = 1;				/* enable TX interrupt */
-
+	memcpy(frame, rfPtr->RX_frame, MAX_HDR_LENGTH);		/* copy just the header */
+	frame->fcf.frameType = FRAME_TYPE_ACK;				/* and modify			*/
+	frame->fcf.frameAckRequested = 0;
+	frame->data_len = 0;
+	
+	temp_pid = frame->dest_pid;							/* swap src and dest	*/
+	frame->dest_pid = frame->src_pid;
+	frame->src_pid = temp_pid;
+	memcpy(temp_addr, frame->dest_addr, 8);
+	memcpy(frame->dest_addr, frame->src_addr, 8);
+	memcpy(frame->src_addr, temp_addr, 8);
+	
+	packTXFrame(frame);
+	IRQ_status.TX_End = 1;					// clears TX_End bit
+	IRQ_mask.TX_END_Enable = 1;				// enable TX interrupt
 	rfPtr->ackTXPending = TRUE;
 	
-	rfPtr->ackTXFrame.seq = rfPtr->RX_frame->seq; /* copy from received frame to ack frame */
-	*q++ = 5;
-	copyOctets(q, (octet_t *)(&rfPtr->ackTXFrame), 5);
+//	frameHeaderDump("sendAckFrame", frame, 40);
+	
 	TRX_state.TRX_Cmd = CMD_TX_START;
-	kprintf("sendAckFrame\n");
-	frameDump("sendAckFrame",q,5);
+	suspend(currpid);			/* wait for TX_END with ackPending */
+	freebuf((int *)frame);
 }
-
 
 /*
  *------------------------------------------------------------------------
@@ -366,7 +380,8 @@ DEVCALL radioWrite(struct devsw *devptr, frame802154_t *frame, int dataLen)
 	
 	wait(rfPtr->writeSemaphore);	/* wait (possibly) for previous TX to finish  */
 	disable(ps);
-		
+	
+	rfPtr->IRQ_save = IRQ_mask.RX_END_Enable;		/* save IRQ mask */
 	rfPtr->TX_saveState = TRX_status.TRX_Status;	/* save state */
 	
 	if ( (rfPtr->operatingMode == BASIC) && ((status = radio_set_trx_state(CMD_PLL_ON)) != RADIO_SUCCESS))	{
@@ -390,50 +405,65 @@ DEVCALL radioWrite(struct devsw *devptr, frame802154_t *frame, int dataLen)
 	
 	rfPtr->TX_frame = frame;
 
-	kprintf("Write: 1st suspend\n");
+//	kprintf("Write: 1st suspend\n");
 	suspend( (rfPtr->writePid = currpid) );
 	
 	if ( (frame->fcf.frameAckRequested) && (rfPtr->operatingMode == BASIC) )	{
 		/* we either get notified that an Ack frame was received	*/
 		/* or we get RADIO_NO_ACK									*/
-		kprintf("Write: 2nd suspend\n");
-//		getAckFrame(rfPtr);
 		rfPtr->ackRXPending = TRUE;
-		status = radio_set_trx_state(CMD_RX_ON);
-		kprintf("Get ack: status=%d\n",status);
+//		rfPtr->ackRXSeq = frame->seq;
 		IRQ_status.RX_End = 1;					/* clears RX_End bit   */
 		IRQ_mask.RX_END_Enable = 1;				/* enable RX interrupt */
+		/* set an ack time-out EVENT */
 		
-		suspend(currpid);
+		/*	5.1.6.4.2 Acknowledgment
+		 A frame transmitted with the AR field set to request an acknowledgment, as defined in 5.2.1.1.4, shall be
+		 acknowledged by the recipient. If the intended recipient correctly receives the frame, it shall generate and
+		 send an acknowledgment frame containing the same DSN from the data or MAC command frame that is
+		 being acknowledged.	The transmission of an acknowledgment frame in a nonbeacon-enabled PAN or in the CFP
+		 shall commence macSIFSPeriod after the reception of the last symbol of the data or MAC command frame.
+		 The transmission of an acknowledgment frame in the CAP shall commence either macSIFSPeriod after the
+		 reception of the last symbol of the data or MAC command frame or at a backoff period boundary.
+		 In the latter case, the transmission of an acknowledgment frame shall commence between macSIFSPeriod
+		 and (macSIFSPeriod + aUnitBackoffPeriod) after the reception of the last symbol of the data or
+		 MAC command frame. The message sequence chart in Figure 26 [ieee 2011] shows the scenario for transmitting
+		 a single frame of data from an originator to a recipient with an acknowledgment requested.
+		 
+		 A device that sends a data or MAC command frame with its AR field set to acknowledgment requested shall
+		 wait for at most macAckWaitDuration for the corresponding acknowledgment frame to be received.
+		 */
+		
+		/* set-up to wait until we get an Ack frame or an Ack TIMEOUT */
+
+		status = radio_set_trx_state(CMD_RX_ON);
+		uint8_t event = MKEVENT(WRITE_WITH_ACK, 0);
+		rfPtr->errorCode = RADIO_SUCCESS;
+//		tmset(timerPortID, &event, TIME_SIFS_WITH_BACKOFF, &setNoAck);
+		tmset(timerPortID, &event, 125000, &setNoAck);						/* A LONG LONG TIME, shorter than "TIME" */
+		
+		suspend(currpid); /* resume if ack received OR ack TIMEOUT */
 
 		ackFrame_t *ack = (ackFrame_t *)&TRXFBST;
+//		kprintf("ack received, ackRXSeq=%d\n",rfPtr->ackRXSeq);
 		if (rfPtr->errorCode == RADIO_NO_ACK)	{
 			rfPtr->errorCode = 0;
 			ret = RADIO_NO_ACK;
-		} else	if ( rfPtr->ackRXSeq == ack->seq )		{	/* the right Ack! */
-			tmclear(timerPortID, (void *)MKEVENT(0,WRITE_WITH_ACK));	/* clear time-out */
+			kprintf("No ack frame\n");
+		} else	if ( ack->fcf.frameType == FRAME_TYPE_ACK && frame->seq == ack->seq )		{	/* the right Ack! */
+//			kprintf("Ack frame: len=%d\n", TST_RX_LENGTH);
+			tmclear(timerPortID, &event);	/* clear time-out */
 			ret = rfPtr->RX_frame->header_len + rfPtr->RX_frame->data_len + FTR_LEN;
+		} else	{
+			kprintf("Bad ack frame: len=%d\n", TST_RX_LENGTH);
 		}
 	}
 	radio_set_trx_state(rfPtr->TX_saveState);	/* restore state */
+	IRQ_mask.RX_END_Enable = rfPtr->IRQ_save;	/* restore mask  */
 	signal(rfPtr->writeSemaphore);				/* signal TX done */
 	restore(ps);
 	return( ret );
 }
-
-//void getAckFrame(struct rfDeviceControlBlock *rfPtr)
-//{
-	/* operatingMode == BASIC && frameAckRequested */
-//	rfPtr->ackRXPending = TRUE;
-//	radio_set_trx_state(CMD_RX_ON);
-//	IRQ_status.RX_End = 1;					/* clears RX_End bit   */
-//	IRQ_mask.RX_END_Enable = 1;				/* enable RX interrupt */
-	
-//	suspend(currpid);
-	/* don't unpack frame - just checks and retrieve seq */
-//	rfPtr->ackRXSeq = rfPtr->ackRXFrame->seq;
-//	return;
-//}
 
 //ISR(TRX24_TX_END_vect)
 //{
@@ -451,7 +481,7 @@ INTPROC	radioOInt(struct rfDeviceControlBlock *rfPtr)
 
 	if (rfPtr->ackTXPending)	{
 		rfPtr->ackTXPending = FALSE;
-		kprintf("resume from ackTXPending\n");
+//		kprintf("resume from ackTXPending\n");
 		ready(rfPtr->readPid, RESCHYES);
 		return;
 	}
@@ -488,27 +518,7 @@ INTPROC	radioOInt(struct rfDeviceControlBlock *rfPtr)
 	} else	{
 		rfPtr->transactionStatus = SUCCESS;			/* (PLL_ON)				*/
 	
-/*	5.1.6.4.2 Acknowledgment
-	A frame transmitted with the AR field set to request an acknowledgment, as defined in 5.2.1.1.4, shall be
-	acknowledged by the recipient. If the intended recipient correctly receives the frame, it shall generate and
-	send an acknowledgment frame containing the same DSN from the data or MAC command frame that is
-	being acknowledged.	The transmission of an acknowledgment frame in a nonbeacon-enabled PAN or in the CFP
- 	shall commence macSIFSPeriod after the reception of the last symbol of the data or MAC command frame.
- 	The transmission of an acknowledgment frame in the CAP shall commence either macSIFSPeriod after the
- 	reception of the last symbol of the data or MAC command frame or at a backoff period boundary.
- 	In the latter case, the transmission of an acknowledgment frame shall commence between macSIFSPeriod
- 	and (macSIFSPeriod + aUnitBackoffPeriod) after the reception of the last symbol of the data or
- 	MAC command frame. The message sequence chart in Figure 26 shows the scenario for transmitting a single
- 	frame of data from an originator to a recipient with an acknowledgment requested.
- */
-		/* rfPtr->operatingMode == BASIC */
-		if (rfPtr->TX_frame->fcf.frameAckRequested)	{
-			/* set-up to wait until we get an Ack frame or an Ack TIMEOUT */
-			uint8_t event = MKEVENT(WRITE_WITH_ACK, 0);
-//			tmset(timerPortID, &event, TIME_SIFS_WITH_BACKOFF, &setNoAck);
-			tmset(timerPortID, &event, 1000000, &setNoAck);						/* A LONG LONG TIME */
-			kprintf("Oint: tmset\n");
-		}
+
 	}
 	ready(rfPtr->writePid, RESCHYES);
 	return;
@@ -522,7 +532,7 @@ INTPROC setNoAck(void *event)
 {
 	struct rfDeviceControlBlock *rfPtr = &radio[UNIT(*(uint8_t *)event)];
 
-	kprintf("setNoAck: TIMEOUT\n");
+//	kprintf("setNoAck: TIMEOUT\n");
 	rfPtr->ackRXPending = FALSE;		/* cancel pending */
 	rfPtr->errorCode = RADIO_NO_ACK;
 	resume(rfPtr->writePid);

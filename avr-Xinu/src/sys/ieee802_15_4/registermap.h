@@ -440,4 +440,14 @@ struct	IRQ_Mask1 {
 };
 #define IRQ_Mask1 (*((volatile struct IRQ_Mask1*)&IRQ_MASK1))
 
+// Multiple Address Filter Configuration Register 0
+struct MAF_Cr0	{
+	uint8_t MAF_0_Enable:1;	/* defaults to 1 on reset */
+	uint8_t MAF_1_Enable:1;
+	uint8_t MAF_2_Enable:1;
+	uint8_t MAF_3_Enable:1;
+	uint8_t Reserved:4;
+};
+#define MAF_Cr0 (*((volatile struct MAF_Cr0*)&MAFCR0))
+
 #endif

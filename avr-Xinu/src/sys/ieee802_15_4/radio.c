@@ -79,6 +79,9 @@
 #include <rfr2_radioDriver.h>
 #include "radio.h"
 
+uint8_t pause_TIMER = 3;
+#define PAUSE_TIMER &pause_TIMER
+
 #define __ASSERT_USE_STDERR
 #include <assert.h>
 #define ASSERT(e) assert(e)
@@ -186,7 +189,7 @@ radio_init(void)
     radio_status_t init_status = RADIO_SUCCESS;
 
 //	delay_us(TIME_TO_ENTER_P_ON);
-	pauseMicroSeconds((void *)3, TIME_TO_ENTER_P_ON);
+	pauseMicroSeconds(PAUSE_TIMER, TIME_TO_ENTER_P_ON);
 
     /*  calibrate oscillator */
 //    if (cal_rc_osc){
@@ -202,7 +205,7 @@ radio_init(void)
 
 	TRX_state.TRX_Cmd = CMD_FORCE_TRX_OFF;
 //	delay_us(TIME_P_ON_TO_TRX_OFF); /* Wait for the transition to be complete. */
-	pauseMicroSeconds((void *)3, TIME_P_ON_TO_TRX_OFF);
+	pauseMicroSeconds(PAUSE_TIMER, TIME_P_ON_TO_TRX_OFF);
 
     if (TRX_status.TRX_Status != STATUS_TRX_OFF)	{
 		printf("Error: State=0x%0x\n",TRX_status.TRX_Status);
@@ -890,7 +893,7 @@ static void switch_pll_on(void)
 	
 	IRQ_status.PLL_Lock = 1;			// clear PLL lock bit
 	TRX_state.TRX_Cmd = CMD_PLL_ON;
-	pauseMicroSeconds((void *)3, 2*TIME_PLL_LOCK);	// Check if PLL is locked
+	pauseMicroSeconds(PAUSE_TIMER, 2*TIME_PLL_LOCK);	// Check if PLL is locked
 	if (IRQ_status.PLL_Lock == 1)	{
 		return;  						// PLL is locked now
 	}

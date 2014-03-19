@@ -43,10 +43,12 @@ main(void)
 {
 	frame802154_t *frame;
 	pingPacket_t *ping;
+	int loop = 0;
 
 #ifdef MASTER
 	frame802154_t *reply;
 	uint8_t seq = 0;
+	int echo_reply = 0;
 	
 	/* make a ping packet */
 	ping = (pingPacket_t *)getmem(sizeof(pingPacket_t));
@@ -55,16 +57,16 @@ main(void)
 	ping->pcf.includeTimeVal = 1;
 	ping->pcf.res = 0;
 	memset(ping->data, 0, 8);
-	frameDump("main", (octet_t *)ping, sizeof(pingPacket_t));
 	
 	while (TRUE) {
 		
-		
+		loop++;
+//		printf("Ping %d\n", loop);
 		frame = (frame802154_t *)getbuf(Radio.radiopool);
-		/* fill every field */
+		/* fill every field! */
 		frame->fcf.frameType = FRAME_TYPE_DATA;
 		frame->fcf.frameSecurity = 0;
-		frame->fcf.frameAckRequested = 0;						/* working with =0 */
+		frame->fcf.frameAckRequested = 1;
 		frame->fcf.framePending = 0;
 		frame->fcf.frameVersion = FRAME_VERSION_2006;
 		frame->fcf.frameDestinationAddressMode = FRAME_ADDRESS_MODE_SHORT;
@@ -87,10 +89,13 @@ main(void)
 		
 		if (ping->pcf.replyRequested)	{
 			reply = (frame802154_t *)preceive(Radio.fiport);
-			frameHeaderDump("Master", reply, 40);
 			freebuf((int *)reply);
+			echo_reply++;
 		}
 		
+		if (ping->pcf.replyRequested && loop%10 == 0)	{
+			printf("pings sent %d, echoed pings received %d\n", loop, echo_reply);
+		}
 		sleep(TIME);
 	}
 #endif
@@ -100,12 +105,14 @@ main(void)
 	uint8_t temp_addr[8];
 	
 	kprintf("Slave is listening\n");
-	macPromiscuousMode = TRUE;
+//	macPromiscuousMode = TRUE;
 	while (TRUE) {
 
+		printf("Got ping %d\n", loop++);
 		frame = (frame802154_t *)preceive(Radio.fiport);	/* blocks */
 		ping = (pingPacket_t *)frame->data;
 		if (ping->pcf.replyRequested == 1)	{
+			sleep10(5);							/* slow ping response */
 			temp_pid = frame->dest_pid;
 			frame->dest_pid = frame->src_pid;
 			frame->src_pid = temp_pid;

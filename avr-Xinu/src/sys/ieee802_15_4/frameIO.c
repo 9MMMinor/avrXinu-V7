@@ -9,9 +9,9 @@
 /*
  *	This module is a simple 802.15.4 network layer which would be replaced by specific protcol layers (ZigBee or others).
  *	We implement this layer with two processes, the input process, and the output process. The output process is
- *	fairly simple, it accepts frames from the local output port and sends them. The input
- *	process receives frames and decides whether to enqueue them for upper layers of the network software or to forward
- *	them. The user layer (main ...) does output by sending frames to Radio.foport and input by receiving frames from
+ *	fairly simple, it accepts frames from the local output port and sends them. The input process receives frames and
+ *  decides whether to enqueue them for upper layers of the network software or to forward them. The user layer
+ *	(main ...) does output by sending frames to Radio.foport and input by receiving frames from
  *	the input port (Radio.fiport).
  */
 
@@ -81,7 +81,7 @@ PROCESS frameInput(int argc, int *argv)
 			dropFrame();
 		}
 		else if (macPromiscuousMode == TRUE)	{
-			kprintf("Promiscuous\n");
+//			kprintf("Promiscuous\n");
 			psend(Radio.fiport, (int)fptr);					/* just queue the frame */
 			fptr = (frame802154_t *)getbuf(Radio.radiopool);	/* and get a new one */
 		}
@@ -91,11 +91,11 @@ PROCESS frameInput(int argc, int *argv)
 					break;
 				case FRAME_TYPE_DATA:
 					psend(Radio.fiport, (int)fptr);					/* queue the frame for upper levels*/
-					kprintf("frameInput(data): f=%p\n", fptr);
+//					kprintf("frameInput(data): f=%p\n", fptr);
 					fptr = (frame802154_t *)getbuf(Radio.radiopool);	/* and get a new one */
 					break;
 				case FRAME_TYPE_ACK:
-					kprintf("frameInput(ack): f=%p\n", fptr);
+//					kprintf("frameInput(ack): f=%p\n", fptr);
 					break;
 				case FRAME_TYPE_MAC_COMMAND:
 					doMACCommand(fptr);
@@ -121,19 +121,19 @@ void dropFrame(void)
 PROCESS frameOutput(int argc, int *argv)
 {
 	frame802154_t *fptr;
+//	int loop = 0;
 	
 	if (argc != 1)
 		panic("frameOutput: Bad arguments\n");
 	resume( argv[0] );							/* main!! */
+	kprintf("Network output process runs\n");	/* don't ask - this needs to be here??? */
 	
 	while ( TRUE )	{
 		fptr = (frame802154_t *)preceive(Radio.foport);			/* blocks */
-		kprintf("frameOutput: f=%p\n", fptr);
 		int len = fptr->header_len + fptr->data_len + FTR_LEN;
-		kprintf("write\n");
 		write(RADIO, (unsigned char *)fptr, len);
-		kprintf("write done\n");
 		freebuf((int *)fptr);
+//		printf("frameOutput %d\n", loop++);
 	}
 }
 
