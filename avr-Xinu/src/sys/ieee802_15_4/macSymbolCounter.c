@@ -44,10 +44,7 @@ PROCESS radioTimer(void);
 void macSymbolCounterInit(void)
 {
 	STATWORD ps;
-//
-//	12/21/13 -- timer2 stopped?? after I soldered 47 ohm termination on RFP, RFN pins. (Connection??)
-//		select system clock (SCCKSEL=0)
-//
+
 	SCCR0 |= ( (0<<SCCKSEL)	|	/* select 32kHz clock source if 1 */
 				(1<<SCEN)	|	/* Symbol Counter Enable */
 				(1<<SCTSE) );	/* Symbol Counter Automatic Timestamping Enable */
@@ -144,7 +141,7 @@ radioTimerEventInit(void)
 	SCCR0 &= ~(1<<SCCMP1);		/* absolute compare (SCOCR1 == SCCNT) */
 	/* create a port with maximum counts of messages */
 	timerPortID = pcreate(MAXTIMERMESSAGES);
-	tqPid = create(radioTimer, 600, 105, "radioTimer", 0);
+	tqPid = create(radioTimer, 600, 105, "radioTim", 0);
 	resume(tqPid);
 }
 
@@ -166,8 +163,13 @@ radioTimer(void)
 		wait(tqMutex);
 		now = macSymbolCounterRead();
 
-		while ( tqHead  && tqHead->tq_compare <= now)	{
-			psend(tqHead->tq_port, (int)tqHead->tq_msg);
+		while ( tqHead  && tqHead->tq_compare <= now )	{
+			if ((int)tqHead->tq_port == SLEEP_SYMBOL_TIMES)	{
+				send(tqHead->tq_pid, (int)tqHead->tq_msg);
+			}
+			else	{
+				psend(tqHead->tq_port, (int)tqHead->tq_msg);
+			}
 			tq = tqHead;
 			tqHead = tqHead->tq_next;
 			freemem(tq, sizeof(struct tqent));
@@ -197,7 +199,7 @@ ISR(SCNT_CMP1_vect)
 	uint32_t now;
 	
 	now = macSymbolCounterRead();
-	for( tq = tqHead; tq && tq->tq_compare <= now; tq = tq->tq_next)	{
+	for ( tq = tqHead; tq && tq->tq_compare <= now; tq = tq->tq_next )	{
 		if ( tq->tq_callThru )	{
 			(*tq->tq_callThru)(tq->tq_msg);		/* callback routine */
 		}
@@ -275,7 +277,9 @@ tmleft(int port, void *msg)
  *	is the relative time (in symbol time units) from the execution of tmset
  *	until a compare interrupt is set to occur. When the interrupt
  *	occurs, \em msg is passed to the Xinu port, \em port, and the INTPROC,
- *	\em callThru, is called with \em msg as an argument.
+ *	\em callThru, is called with \em msg as an argument. If the port is the
+ *	special SLEEP_SYMBOL_TIMES-port (Not a real port) the message, msg, is sent
+ *	to the process executing tmset when the compare interrupt occurs.
  */
 
 int
@@ -288,7 +292,12 @@ tmset(uint8_t port, void *msg, uint32_t time, INTPROC (*callThru)(void *))
 		if ( callThru )	{
 			(*callThru)(msg);		/* callback routine */
 		}
-		psend(port, (int)msg);
+		if (port == SLEEP_SYMBOL_TIMES)	{
+			send(currpid, (int)msg);		/* send self a wakeup message */
+		}
+		else	{
+			psend(port, (int)msg);
+		}
 		return OK;
 	}
 	/* get a new time structure and fill it */
@@ -297,6 +306,7 @@ tmset(uint8_t port, void *msg, uint32_t time, INTPROC (*callThru)(void *))
 	tqNew->tq_compare = now + time;
 	tqNew->tq_port = port;
 	tqNew->tq_msg = msg;
+	tqNew->tq_pid = currpid;
 	tqNew->tq_callThru = callThru;
 	tqNew->tq_next = NULLQ;
 	
@@ -354,8 +364,8 @@ void pauseMicroSeconds(void *message, uint32_t usec)
 {
 	uint32_t time = usec/16;	/* convert to symbol times */
 	
-	tmset(timerPortID, message, time, (void *)0);
-	preceive(timerPortID);		/* blocks until time event */
+	tmset(SLEEP_SYMBOL_TIMES, message, time, (void *)0);
+	receive();		/* blocks until time event */
 }
 
 /**
@@ -367,8 +377,8 @@ void pauseMicroSeconds(void *message, uint32_t usec)
 void pauseSymbolTimes(void *message, uint32_t stime)
 {
 	
-	tmset(timerPortID, message, stime, (void *)0);
-	preceive(timerPortID);		/* blocks until time event */
+	tmset(SLEEP_SYMBOL_TIMES, message, stime, (void *)0);
+	receive();		/* blocks until time event */
 }
 
 

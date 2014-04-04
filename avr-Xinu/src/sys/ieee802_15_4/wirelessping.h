@@ -9,7 +9,7 @@
 #ifndef _02_15_4_Mib_wirelessping_h
 #define _02_15_4_Mib_wirelessping_h
 
-#define TIME 10
+#define TIME 1
 #define PINGAPP 0xab
 
 typedef struct pingControlField	{
@@ -24,5 +24,13 @@ typedef struct pingPacket	{
 	uint8_t data[8];
 } pingPacket_t;
 
+struct ping_info	{
+	int pingsSent;
+	int pingsRecvd;
+	int pingsNoEcho;
+	uint32_t delta;
+};
+
+extern struct ping_info Pinfo;
 
 #endif

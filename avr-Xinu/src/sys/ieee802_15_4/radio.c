@@ -187,9 +187,12 @@ radio_status_t
 radio_init(void)
 {
     radio_status_t init_status = RADIO_SUCCESS;
+	
+	kprintf("radio_init()...");
 
 //	delay_us(TIME_TO_ENTER_P_ON);
 	pauseMicroSeconds(PAUSE_TIMER, TIME_TO_ENTER_P_ON);
+	kprintf("..done\n");
 
     /*  calibrate oscillator */
 //    if (cal_rc_osc){
@@ -1004,62 +1007,6 @@ radio_use_auto_tx_crc(bool auto_crc_on)
     } else {
 		TRX_ctrl1.TX_AUTO_CRC_On = 0;
     }
-}
-
-/*----------------------------------------------------------------------------*/
-/** \brief  This function will download a frame to the radio transceiver's
- *          transmit buffer and send it.
- *
- *  \param  data_length Length of the frame to be transmitted. 1 to 128 bytes are the valid lengths.
- *  \param  *data   Pointer to the data to transmit
- *
- *  \retval RADIO_SUCCESS Frame downloaded and sent successfully.
- *  \retval RADIO_INVALID_ARGUMENT If the dataLength is 0 byte or more than 127
- *                               bytes the frame will not be sent.
- *  \retval RADIO_WRONG_STATE It is only possible to use this function in the
- *                          PLL_ON and TX_ARET_ON state. If any other state is
- *                          detected this error message will be returned.
- */
-radio_status_t
-radio_send_data(uint8_t data_length, uint8_t *data)
-{
-#if ( defined (XINU_TARGET_MEGA2564RF) || defined (XINU_TARGET_256RFR2XPLAINPRO) )
-
-	return (write(RADIO, data, data_length) > 0);
-#else
-    /*Check function parameters and current state.*/
-    if (data_length > RADIO_MAX_TX_FRAME_LENGTH){
-#if RADIOSTATS
-        RADIO_sendfail++;
-#endif
-        return RADIO_INVALID_ARGUMENT;
-    }
-
-     /* If we are busy, return */
-        if ((TRX_status.TRX_Status == BUSY_TX) || (TRX_status.TRX_Status == BUSY_TX_ARET) )
-        {
-#if RADIOSTATS
-        RADIO_sendfail++;
-#endif
-        return RADIO_WRONG_STATE;
-        }
-
-    radio_set_trx_state(TRX_OFF);
-    radio_set_trx_state(TX_ARET_ON);
-
-    /*Do frame transmission.*/
-    /* Toggle the SLP_TR pin to initiate the frame transmission. */
-    TRX_pr.sleep = 1;
-    TRX_pr.sleep = 0;
-
-    hal_frame_write(data, data_length); /* Then write data to the frame buffer. */
-
-#if RADIOSTATS
-    RADIO_sendpackets++;
-#endif
-    return RADIO_SUCCESS;
-#endif
-	
 }
 
 /*----------------------------------------------------------------------------*/

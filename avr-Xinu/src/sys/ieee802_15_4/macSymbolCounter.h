@@ -12,6 +12,7 @@
 typedef uint32_t time_t;
 #define NULLQ (struct tqent *)0
 #define MAXTIMERMESSAGES	15
+#define SLEEP_SYMBOL_TIMES	129
 
 /* 802.15.4-2011
  The MLME shall timestamp each received beacon frame at the same symbol boundary within each frame,
@@ -32,6 +33,7 @@ struct	tqent {
 	uint32_t tq_compare;			/* time to expire (Symbol Counts)		*/
 	uint32_t tq_time;				/* time this entry was queued			*/
 	uint8_t tq_port;				/* port to send the event				*/
+	uint8_t tq_pid;					/* process id for send/receive (SLEEP)	*/
 	void *tq_msg;					/* data to send when expired			*/
 	INTPROC (*tq_callThru)(void *);	/* INTPROC called from event match ISR	*/
 	struct tqent *tq_next;			/* next in the list						*/

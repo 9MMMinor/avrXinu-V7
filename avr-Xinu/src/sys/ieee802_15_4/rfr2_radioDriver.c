@@ -50,6 +50,7 @@
 #include <assert.h>
 #define ASSERT(e) assert(e)
 
+extern uint32_t macAckWaitDuration;			/* needs to be in mib.h */
 
 #ifdef Nradio
 struct rfDeviceControlBlock radio[Nradio];
@@ -124,6 +125,7 @@ DEVCALL radioInit(struct devsw *devptr)
 //	IRQ_mask.TX_END_Enable = 1;				/* enable TX interrupt */
 	
 //	ASSERT(TRX_status.TRX_Status == STATUS_TRX_OFF);
+	kprintf("radioInit\n");
 		
 	return(OK);
 }
@@ -259,10 +261,9 @@ DEVCALL radioRead(struct devsw *devptr, frame802154_t *frame, int len)
 	}
 	if (rfPtr->operatingMode == BASIC &&
 			rfPtr->RX_frame->fcf.frameAckRequested &&
-			ret != RADIO_TIMEOUT)						{
+			ret != RADIO_TIMEOUT)	{
 		/* send an ACK Frame out - wait only for TX_END */
-//		pauseSymbolTimes(RADIO_TIMER, TIME_SIFS_WITH_BACKOFF);
-		pauseSymbolTimes(RADIO_TIMER, 12);	/* 2, 6 12 Symbol Times */
+		pauseSymbolTimes(RADIO_TIMER, 12);	/* standard 12 Symbol Times */
 		radio_set_trx_state(CMD_PLL_ON);
 		
 		sendAckFrame(rfPtr);
@@ -435,26 +436,40 @@ DEVCALL radioWrite(struct devsw *devptr, frame802154_t *frame, int dataLen)
 		 */
 		
 		/* set-up to wait until we get an Ack frame or an Ack TIMEOUT */
+		
+		/*
+		 * Received frames are passed to the frame filtering unit, refer to section "Frame Filtering"
+		 * on page 58. If the content of the MAC addressing fields of a frame (refer to
+		 * IEEE 802.15.4 section 7.2.1) matches to the expected addresses, which is further
+		 * dependent on the addressing mode, an address match interrupt (TRX24_XAH_AMI) is
+		 * issued, refer to "Interrupt Logic" on page 36. The expected address values are to be
+		 * stored in the registers Short-Address, PAN-ID and IEEE-address. Frame filtering is
+		 * available in Basic and Extended Operating Mode, refer to section "Frame Filtering" on
+		 * page 58.
+		 */
 
 		status = radio_set_trx_state(CMD_RX_ON);
-		uint8_t event = MKEVENT(WRITE_WITH_ACK, 0);
+		/* static ????? */
+		static uint8_t event = MKEVENT(WRITE_WITH_ACK, 0);
 		rfPtr->errorCode = RADIO_SUCCESS;
-//		tmset(timerPortID, &event, TIME_SIFS_WITH_BACKOFF, &setNoAck);
-		tmset(timerPortID, &event, 125000, &setNoAck);						/* A LONG LONG TIME, shorter than "TIME" */
+		tmset(timerPortID, &event, 2*macAckWaitDuration, &setNoAck);	/* see mib.c */
 		
 		suspend(currpid); /* resume if ack received OR ack TIMEOUT */
 
 		ackFrame_t *ack = (ackFrame_t *)&TRXFBST;
 //		kprintf("ack received, ackRXSeq=%d\n",rfPtr->ackRXSeq);
 		if (rfPtr->errorCode == RADIO_NO_ACK)	{
-			rfPtr->errorCode = 0;
-			ret = RADIO_NO_ACK;
-			kprintf("No ack frame\n");
-		} else	if ( ack->fcf.frameType == FRAME_TYPE_ACK && frame->seq == ack->seq )		{	/* the right Ack! */
+			ret = SYSERR;
+			kprintf("TIMEOUT: No ack frame\n");
+		}
+		else if ( ack->fcf.frameType == FRAME_TYPE_ACK && frame->seq == ack->seq )		{	/* the right Ack! */
 //			kprintf("Ack frame: len=%d\n", TST_RX_LENGTH);
 			tmclear(timerPortID, &event);	/* clear time-out */
 			ret = rfPtr->RX_frame->header_len + rfPtr->RX_frame->data_len + FTR_LEN;
-		} else	{
+		}
+		else	{
+			rfPtr->errorCode = RADIO_NO_ACK;
+			ret = SYSERR;
 			kprintf("Bad ack frame: len=%d\n", TST_RX_LENGTH);
 		}
 	}

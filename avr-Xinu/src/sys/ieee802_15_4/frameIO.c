@@ -7,10 +7,10 @@
 //
 
 /*
- *	This module is a simple 802.15.4 network layer which would be replaced by specific protcol layers (ZigBee or others).
+ *	This module is a simple 802.15.4 network layer which would be replaced by specific protcol layers.
  *	We implement this layer with two processes, the input process, and the output process. The output process is
  *	fairly simple, it accepts frames from the local output port and sends them. The input process receives frames and
- *  decides whether to enqueue them for upper layers of the network software or to forward them. The user layer
+ *  decides whether to enqueue them for upper layers of the network software or to drop them. The user layer
  *	(main ...) does output by sending frames to Radio.foport and input by receiving frames from
  *	the input port (Radio.fiport).
  */
@@ -44,7 +44,6 @@ int frameInit(void)
 	Radio.nmutex = screate(1);
 	Radio.fiport = pcreate(RADIO_QUEUE_LEN);		/* input */
 	Radio.foport = pcreate(RADIO_QUEUE_LEN);		/* output */
-//	Radio.faport = pcreate(RADIO_QUEUE_LEN);		/* separate ack port? */
 	Radio.npacket = Radio.ndrop = Radio.nover = Radio.nmiss = Radio.nerror = 0;
 	return(OK);
 }
@@ -76,32 +75,39 @@ PROCESS frameInput(int argc, int *argv)
 	for (fptr = (frame802154_t *)getbuf(Radio.radiopool); TRUE; )	{			/* FOREVER */
 		/* MAC command reception shall abide by the procedure described in 5.1.6.2. */
 		len = read(RADIO, (unsigned char *)fptr, sizeof(frame802154_t));	/* includes 1st level (FCS) filtering */
-		if ( len < 0)	{
-			kprintf("frameInput: TIME-OUT (%d)\n", len);
+		if ( len < 0 )	{
+			kprintf("frameInput: driver Time-Out (%d)\n", len);
 			dropFrame();
 		}
-		else if (macPromiscuousMode == TRUE)	{
+		Radio.npacket++;
+		if (macPromiscuousMode == TRUE)	{
 //			kprintf("Promiscuous\n");
-			psend(Radio.fiport, (int)fptr);					/* just queue the frame */
-			fptr = (frame802154_t *)getbuf(Radio.radiopool);	/* and get a new one */
+			if (psend(Radio.fiport, (int)fptr) == OK)	{			/* just queue the frame */
+				fptr = (frame802154_t *)getbuf(Radio.radiopool);	/* and get a new one */
+			}
 		}
 		else	{			/* passes 3rd level filtering */
 			switch (fptr->fcf.frameType)	{
 				case FRAME_TYPE_BEACON:
 					break;
 				case FRAME_TYPE_DATA:
-					psend(Radio.fiport, (int)fptr);					/* queue the frame for upper levels*/
-//					kprintf("frameInput(data): f=%p\n", fptr);
-					fptr = (frame802154_t *)getbuf(Radio.radiopool);	/* and get a new one */
-					break;
-				case FRAME_TYPE_ACK:
-//					kprintf("frameInput(ack): f=%p\n", fptr);
+					if ( psend(Radio.fiport, (int)fptr) == OK )	{			/* queue the frame for upper levels */
+						fptr = (frame802154_t *)getbuf(Radio.radiopool);	/* and get a new one */
+					}
+					else	{
+						kprintf("frameInput: no psend\n");
+					}
 					break;
 				case FRAME_TYPE_MAC_COMMAND:
 					doMACCommand(fptr);
 					fptr = (frame802154_t *)getbuf(Radio.radiopool);
+					break;
 				default:
+				case FRAME_TYPE_ACK:							/* ack frames intercepted in driver */
+//					kprintf("frameInput(ack): f=%p\n", fptr);
 					Radio.nerror++;
+					Radio.ndrop++;
+					break;
 			}
 		}
 	}

@@ -14,7 +14,6 @@
 #define false 0
 
 /* structs and typedefs */
-typedef uint8_t octet_t;			/* type of sub object ids	*/
 
 /* Structure that contains the value of an MIB variable: {MIBtype,MIBvalue} */
 struct mibValue {
@@ -30,10 +29,6 @@ struct mibValue {
 		uint64_t MIBextendedAddr;		/* variable is an extended address	*/
 	} MIBvalue;						/* value of var is one of the above	*/
 };
-
-typedef uint16_t PanId_t;     ///< PAN identifier type declaration.
-typedef uint16_t ShortAddr_t; ///< Short address type declaration.
-typedef uint64_t ExtAddr_t;   ///< Extended address type declaration.
 
 struct mib_info	{
 	const char *mib_name;		/* name of mib variable */
@@ -185,5 +180,55 @@ int SYNC_LOSS_indication(struct sap_info *, struct mib_info *);
 int POLL_request(struct sap_info *,  struct mib_info *);
 int POLL_confirm(struct sap_info *, struct mib_info *);
 int NOFUNCTION_error(struct sap_info *, struct mib_info *mip);
+
+void mac_init(void);
+
+/* PHY global variables */
+extern uint8_t phyCurrentChannel;
+extern uint32_t	phyChannelsSupported;
+extern int8_t phyTransmitPower;
+extern PHY_CcaMode_t phyCCAMode;
+extern uint8_t phyCurrentPage;
+extern uint16_t phyMaxFrameDuration;
+extern uint8_t phySHRDuration;
+extern uint8_t phySymbolsPerOctet;
+
+/* MAC global variables */
+extern uint32_t macAckWaitDuration;
+extern Bool macAssociationPermit;
+extern Bool macAutoRequest;
+//Bool			macBattLifeExt;
+//uint8_t		macBattLifeExtPeriods;
+extern uint8_t *macBeaconPayload;
+extern uint8_t macBeaconPayloadLength;
+//uint8_t		macBeaconOrder;
+//uint32_t		macBeaconTxTime;
+extern uint8_t macBSN;
+extern ExtAddr_t macCoordExtendedAddress;
+extern ShortAddr_t macCoordShortAddress;
+extern uint8_t macDSN;
+extern Bool macGTSPermit;
+extern uint8_t macMaxCsmaBackoffs;
+extern uint8_t macMinBE;
+extern PanId_t macPANId;
+extern Bool macPromiscuousMode;
+extern Bool macRxOnWhenIdle;
+extern ShortAddr_t macShortAddress;
+extern ExtAddr_t macExtAddress;
+//uint8_t		macSuperframeOrder;
+extern uint16_t macTransactionPersistenceTime;
+extern uint32_t macTransactionPersistenceTimeInMs;
+extern Bool macAssociatedPanCoord;
+extern uint8_t macMaxBE;
+extern uint8_t macMaxFrameTotalWaitTime;
+extern uint8_t macMaxFrameRetries;
+extern uint8_t macResponseWaitTime;
+extern Bool macTimestampSupported;
+extern Bool macSecurityEnabled;
+extern Bool macBeaconTxEnable;
+extern uint32_t macResponseWaitTimeMs;
+extern uint64_t macLongAddr;
+extern uint8_t macLongAddrBuf[8];
+
 
 #endif

@@ -152,10 +152,14 @@ RADIO is radio on RFR2	ivec=TRX24_RX_END_vect	ovec=TRX24_TX_END_vect
 #define	NIST_TSERVER "64.147.116.229:37"	/* Time server address	nist1-la.ustiming.org, Los Angeles, CA	*/
 #define	RSERVER	    "192.168.1.100:2001"	/* Remote file server address	*/
 #define	NSERVER	    "192.168.1.100:53"		/* Local Domain Name server address	*/
+#define RADIOIN		netin
+#define RADIOISTK	400
+#define RADIOIPRI	100
+#define RADIOINAM	"netin"
 
 /* Don't affect allocation */
-#define	BPMAXB	1500		/* max buffer size for mkpool (2048 default)	*/
-#define BPMAXN	20			/* max # buffers in a buf pool (100 default)	*/
+#define	BPMAXB	256		/* max buffer size for mkpool (2048 default)	*/
+#define BPMAXN	21			/* max # buffers in a buf pool (100 default)	*/
 
 /* Do affect allocation */
 #define NETBUFS 4		/* max # of pools (5 default)	*/

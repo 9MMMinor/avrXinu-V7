@@ -51,6 +51,27 @@ frame802154_create(uint8_t type)
 	return (BAD_FRAME_CREATE);
 }
 
+/*------------------------------------------------------------------------
+ * radio_send_data - send a radio packet
+ *------------------------------------------------------------------------
+ */
+radio_status_t radio_send_data (
+				  uint8_t *buff,			/* buffer of user data		*/
+				  uint8_t len				/* length of data in buffer	*/
+)
+{
+	int pktlen;
+	frame802154_t *p = frame802154_create(FRAME_TYPE_DATA);
+	
+	p->header_len = getFrameHdrLength(p);
+	memcpy(p->data, buff, (p->data_len = len));
+	pktlen = p->header_len + p->data_len + FTR_LEN;
+	
+	write(RADIO, (unsigned char *)p, pktlen);
+	freebuf((int *)p);
+	return OK;
+}
+
 frame802154_t *
 makeMACCommandHdr(frame802154_t *p)
 {

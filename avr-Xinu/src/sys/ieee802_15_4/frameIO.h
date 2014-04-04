@@ -46,5 +46,8 @@ struct	radioinfo	{			/* info and parms. for radio	*/
 PROCESS frameInput(int, int *);
 PROCESS frameOutput(int, int *);
 
+/* GLOBALS */
+extern struct radioinfo Radio;
+
 
 #endif

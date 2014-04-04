@@ -15,7 +15,7 @@
 tmset \- set a fast timer
 .Sh SYNOPSIS
 .Em int
-.Em tmset(uint8_t port, void *msg, uint32_t time, INTPROC *callThru);
+.Em tmset(uint8_t port, void *msg, uint32_t time, INTPROC (*callThru)(void *));
 .br
 .Em uint8_t port;
 .Sh DESCRIPTION
@@ -34,12 +34,22 @@ could use the message, which is type (void *), to pass callback routines through
 the port.
 .Pp
 .Ar tmset
-enters a time event into a linked list in time order. The
+enters a time event into a linked list in time order.
+The
 .Ar time
-argument
-is the relative time (in symbol time units) from the execution of
-.Ar tmset
-until a compare interrupt is set to occur.
+argument is the relative time (in symbol time units) from the execution of tmset until a compare interrupt is set to occur.
+When the interrupt occurs,
+.Ar msg
+is passed to the Xinu port,
+.Ar port
+, and the INTPROC,
+.Ar callThru
+, is called with msg as an argument. If the port is the special
+.Em SLEEP_SYMBOL_TIMES-port
+(not a real port), the message,
+.Ar msg
+, is sent to the process executing tmset and not queued.  The code is found in
+.Em macSymbolCounter.c.
 .Pp
 .Ar tmset
 returns OK

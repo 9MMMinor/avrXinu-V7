@@ -33,12 +33,14 @@
 
 /*============================ TYPDEFS =======================================*/
 
-typedef uint8_t octet_t;			/* smallest unit type of all packets */
+typedef uint8_t octet_t;			/* smallest unit type of all packets*/
+typedef uint16_t PanId_t;     		/* PAN identifier type declaration	*/
+typedef uint16_t ShortAddr_t;		/* Short address type declaration	*/
+typedef uint64_t ExtAddr_t;			/* Extended address type declaration*/
 typedef uint8_t frameReturn_t;
 
 /** \struct frame_t
  *  \brief  This struct defines the basic storage unit for tx and rx frames
- *	which are managed by the buffer pool mechanism.
  *
  *  \see radioRead() and radioWrite()
  */
@@ -110,6 +112,8 @@ typedef struct {
 } ackFrame_t;
 
 #define HEADERVARPTR(var) (octet_t *)(&(var))
+#define COPY_EXTENDED_ADDR(TO, FROM) memcpy(&(TO), &(FROM), 8)
+#define IS_EQ_EXTENDED_ADDR(A, B) (0 == memcmp(&(A), &(B), 8))
 
 /*============================ PROTOTYPES =======================================*/
 frame802154_t * frame802154_create(uint8_t);

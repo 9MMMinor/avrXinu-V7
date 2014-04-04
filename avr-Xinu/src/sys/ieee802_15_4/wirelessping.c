@@ -21,11 +21,20 @@
 //
 
 #include <avr-Xinu.h>
+#include <mark.h>
+#include <ports.h>
 #include <avr/io.h>
+#include "mib.h"
 #include "frameIO.h"
+#include "macSymbolCounter.h"
 
 extern struct radioinfo Radio;
 extern Bool	macPromiscuousMode;
+extern uint32_t macAckWaitDuration;
+extern uint8_t radio_TIMER;
+#define RADIO_TIMER &radio_TIMER
+
+int dispose_Messages(int);
 
 /*
  *--------------------------------------------------------------------------
@@ -37,18 +46,27 @@ extern Bool	macPromiscuousMode;
  */
 
 #include "wirelessping.h"
+INTPROC setTimeOut(void *event);
+
+struct ping_info Pinfo = {0, 0, 0, 0L};
+uint8_t timeEvent;
 
 int
-main(void)
+wping(void)
 {
 	frame802154_t *frame;
-	pingPacket_t *ping;
+	pingPacket_t *ping, *pr;
 	int loop = 0;
+	
+	kprintf("Hello World\n");
 
 #ifdef MASTER
 	frame802154_t *reply;
+	int fmlen;
 	uint8_t seq = 0;
 	int echo_reply = 0;
+	uint32_t now, reply_time;
+	uint32_t delta = 0;
 	
 	/* make a ping packet */
 	ping = (pingPacket_t *)getmem(sizeof(pingPacket_t));
@@ -58,44 +76,72 @@ main(void)
 	ping->pcf.res = 0;
 	memset(ping->data, 0, 8);
 	
+	frame = (frame802154_t *)getbuf(Radio.radiopool);
+	/* fill every field! */
+	frame->fcf.frameType = FRAME_TYPE_DATA;
+	frame->fcf.frameSecurity = 0;
+	frame->fcf.frameAckRequested = 0;
+	frame->fcf.framePending = 0;
+	frame->fcf.frameVersion = FRAME_VERSION_2006;
+	frame->fcf.frameDestinationAddressMode = FRAME_ADDRESS_MODE_SHORT;
+	frame->fcf.framePanIDCompress = 0;
+	frame->fcf.frameSourceAddressMode = FRAME_ADDRESS_MODE_SHORT;
+	frame->seq = seq++;
+	frame->dest_pid = 0xab;
+	frame->dest_addr[0] = 0xbe;
+	frame->dest_addr[1] = 0xba;
+	frame->src_addr[0] = 0xa0;
+	frame->src_addr[1] = 0xa1;
+	frame->src_pid = 0x1234;
+	frame->header_len = getFrameHdrLength(frame);
+	
+	
 	while (TRUE) {
 		
-		loop++;
+		Pinfo.pingsSent = loop++;
 //		printf("Ping %d\n", loop);
-		frame = (frame802154_t *)getbuf(Radio.radiopool);
-		/* fill every field! */
-		frame->fcf.frameType = FRAME_TYPE_DATA;
-		frame->fcf.frameSecurity = 0;
-		frame->fcf.frameAckRequested = 1;
-		frame->fcf.framePending = 0;
-		frame->fcf.frameVersion = FRAME_VERSION_2006;
-		frame->fcf.frameDestinationAddressMode = FRAME_ADDRESS_MODE_SHORT;
-		frame->fcf.framePanIDCompress = 0;
-		frame->fcf.frameSourceAddressMode = FRAME_ADDRESS_MODE_SHORT;
-		frame->seq = seq++;
-		frame->dest_pid = 0xab;
-		frame->dest_addr[0] = 0xbe;
-		frame->dest_addr[1] = 0xba;
-		frame->src_addr[0] = 0xa0;
-		frame->src_addr[1] = 0xa1;
-		frame->src_pid = 0x1234;
-		frame->header_len = getFrameHdrLength(frame);
-		if (ping->pcf.includeTimeVal == 1)	{
-			memcpy(ping->data, (char *)&SCCNTLL, 4); /* get the symbol counter register */
-		}
 		
+		if (ping->pcf.includeTimeVal == 1)	{
+			now = macSymbolCounterRead();
+			memcpy(ping->data, &now, 4); /* get the symbol counter register */
+		}
 		memcpy(frame->data, ping, (frame->data_len = sizeof(pingPacket_t)));
-		psend(Radio.foport, (int)frame);		/* writes & freebufs frame */
+		fmlen = frame->header_len + frame->data_len + FTR_LEN;
+		
+		write(RADIO, (unsigned char *)frame, fmlen);
 		
 		if (ping->pcf.replyRequested)	{
-			reply = (frame802154_t *)preceive(Radio.fiport);
-			freebuf((int *)reply);
-			echo_reply++;
+			/* want to receive the reply as soon as it comes ... */
+			/* However, it may never come and we will need to cancel */
+			timeEvent = Radio.fiport;
+			tmset(timerPortID, &timeEvent, 8*macAckWaitDuration, &setTimeOut);	/* see mib.c */
+			reply = (frame802154_t *)preceive(Radio.fiport); /* THE message that is replaced by SYSERR */
+															 /* is a frame that needs to be freed!!!!! */
+			if (reply == (frame802154_t *)SYSERR)	{
+				Pinfo.pingsNoEcho++;
+			}
+			else	{
+				tmclear(timerPortID, &timeEvent);			/* cancel TIMEOUT */
+				pr = (pingPacket_t *)reply->data;
+				reply_time =	(uint32_t)pr->data[0]		|
+								(uint32_t)pr->data[1]<<8	|
+								(uint32_t)pr->data[2]<<16	|
+								(uint32_t)pr->data[3]<<24;
+				delta += macSymbolCounterRead() - reply_time;
+				if (loop%10 == 0)		{
+					Pinfo.delta = delta/10;
+					delta = 0;
+				}
+				freebuf((int *)reply);
+				Pinfo.pingsRecvd = echo_reply++;
+			}
 		}
 		
-		if (ping->pcf.replyRequested && loop%10 == 0)	{
-			printf("pings sent %d, echoed pings received %d\n", loop, echo_reply);
-		}
+//		if (ping->pcf.replyRequested && loop%10 == 0)	{
+//			printf("\n");
+//			printf("pings sent %d, echoed pings received %d, ave. delta = %ld\n", loop, echo_reply, delta/10);
+//			delta = 0;
+//		}
 		sleep(TIME);
 	}
 #endif
@@ -112,13 +158,14 @@ main(void)
 		frame = (frame802154_t *)preceive(Radio.fiport);	/* blocks */
 		ping = (pingPacket_t *)frame->data;
 		if (ping->pcf.replyRequested == 1)	{
-			sleep10(5);							/* slow ping response */
 			temp_pid = frame->dest_pid;
 			frame->dest_pid = frame->src_pid;
 			frame->src_pid = temp_pid;
 			memcpy(temp_addr, frame->dest_addr, 8);
 			memcpy(frame->dest_addr, frame->src_addr, 8);
 			memcpy(frame->src_addr, temp_addr, 8);
+			/* turn around delay of 12 symbol times */
+			pauseSymbolTimes(RADIO_TIMER, 12);	/* standard 12 Symbol Times */
 //			frameHeaderDump("Slave Echo", frame, 40);
 			psend(Radio.foport, (int)frame);		/* ECHO: writes & freebufs frame */
 		}
@@ -129,4 +176,26 @@ main(void)
 #endif
 
 	return(OK);
+}
+
+/**
+ * setTimeOut() -- callback from 66 TIMEOUT interrupt
+ */
+
+INTPROC setTimeOut(void *event)
+{
+	int portID = (*(int *)event);
+	int n;
+//	struct pt *pptr = &ports[portID];
+	
+	n = pcount(portID);
+	kprintf("setTimeOut: TIMEOUT on port %d; pcount = %d\n", portID, n);
+	preset(portID, &dispose_Messages);
+	return;
+}
+
+int dispose_Messages(int msg)
+{
+	kprintf("dispose msg = %x\n", msg);
+	return (OK);
 }

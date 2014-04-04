@@ -60,7 +60,7 @@ uint8_t         phySHRDuration;
 uint8_t         phySymbolsPerOctet;
 
 /* MAC global variables */
-uint32_t		macAckWaitDuration		= 20000;			/* symbol times */
+uint32_t		macAckWaitDuration		= 54;			/* symbol times (846 us) */
 /*		The read-only attribute macAckWaitDuration is dependent on a combination of constants and PHY PIB
 		attributes. The PHY PIB attributes are listed in Table 71. The formula for relating the constants and attributes
 		is:
@@ -109,7 +109,7 @@ uint32_t		macResponseWaitTimeMs; // MAC response wait time in !!!milliseconds!!!
  *  other secure memory storage.
  */
 uint64_t macLongAddr = 0x000425191801058C;				/* my Xplained Pro */
-volatile uint8_t macLongAddrBuf[8];		/* for debug? */
+uint8_t macLongAddrBuf[8];		/* for debug? */
 
 /*
  *-------------------------------------------------------------------------------------------------------------------------
@@ -312,21 +312,10 @@ get_MibEntry(int pib_attribute_id)
 void
 mac_init(void)
 {
-    volatile uint8_t *buf;
+    uint8_t *buf;
 	
 	buf = macLongAddrBuf;
-	
-	//mmm    sicslowmac_resetRequest(true);
-	
-    /* Set up the radio for auto mode operation. */
-	//mmm    hal_subregister_write( SR_MAX_FRAME_RETRIES, 2 );
-//	XAH_ctrl0.MAX_FRAME_Retries = 2;	//mmm
-	
-    /* Need to laod PANID for auto modes */
-//    radio_set_pan_id(DEST_PAN_ID);
-	
     /* Buffer the uint64_t address for easy loading and debug. */
-    /** \todo   Find a better location to load the IEEE address. */
     buf[0] = macLongAddr & 0xFF;
     buf[1] = (macLongAddr >> 8) & 0xFF;
     buf[2] = (macLongAddr >> 16) & 0xFF;
@@ -337,25 +326,10 @@ mac_init(void)
     buf[7] = (macLongAddr >> 56) & 0xFF;
     /* Load the long address into the radio. This is required for auto mode */
     /* operation. */
-//    radio_set_extended_address((uint8_t *)&macLongAddr);
-	
-	//mmm    srand(1234 );
-	//mmm    msduHandle = rand();
-	
-    /* Ping6 debug */
-	//mmm    memcpy(uip_lladdr.addr, &macLongAddr, 8);
-	
-	/* Convert expected byte order */
-	//mmm	byte_reverse((uint8_t *)uip_lladdr.addr, 8);
+//	radio_set_extended_address((uint8_t *)&macLongAddr);
 }
-/* end SICS: */
-
-
-
-
 
 /* Table 46—Summary of the primitives accessed through the MLME-SAP */
-
 
 struct sap_info sapFuncTab[] = {
 	{ ASSOCIATE_request,	ASSOCIATE_indication,		ASSOCIATE_response,		ASSOCIATE_confirm,		0 },
