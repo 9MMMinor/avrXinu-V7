@@ -35,6 +35,7 @@
 
 typedef uint8_t octet_t;			/* smallest unit type of all packets*/
 typedef uint16_t PanId_t;     		/* PAN identifier type declaration	*/
+typedef uint8_t *CharAddr_t;		/* Character address type declaration */
 typedef uint16_t ShortAddr_t;		/* Short address type declaration	*/
 typedef uint64_t ExtAddr_t;			/* Extended address type declaration*/
 typedef uint8_t frameReturn_t;
@@ -83,6 +84,12 @@ typedef struct auxSecurityHeader {
 	octet_t key[9];			/* The key, or an index to the key */
 } auxSecurityHeader_t;
 
+typedef union	{
+	char caddr[8];
+	ShortAddr_t saddr;
+	ExtAddr_t eaddr;
+} radioAddr_t;
+
 /** \brief Parameters used by the frame802154_create() function.  These
  *  parameters are used in the 802.15.4 frame header.  See the 802.15.4
  *  specification for details.
@@ -95,9 +102,9 @@ typedef struct {
 	frameControlField_t fcf;		/* Frame control field  (2)				*/
 	uint8_t seq;					/* Sequence number		(1)				*/
 	uint16_t dest_pid;				/* Destination PAN ID	(0/2)			*/
-	uint8_t dest_addr[8];			/* Destination address	(0/2/8)			*/
+	radioAddr_t dest_addr;			/* Destination address	(0/2/8)			*/
 	uint16_t src_pid;				/* Source PAN ID		(0/2)			*/
-	uint8_t src_addr[8];			/* Source address		(0/2/8)			*/
+	radioAddr_t src_addr;			/* Source address		(0/2/8)			*/
 	auxSecurityHeader_t aux_hdr;	/* Aux security header	(0/5/6/10/14)	*/
 	uint8_t header_len;				/* Actual header length (0)				*/
 	uint8_t data_len;				/* Payload length		(0)				*/

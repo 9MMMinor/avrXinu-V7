@@ -314,16 +314,17 @@ mac_init(void)
 {
     uint8_t *buf;
 	
+	macExtAddress = macLongAddr;		/* should come from EEPROM */
 	buf = macLongAddrBuf;
     /* Buffer the uint64_t address for easy loading and debug. */
-    buf[0] = macLongAddr & 0xFF;
-    buf[1] = (macLongAddr >> 8) & 0xFF;
-    buf[2] = (macLongAddr >> 16) & 0xFF;
-    buf[3] = (macLongAddr >> 24) & 0xFF;
-    buf[4] = (macLongAddr >> 32) & 0xFF;
-    buf[5] = (macLongAddr >> 40) & 0xFF;
-    buf[6] = (macLongAddr >> 48) & 0xFF;
-    buf[7] = (macLongAddr >> 56) & 0xFF;
+    IEEE_ADDR_0 = buf[0] = macLongAddr & 0xFF;
+    IEEE_ADDR_1 = buf[1] = (macLongAddr >> 8) & 0xFF;
+    IEEE_ADDR_2 = buf[2] = (macLongAddr >> 16) & 0xFF;
+    IEEE_ADDR_3 = buf[3] = (macLongAddr >> 24) & 0xFF;
+    IEEE_ADDR_4 = buf[4] = (macLongAddr >> 32) & 0xFF;
+    IEEE_ADDR_5 = buf[5] = (macLongAddr >> 40) & 0xFF;
+    IEEE_ADDR_6 = buf[6] = (macLongAddr >> 48) & 0xFF;
+    IEEE_ADDR_7 = buf[7] = (macLongAddr >> 56) & 0xFF;
     /* Load the long address into the radio. This is required for auto mode */
     /* operation. */
 //	radio_set_extended_address((uint8_t *)&macLongAddr);

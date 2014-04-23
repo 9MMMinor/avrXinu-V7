@@ -17,16 +17,16 @@
 
 /* Network input and output processes: procedure name and parameters */
 
-#define	RADIOIN		frameInput	/* radio input daemon process	*/
-#define	RADIOOUT	frameOutput	/* radio output process	*/
-#define	RADIOISTK		600		/* stack size for radio input	*/
-#define	RADIOOSTK		600		/* stack size for radio output*/
-#define	RADIOIPRI		100		/* radio runs at high priority*/
-#define	RADIOOPRI		 99		/* radio output priority	*/
-#define	RADIOINAM	"radioIn"	/* name of radio input process*/
-#define	RADIOONAM	"radioOut"	/* name of radio output   "	*/
-#define	RADIOIARGC	1			/* count of args to radio input	*/
-#define	RADIOOARGC	2			/* count of args to radio output	*/
+//#define	RADIOIN		frameInput	/* radio input daemon process	*/
+//#define	RADIOOUT	frameOutput	/* radio output process	*/
+//#define	RADIOISTK		600		/* stack size for radio input	*/
+//#define	RADIOOSTK		600		/* stack size for radio output*/
+//#define	RADIOIPRI		100		/* radio runs at high priority*/
+//#define	RADIOOPRI		 99		/* radio output priority	*/
+//#define	RADIOINAM	"radioIn"	/* name of radio input process*/
+//#define	RADIOONAM	"radioOut"	/* name of radio output   "	*/
+//#define	RADIOIARGC	1			/* count of args to radio input	*/
+//#define	RADIOOARGC	2			/* count of args to radio output	*/
 
 
 struct	radioinfo	{			/* info and parms. for radio	*/

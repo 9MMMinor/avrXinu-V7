@@ -44,7 +44,8 @@
 #include <macSymbolCounter.h>
 #include <mib.h>
 #include <radio.h>
-#include <frameIO.h>
+//#include <frameIO.h>
+#include "radioIO.h"
 
 #define __ASSERT_USE_STDERR
 #include <assert.h>
@@ -123,6 +124,13 @@ DEVCALL radioInit(struct devsw *devptr)
 	
 //	IRQ_status.TX_End = 1;					/* clears TX_End bit   */
 //	IRQ_mask.TX_END_Enable = 1;				/* enable TX interrupt */
+	
+	/* This bit enables the Multiple Address Filter 0. If the bit is set and the corresponding
+	 * Short Address and PAN ID Register is configured, an address match is indicated in the
+	 * IRQ_STATUS1 register and an interrupt occurs if the interrupt enable flag is set in the
+	 * IRQ_MASK register.
+	 */
+	MAFCR0 |= (1<<MAF0EN);
 	
 //	ASSERT(TRX_status.TRX_Status == STATUS_TRX_OFF);
 	kprintf("radioInit\n");
@@ -214,7 +222,7 @@ DEVCALL radioRead(struct devsw *devptr, frame802154_t *frame, int len)
 	STATWORD ps;
 	struct rfDeviceControlBlock *rfPtr;
 	radio_status_t status;
-	uint8_t timer_event = 0;
+	static uint8_t timer_event = 0;
 	int ret;
 	
 	rfPtr = &radio[devptr->dvminor];
@@ -243,7 +251,7 @@ DEVCALL radioRead(struct devsw *devptr, frame802154_t *frame, int len)
 	/* set a time-out EVENT if we don't want to block forever */
 	if (rfPtr->doRXTimeout)	{
 		timer_event = MKEVENT(READ_WITH_TIMEOUT, devptr->dvminor);
-		tmset(timerPortID, &timer_event, TIME_OUT_TIME, &cancelRead);
+		tmset(SLEEP_SYMBOL_TIMES, &timer_event, TIME_OUT_TIME, &cancelRead);
 	}
 	
 	suspend( (rfPtr->readPid = currpid) );
@@ -340,9 +348,9 @@ sendAckFrame(struct rfDeviceControlBlock *rfPtr)
 	temp_pid = frame->dest_pid;							/* swap src and dest	*/
 	frame->dest_pid = frame->src_pid;
 	frame->src_pid = temp_pid;
-	memcpy(temp_addr, frame->dest_addr, 8);
-	memcpy(frame->dest_addr, frame->src_addr, 8);
-	memcpy(frame->src_addr, temp_addr, 8);
+	memcpy(temp_addr, frame->dest_addr.caddr, 8);
+	memcpy(frame->dest_addr.caddr, frame->src_addr.caddr, 8);
+	memcpy(frame->src_addr.caddr, temp_addr, 8);
 	
 	packTXFrame(frame);
 	IRQ_status.TX_End = 1;					// clears TX_End bit
@@ -452,7 +460,7 @@ DEVCALL radioWrite(struct devsw *devptr, frame802154_t *frame, int dataLen)
 		/* static ????? */
 		static uint8_t event = MKEVENT(WRITE_WITH_ACK, 0);
 		rfPtr->errorCode = RADIO_SUCCESS;
-		tmset(timerPortID, &event, 2*macAckWaitDuration, &setNoAck);	/* see mib.c */
+		tmset(SLEEP_SYMBOL_TIMES, &event, 2*macAckWaitDuration, &setNoAck);	/* see mib.c */
 		
 		suspend(currpid); /* resume if ack received OR ack TIMEOUT */
 

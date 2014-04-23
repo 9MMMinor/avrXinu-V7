@@ -26,15 +26,19 @@
 
 /*
  *------------------------------------------------------------------------
- *  main  --  start wireless ping and then run Xinu pseudo-shell
+ *  main  --  run Xinu pseudo-shell with ping inside
  *------------------------------------------------------------------------
  */
-
 int main()
 {
-//	int	ping();
-	
-//	resume( create(ping, 380, 30, "Ping", 0) );
+	int mainShell();
+	/* main has too small of a stack! */
+	resume( create(mainShell, 600, 20, "shell", 0) );
+	return 0;
+}
+
+int mainShell(void)
+{
 	
 	while (TRUE) {
 		login(CONSOLE);

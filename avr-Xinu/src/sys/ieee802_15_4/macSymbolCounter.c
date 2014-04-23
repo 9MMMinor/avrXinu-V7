@@ -40,6 +40,7 @@
 
 struct timestamp_timeval radioTime;
 PROCESS radioTimer(void);
+static INTPROC gotTimeout(void *);
 
 void macSymbolCounterInit(void)
 {
@@ -380,6 +381,33 @@ void pauseSymbolTimes(void *message, uint32_t stime)
 	tmset(SLEEP_SYMBOL_TIMES, message, stime, (void *)0);
 	receive();		/* blocks until time event */
 }
+
+/**
+ *------------------------------------------------------------------------
+ *	recvOrTimeout - return received message or a fast Time-Out
+ *------------------------------------------------------------------------
+ */
+int
+recvOrTimeout(uint32_t totime)
+{
+	static int message = 0;
+	int msg;
+	
+	message = getpid();
+	tmset(SLEEP_SYMBOL_TIMES, &message, totime, &gotTimeout);
+	msg = receive();			/* blocks until a message is received */
+	if ( msg != TIMEOUT )	{
+		tmclear(SLEEP_SYMBOL_TIMES, &message);
+	}
+	return msg;
+}
+
+static INTPROC gotTimeout(void *message)
+{
+	
+	send(*(int *)message, TIMEOUT);
+}
+
 
 
 /**

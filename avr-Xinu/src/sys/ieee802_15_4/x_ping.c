@@ -31,9 +31,8 @@
 #include <stdlib.h>
 
 #define PINGAPP 0xab
-#define PING_TIMEOUT 200000UL		/* Symbol Times */
+#define PING_TIMEOUT 200UL		/* Symbol Times */
 extern struct radioinfo Radio;
-int ping(int, char**);
 
 /*
  *------------------------------------------------------------------------
@@ -41,13 +40,13 @@ int ping(int, char**);
  *------------------------------------------------------------------------
  */
 
-BUILTIN	x_ping(int stdIN, int stdOUT, int stdERR, int nargs, char *args[])
-{
+//BUILTIN	x_ping(int stdIN, int stdOUT, int stdERR, int nargs, char *args[])
+//{
 	
-	if (ping(nargs,args) == SYSERR)
-		return (0);
-	return (OK);
-}
+//	if (ping(nargs,args) == SYSERR)
+//		return (0);
+//	return (OK);
+//}
 
 
 struct ping_data	{
@@ -77,30 +76,43 @@ struct pingPacket	{
  *------------------------------------------------------------------------
  */
 
-int
-ping(int nargs, char *args[])
+COMMAND
+x_ping(int nargs, int *argv)
 {
-	ExtAddr_t dst;
-	int	got, i;
+	int	drop, got, i;
 	int	np;		// # packets to send
-	
 	int retval;
-	np = 10;
-	got = i = 0;
-	uint32_t delta;
+	uint32_t delta, delta2, sendTime;
 	
-	if (nargs == 3) {
-		np = atoi(args[2]);
-	} else if (nargs != 2) {
+	np = 10;
+	got = i = drop = 0;
+	
+//	if (nargs == 3) {
+//		np = atoi(args[2]);
+//	} else if (nargs != 2) {
+//		printf("usage: ping dest_addr [no. of pings]\n");
+//		return OK;
+//	}
+	
+	/*	avr-gcc passes most arguments in registers. Not wanting to get into
+	 *  the details, and gcc's strict use of variable length argument passing,
+	 *  for avr-Xinu, create() creates new threads with just two arguments:
+	 *  newproc(int argc, int *argv).
+	 *  But then the shell is bizare and has never been fixed (mmm 4/13/2014):
+	 */
+	if (nargs == 7) {
+		np = atoi((char *)argv[6]);
+	}
+	else if (nargs != 6) {
 		printf("usage: ping dest_addr [no. of pings]\n");
 		return OK;
 	}
-	dst = (ExtAddr_t)atoi(args[1]);
-	
-	Ping_data.dest_panID = 0xab;
-	Ping_data.dest_addr  = dst;
-	Ping_data.src_addr   = 0xa1a0;
-	Ping_data.src_panID  = 0x1234;
+	/*  Yikes!!  */
+		
+	Ping_data.dest_panID = 0xffff;
+	Ping_data.dest_addr  = atoi((char *)argv[5]);
+	Ping_data.src_addr   = 	0xbabe;
+	Ping_data.src_panID  = 101;
 	
 	pingPkt.hdr = PINGAPP;
 	pingPkt.pcf.replyRequested = 1;
@@ -110,7 +122,7 @@ ping(int nargs, char *args[])
 	
 	/* For the first time after reboot, register through RadioIO */
 	if ( ! Ping_data.registered ) {
-		retval = radio_register(0,	Ping_data.dest_panID,
+		retval = radio_register(BROADCAST_ADDR,	Ping_data.dest_panID,
 									Ping_data.src_panID);
 		Ping_data.registered = TRUE;
 		Ping_data.seq = 0;
@@ -118,52 +130,63 @@ ping(int nargs, char *args[])
 	
 	macBSN = Ping_data.seq++;
 	delta = 0;
+	sendTime = delta2 = 0;
 	
-	while (TRUE) {
+	for (i = 0; i < np; i++) {
 		/* Send a copy of the message */
 		
 		if (pingPkt.pcf.includeTimeVal == 1)	{
-			pingPkt.time = macSymbolCounterRead();
+			sendTime = pingPkt.time = macSymbolCounterRead();
 		}
 
+//		dump = radio_clear(0, Ping_data.dest_panID, Ping_data.src_panID);
+//		if (dump > 0)	{
+//			kprintf("ping: dump %d packets\n", dump);
+//		}
 		retval = radio_send(Ping_data.dest_addr,
 							Ping_data.dest_panID,
-							macLongAddr,
+							Ping_data.src_addr,
 							Ping_data.src_panID,
 							(octet_t *)&pingPkt,
 							sizeof(pingPkt));
 		if (retval == SYSERR) {
-			kprintf("Cannot send ping\n");
+			printf("Cannot send ping\n");
 			return SYSERR;
 		}
 		
 		/* Receive a reply */
 
-		retval = radio_recv(0,	Ping_data.dest_panID,
+		retval = radio_recv(BROADCAST_ADDR,
+								Ping_data.dest_panID,
 								Ping_data.src_panID,
 								(octet_t *)&reply,
 								sizeof(pingPkt),
-								PING_TIMEOUT);
+								10*PING_TIMEOUT);
 		if (retval == TIMEOUT) {
-			continue;
-		} else if (retval == SYSERR) {
-			kprintf("Error reading remote file reply\n");
+			drop++;
+		}
+		else if (retval == SYSERR) {
+			printf("Error reading remote file reply\n");
 			return SYSERR;
-		} else {
-			if (i >= np)
-				break;
-			i++;
+		}
+		else	{
+			delta += macSymbolCounterRead() - reply.time;
+			delta2 += macSymbolCounterRead() - sendTime;
+			got++;
+//			printf("receive %d\n",got);
 		}
 		
-		delta += macSymbolCounterRead() - reply.time;
 		
-		got++;
 		sleep(1);
 		printf(".");
 	}
-	delta = delta/got;
-	printf("\nreceived %d/%d packets (%d %% loss) Average delta = %ld\n", got, i,
-			(100 * (i-got))/i, delta);
-	
+	if (got > 0)		{
+		delta2 = delta2/got;
+		delta = delta/got;
+	}
+	printf("\nreceived %d/%d packets (%d %% loss) Average delta = %ld %ld\n", got, i,
+			(100 * (i-got))/i, delta, delta2);
+	radio_release(0, Ping_data.dest_panID, Ping_data.src_panID);
+	Ping_data.registered = FALSE;
 	return(OK);
 }

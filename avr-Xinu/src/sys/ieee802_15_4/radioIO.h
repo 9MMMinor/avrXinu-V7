@@ -21,6 +21,11 @@
 #define	RADIO_USED	1		/* entry is being used		*/
 #define	RADIO_RECV	2		/* entry has a process waiting	*/
 
+/* Broadcast address Any PAN-ID (level 3 match) */
+
+#define BROADCAST_ADDR 0xffff
+#define ANY_PAN_ID 0xffff
+
 struct	radioentry {		/* entry in the RADIO endpoint tbl*/
 	uint8_t	rdstate;		/* state of entry: free/used	*/
 //	uint8_t	rddest_addr[8];	/* destination address (zero means "don't care") */
@@ -60,24 +65,48 @@ int netInit(void);
 PROCESS netin(int, int *);
 void radio_buffer_init(void);
 void radio_in(void);
-int radio_register(uint64_t, uint16_t, uint16_t);
-uint8_t radio_recv(uint64_t, uint16_t, uint16_t, octet_t *, uint8_t, uint32_t);
-uint8_t	radio_recvaddr(uint64_t *, uint16_t *, uint16_t, octet_t *, uint8_t, uint32_t);
+int radio_register	(
+					 ShortAddr_t dest_addr,	/* destination address address or BROADCAST_ADDR */
+					 PanId_t dest_panID,	/* destination RADIO protocol panID	*/
+					 PanId_t src_panID		/* source RADIO protocol panID	*/
+);
+int radio_recv	(
+				 ShortAddr_t dest_addr,	/* destination address address or 0xffff	*/
+				 PanId_t dest_panID,	/* destination RADIO protocol panID			*/
+				 PanId_t src_panID,		/* source RADIO protocol panID				*/
+				 octet_t *buff,			/* buffer to hold RADIO data				*/
+				 uint8_t len,			/* length of buffer							*/
+				 uint32_t timeout		/* read timeout in Symbol Times				*/
+);
+int	radio_recvaddr	 (
+					  ShortAddr_t *dest_addr,	/* ptr destination address or 0	*/
+					  PanId_t *dest_panID,		/* ptr destination RADIO protocol panID	*/
+					  PanId_t src_panID,		/* source RADIO protocol panID	*/
+					  octet_t *buff,			/* buffer to hold RADIO data	*/
+					  uint8_t len,				/* length of buffer		*/
+					  uint32_t timeout			/* read timeout in symbol times		*/
+);
 INTPROC setTimeOut(void *event);
-int radio_send(
-				uint64_t dest_addr,			/* destination address address or address_BCAST*/
+int radio_send (
+				ShortAddr_t dest_addr,		/* destination address address or address_BCAST*/
 											/*  for a source broadcast	*/
-				uint16_t dest_panID,		/* destination RADIO protocol panID	*/
-				uint64_t src_addr,			/* source address address		*/
-				uint16_t src_panID,			/* source RADIO protocol panID	*/
+				PanId_t dest_panID,			/* destination RADIO protocol panID	*/
+				ShortAddr_t src_addr,		/* source address address		*/
+				PanId_t src_panID,			/* source RADIO protocol panID	*/
 				octet_t *buff,				/* buffer of RADIO data		*/
 				uint8_t len					/* length of data in buffer	*/
 );
-int radio_release (
-				   uint64_t dest_addr,	/* destination address address or zero	*/
-				   uint16_t dest_panID,	/* destination RADIO protocol panID	*/
-				   uint16_t src_panID	/* source RADIO protocol panID	*/
+int radio_release	 (
+					  ShortAddr_t dest_addr,/* destination address address or zero	*/
+					  PanId_t dest_panID,	/* destination RADIO protocol panID	*/
+					  PanId_t src_panID		/* source RADIO protocol panID	*/
 );
+int radio_clear	 (
+				  ShortAddr_t dest_addr,	/* destination address address or 0xffff	*/
+				  PanId_t dest_panID,		/* destination RADIO protocol panID			*/
+				  PanId_t src_panID			/* source RADIO protocol panID				*/
+);
+
 
 
 #endif

@@ -55,6 +55,7 @@ uint32_t tmclear(int, void *), tmleft(int, void *);
 int tmset(uint8_t, void *, uint32_t, INTPROC (*tq_callThru)(void *));
 void pauseMicroSeconds(void *, uint32_t);
 void pauseSymbolTimes(void *, uint32_t);
+int recvOrTimeout(uint32_t);
 void tqdump(void);
 void tqwrite(void);
 

@@ -34,10 +34,10 @@ frame802154_create(uint8_t type)
 			p->fcf.frameSourceAddressMode = FRAME_ADDRESS_MODE_SHORT;
 			p->seq = 0;
 			p->dest_pid = 0xab;
-			p->dest_addr[0] = 0xbe;
-			p->dest_addr[1] = 0xba;
-			p->src_addr[0] = 0xa0;
-			p->src_addr[1] = 0xa1;
+			p->dest_addr.caddr[0] = 0xbe;
+			p->dest_addr.caddr[1] = 0xba;
+			p->src_addr.caddr[0] = 0xa0;
+			p->src_addr.caddr[1] = 0xa1;
 			p->src_pid = 0x1234;
 			return ( p );
 		case FRAME_TYPE_ACK:
@@ -98,10 +98,10 @@ packTXFrame(frame802154_t *p)
 	}
 	switch (fcf.frameDestinationAddressMode)	{
 		case FRAME_ADDRESS_MODE_SHORT:
-			q = copyOctets(q, HEADERVARPTR(p->dest_addr[0]), 2);
+			q = copyOctets(q, HEADERVARPTR(p->dest_addr.caddr[0]), 2);
 			break;
 		case FRAME_ADDRESS_MODE_EXTENDED:
-			q = copyOctets(q, HEADERVARPTR(p->dest_addr[0]), 8);
+			q = copyOctets(q, HEADERVARPTR(p->dest_addr.caddr[0]), 8);
 			break;
 		case FRAME_ADDRESS_MODE_NONE:
 		default:
@@ -112,10 +112,10 @@ packTXFrame(frame802154_t *p)
 	}
 	switch (fcf.frameSourceAddressMode)	{
 		case FRAME_ADDRESS_MODE_SHORT:
-			q = copyOctets(q, HEADERVARPTR(p->src_addr[0]), 2);
+			q = copyOctets(q, HEADERVARPTR(p->src_addr.caddr[0]), 2);
 			break;
 		case FRAME_ADDRESS_MODE_EXTENDED:
-			q = copyOctets(q, HEADERVARPTR(p->src_addr[0]), 8);
+			q = copyOctets(q, HEADERVARPTR(p->src_addr.caddr[0]), 8);
 			break;
 		case FRAME_ADDRESS_MODE_NONE:
 		default:
@@ -190,11 +190,11 @@ unpackRXFrame(frame802154_t *p)
 	}
 	switch (p->fcf.frameDestinationAddressMode)	{
 		case FRAME_ADDRESS_MODE_SHORT:
-			q = copyRXOctets(HEADERVARPTR(p->dest_addr[0]), q, 2);
-			memset(HEADERVARPTR(p->dest_addr[2]), 0, 6);
+			q = copyRXOctets(HEADERVARPTR(p->dest_addr.caddr[0]), q, 2);
+			memset(HEADERVARPTR(p->dest_addr.caddr[2]), 0, 6);
 			break;
 		case FRAME_ADDRESS_MODE_EXTENDED:
-			q = copyRXOctets(HEADERVARPTR(p->dest_addr[0]), q, 8);
+			q = copyRXOctets(HEADERVARPTR(p->dest_addr.caddr[0]), q, 8);
 			break;
 		case FRAME_ADDRESS_MODE_NONE:
 		default:
@@ -205,11 +205,11 @@ unpackRXFrame(frame802154_t *p)
 	}
 	switch (p->fcf.frameSourceAddressMode)	{
 		case FRAME_ADDRESS_MODE_SHORT:
-			q = copyRXOctets(HEADERVARPTR(p->src_addr[0]), q, 2);
-			memset(HEADERVARPTR(p->src_addr[2]), 0, 6);
+			q = copyRXOctets(HEADERVARPTR(p->src_addr.caddr[0]), q, 2);
+			memset(HEADERVARPTR(p->src_addr.caddr[2]), 0, 6);
 			break;
 		case FRAME_ADDRESS_MODE_EXTENDED:
-			q = copyRXOctets(HEADERVARPTR(p->src_addr[0]), q, 8);
+			q = copyRXOctets(HEADERVARPTR(p->src_addr.caddr[0]), q, 8);
 			break;
 		case FRAME_ADDRESS_MODE_NONE:
 		default:
