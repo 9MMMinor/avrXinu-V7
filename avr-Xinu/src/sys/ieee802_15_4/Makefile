@@ -26,7 +26,7 @@ MAIN_SRC = mib.c frame802154.c rfr2_radioDriver.c macSymbolCounter.c radioStatus
 #(2)MAIN_SRC += test_frameIO.c frameIO.c
 #(3)MAIN_SRC += ProducerConsumer_frameIO.c frameIO.c
 #(4)MAIN_SRC += wirelessping.c frameIO.c test.c setTime.c x_ping.c x_net.c
-MAIN_SRC += radioIO.c test2.c x_ping.c x_net.c setTime.c
+MAIN_SRC += radioIO.c test2.c x_ping.c x_net.c setTime.c x_pingserver.c x_name.c x_set802154.c
 	
 INCLUDE =	
 

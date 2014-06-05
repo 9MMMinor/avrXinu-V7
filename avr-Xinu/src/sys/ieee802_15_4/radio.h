@@ -182,7 +182,7 @@ void           radio_reset_state_machine( void );
 void           radio_reset_trx( void );
 
 void           radio_use_auto_tx_crc( bool auto_crc_on );
-radio_status_t radio_send_data( uint8_t data_length, uint8_t *data );
+//radio_status_t radio_send_data( uint8_t data_length, uint8_t *data );
 
 uint8_t             radio_get_device_role( void );
 void           radio_set_device_role( bool i_am_coordinator );

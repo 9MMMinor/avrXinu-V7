@@ -63,17 +63,20 @@ struct rfDeviceControlBlock	{
 	uint8_t TX_saveState;				/* transmit state */
 	uint8_t IRQ_save;					/* IRQ_mask RX_END_Enable save/restore */
 	uint8_t operatingMode;				/* tranceiver op mode (basic, extended) */
+	Bool doRequestACK;					/* if TRUE, driver sets fcf.frameAckRequested */ 
 	uint8_t freeTXFrame;				/* frame is malloced, free the frame after write() */
 	Bool doRXTimeout;					/* cancel read() after TIME_OUT_TIME seconds (10)	*/
-	uint8_t transactionStatus;			/* status return */
+	uint8_t TxStatus;					/* TX status return */
 	int errorCode;						/* SYSERR reason */
 	uint8_t writeRetrys;				/* number of write attempts */
 	Bool ackTXPending;					/* TRUE if an ack is being TXed */
 	uint8_t ackTXSeq;					/* sequence for ACK frame */
-	ackFrame_t ackTXFrame;				/* an initialized ACK */
+//	ackFrame_t ackTXFrame;				/* an initialized ACK */
 	Bool ackRXPending;					/* TRUE if an ack is expected */
 	uint8_t ackRXSeq;					/* sequence for ACK frame */
-	ackFrame_t *ackRXFrame;				/* a received frame POINTER */
+	ackRXFrame_t *ackRXFrame;			/* a received frame POINTER */
+	Bool receiveDataRequestPending;
+	uint8_t responseRecvDataReq;
 #if RADIOSTATS
 	int RADIO_RXfail;
 	int RADIO_TXfail;

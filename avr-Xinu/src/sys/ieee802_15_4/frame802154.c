@@ -10,12 +10,18 @@
 #include <avr/io.h>
 #include <string.h>
 #include "frame802154.h"
+#include "mib.h"
 
 static int printable(char);
 
 #define NOT_YET (frame802154_t *)0
 #define BAD_FRAME_CREATE (frame802154_t *)0
 
+/**
+ *	frame_create -- allocate a frame and initialize the radio header.
+ *
+ *	This is simply not very useful!
+ */
 frame802154_t *
 frame802154_create(uint8_t type)
 {
@@ -25,52 +31,75 @@ frame802154_create(uint8_t type)
 		case FRAME_TYPE_BEACON:
 			return (NOT_YET);
 		case FRAME_TYPE_DATA:
-			p = (frame802154_t *)getmem(sizeof(frame802154_t));
-			p->fcf.frameType = type;
-			p->fcf.frameSecurity = 0;
-			p->fcf.frameAckRequested = 0;
-			p->fcf.frameVersion = FRAME_VERSION_2006;
-			p->fcf.frameDestinationAddressMode = FRAME_ADDRESS_MODE_SHORT;
-			p->fcf.frameSourceAddressMode = FRAME_ADDRESS_MODE_SHORT;
-			p->seq = 0;
-			p->dest_pid = 0xab;
-			p->dest_addr.caddr[0] = 0xbe;
-			p->dest_addr.caddr[1] = 0xba;
-			p->src_addr.caddr[0] = 0xa0;
-			p->src_addr.caddr[1] = 0xa1;
-			p->src_pid = 0x1234;
-			return ( p );
+			p = (frame802154_t *)malloc(sizeof(frame802154_t));
+			radio_createDataHdr(p, 0xffff, 0xffff, macShortAddress, macPANId);
+			return (p);
 		case FRAME_TYPE_ACK:
 			return (NOT_YET);
 		case FRAME_TYPE_MAC_COMMAND:
 			makeMACCommandHdr(p);
-			return ( NOT_YET);
+			return (NOT_YET);
 		default:
 			break;
 	}
 	return (BAD_FRAME_CREATE);
 }
 
+/**
+ *------------------------------------------------------------------------
+ *	radio_createDataHdr -- create a FRAME_TYPE_DATA packet header
+ *	return pointer to payload
+ *------------------------------------------------------------------------
+ */
+octet_t	*
+radio_createDataHdr (
+				frame802154_t *pkt,			/* source packet buffer */
+				ShortAddr_t dest_addr,		/* destination address address or address_BCAST*/
+				PanId_t dest_panID,			/* destination RADIO protocol panID	*/
+				ShortAddr_t src_addr,		/* source address		*/
+				PanId_t src_panID			/* source RADIO protocol panID	*/
+)
+{
+		
+	/* Create Header in pkt */
+	/* fill every field! */
+	pkt->fcf.frameType = FRAME_TYPE_DATA;
+	pkt->fcf.frameSecurity = 0;
+	pkt->fcf.frameAckRequested = 0;			/* set in driver, if requested */
+	pkt->fcf.framePending = 0;
+	pkt->fcf.frameVersion = FRAME_VERSION_2006;
+	pkt->fcf.frameDestinationAddressMode = FRAME_ADDRESS_MODE_SHORT;
+	pkt->fcf.framePanIDCompress = 0;
+	pkt->fcf.frameSourceAddressMode = FRAME_ADDRESS_MODE_SHORT;
+	pkt->seq = macBSN++;
+	pkt->dest_pid = dest_panID;
+	pkt->dest_addr.saddr = dest_addr;
+	pkt->src_pid = src_panID;
+	pkt->src_addr.saddr = src_addr;
+	pkt->header_len = getFrameHdrLength(pkt);
+	
+	return ( pkt->data );
+}
+
 /*------------------------------------------------------------------------
  * radio_send_data - send a radio packet
  *------------------------------------------------------------------------
  */
-radio_status_t radio_send_data (
-				  uint8_t *buff,			/* buffer of user data		*/
-				  uint8_t len				/* length of data in buffer	*/
-)
-{
-	int pktlen;
-	frame802154_t *p = frame802154_create(FRAME_TYPE_DATA);
+//radio_status_t radio_send_data (
+//				  uint8_t *buff,			/* buffer of user data		*/
+//				  uint8_t len				/* length of data in buffer	*/
+//)
+//{
+//	int pktlen;
+//	frame802154_t *p = frame802154_create(FRAME_TYPE_DATA);
 	
-	p->header_len = getFrameHdrLength(p);
-	memcpy(p->data, buff, (p->data_len = len));
-	pktlen = p->header_len + p->data_len + FTR_LEN;
+//	memcpy(p->data, buff, (p->data_len = len));
+//	pktlen = p->header_len + p->data_len + FTR_LEN;
 	
-	write(RADIO, (unsigned char *)p, pktlen);
-	freebuf((int *)p);
-	return OK;
-}
+//	write(RADIO, (unsigned char *)p, pktlen);
+//	free(p);
+//	return OK;
+//}
 
 frame802154_t *
 makeMACCommandHdr(frame802154_t *p)
@@ -307,19 +336,19 @@ getFrameHdrLength(frame802154_t *p)
 
 
 /**
- *	frameHeaderDump() -- dump the header from the frame with pointer, "fptr."
+ *	frameRAWHeaderDump() -- dump the header from the RAW RX frame with pointer, "fptr."
  *
  *	"routine" is a string identifying the dump.
  */
 
-void frameHeaderDump(char *routine, frame802154_t *fptr, int len)
+void frameRAWHeaderDump(char *routine, octet_t *fptr, int len)
 {
-	frameControlField_t fcf = fptr->fcf;
-	octet_t *p = (octet_t *)fptr;
+	frameControlField_t fcf = ((frame802154_t *)fptr)->fcf;
+	octet_t *p = fptr;
 	int i;
 	
 	kprintf("frame_Dump (%s):", routine);
-	kprintf(" packet length = %d", fptr->header_len+fptr->data_len+2);
+//	kprintf(" packet length = %d", fptr->header_len+fptr->data_len+2);
 	
 	kprintf(" FCF = <%02x%02x> ", *(p+1), *p);
 	p += 2;
@@ -366,11 +395,93 @@ void frameHeaderDump(char *routine, frame802154_t *fptr, int len)
 	}
 	/* Aux security header */
 	if	(fcf.frameSecurity) {
-		securityControlField_t scf = fptr->aux_hdr.scf;
+		securityControlField_t scf = ((frame802154_t *)fptr)->aux_hdr.scf;
 		kprintf("Security Control Field = <%02x> ", *p++);
 		kprintf("Frame Counter = <%02x%02x%02x%02x>\n", *(p+3), *(p+2), *(p+1), *(p+0));
 		p += 4;
 		kprintf("Keys = < ");
+		switch (scf.keyIdMode) {
+			case 1:
+				kprintf("%02x ", *p++);
+				break;
+			case 2:
+				for (i=0 ; i<5 ; i++)
+					kprintf("%02x ", *p++);
+				break;
+			case 3:
+				for (i=0 ; i<9 ; i++)
+					kprintf("%02x ", *p++);
+				break;
+			case 0:
+			default:
+				break;
+		}
+		kprintf(">\n");
+	}
+//	frameDump("data", fptr->data, fptr->data_len);
+//	kprintf("CRC = <%04x>\n", fptr->crc);
+}
+
+/**
+ *	frameHeaderDump() -- dump the header from the frame802154_t frame with pointer, "fptr."
+ *
+ *	"routine" is a string identifying the dump.
+ */
+
+void frameHeaderDump(char *routine, frame802154_t *fptr, int len)
+{
+	frameControlField_t fcf = fptr->fcf;
+	octet_t *p;
+	int i;
+	
+	kprintf("frame_Dump (%s):", routine);
+	kprintf(" packet length = %d", fptr->header_len+fptr->data_len+2);
+	
+	kprintf(" FCF = <%04x> ", fptr->fcf);
+	kprintf("Seq = %02x\n", fptr->seq);
+	if (fcf.frameDestinationAddressMode)	{
+		kprintf("Destination PAN Id = <%04x> ", fptr->dest_pid);
+	}
+	switch (fcf.frameDestinationAddressMode)	{
+		case FRAME_ADDRESS_MODE_SHORT:
+			kprintf("Short Address = <%04x>\n", fptr->dest_addr.saddr);
+			break;
+		case FRAME_ADDRESS_MODE_EXTENDED:
+			p = &fptr->dest_addr.eaddr;
+			kprintf("Extended Address = <%02x%02x%02x%02x%02x%02x%02x%02x>\n", *(p+7), *(p+6), *(p+5), *(p+4),
+					*(p+3), *(p+2), *(p+1), *(p+0));
+			break;
+		case FRAME_ADDRESS_MODE_NONE:
+		default:
+			kprintf("\n");
+			break;
+	}
+	if (!fcf.framePanIDCompress) {
+		kprintf("Source PAN Id = <%04x> ", fptr->src_pid);
+	} else {
+		kprintf("Source ");
+	}
+	switch (fcf.frameSourceAddressMode)	{
+		case FRAME_ADDRESS_MODE_SHORT:
+			kprintf("Short Address = <%04x>\n", fptr->src_addr.saddr);
+			break;
+		case FRAME_ADDRESS_MODE_EXTENDED:
+			p = &(fptr->src_addr.eaddr);
+			kprintf("Extended Address = <%02x%02x%02x%02x%02x%02x%02x%02x>\n",  *(p+7), *(p+6), *(p+5), *(p+4),
+					*(p+3), *(p+2), *(p+1), *(p+0));
+			break;
+		case FRAME_ADDRESS_MODE_NONE:
+		default:
+			kprintf("\n");
+			break;
+	}
+	/* Aux security header */
+	if	(fcf.frameSecurity) {
+		securityControlField_t scf = fptr->aux_hdr.scf;
+		kprintf("Security Control Field = <%02x> ", scf);
+		kprintf("Frame Counter = <%04lx>\n", fptr->aux_hdr.frameCounter);
+		kprintf("Keys = < ");
+		p = fptr->aux_hdr.key;
 		switch (scf.keyIdMode) {
 			case 1:
 				kprintf("%02x ", *p++);

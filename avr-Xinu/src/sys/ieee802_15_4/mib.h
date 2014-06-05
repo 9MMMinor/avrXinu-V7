@@ -109,6 +109,13 @@ enum Mac_Identifiers	{
     MACMinLIFSPeriod				= 0x5e
 };
 
+#define MAX_MAC_IDENTIFIER 0x5e
+#define MIN_MAC_IDENTIFIER 0x40
+#define MAX_PHY_IDENTIFIER 0x07
+#define MIN_PHY_IDENTIFIER 0x00
+#define MAC_ATTRIBUTE_VALID(id) ( (MIN_MAC_IDENTIFIER<=id)&&(id<=MAX_MAC_IDENTIFIER) )
+#define PHY_ATTRIBUTE_VALID(id) ( (MIN_PHY_IDENTIFIER<=id)&&(id<=MAX_PHY_IDENTIFIER) )
+
 enum SAP_Identifiers	{
 	SAP_REQUEST,
 	SAP_INDICATION,
@@ -149,6 +156,7 @@ struct sap_info {
 /* prototypes */
 int mib_Function(void *);
 struct mib_info *get_MibEntry(int);
+int getMibID(int);
 int ASSOCIATE_request(struct sap_info *,  struct mib_info *);
 int ASSOCIATE_indication(struct sap_info *, struct mib_info *);
 int ASSOCIATE_response(struct sap_info *, struct mib_info *);

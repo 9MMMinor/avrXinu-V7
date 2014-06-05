@@ -1,2 +1,2 @@
-#TARGET = 256rfr2XplainPro
-TARGET = mega2564rf
+TARGET = 256rfr2XplainPro
+#TARGET = mega2564rf

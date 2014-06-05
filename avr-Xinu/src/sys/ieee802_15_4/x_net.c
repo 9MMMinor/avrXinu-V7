@@ -25,7 +25,7 @@
 #include <avr-Xinu.h>
 #include "radioIO.h"
 
-extern struct radioinfo Radio;
+extern struct radioinfo Net;
 
 /*
  *----------------------------------------------------------------------------
@@ -34,23 +34,23 @@ extern struct radioinfo Radio;
  */
 
 COMMAND	x_net(int nargs, int *argv)
-//int	stdin, stdout, stderr, nargs;
-//char	*args[];
 {
-	char *str;
+	int i;
+
+	if ( nargs > 1 )		{
+		printf("%s ignore arguments: ", argv[0]);
+		for (i = 1; i < nargs; i++)		{
+			printf("%s%s", argv[i], (i < nargs-1) ? " " : "");
+		}
+		printf("\n");
+	}
+	printf("bpool=%d, mutex/cnt=%d/%d\n",
+			Net.radiopool, Net.nmutex, scount(Net.nmutex));
+	printf("Packets: Total=%d, data=%d beacon=%d mac command=%d\n",
+			Net.npacket, Net.ndata, Net.nbeacon, Net.ncmd);
+	printf("   Data missed: (%d no buffer space)  (%d address not matched)\n",
+			Net.nover, Net.ndrop);
+	printf("   Errors: %d\n", Net.nerror);
 	
-	str = malloc(80);
-	sprintf(str,
-			"bpool=%d, mutex/cnt=%d/%d\n",
-			Radio.radiopool, Radio.nmutex, scount(Radio.nmutex));
-	write(argv[1], (unsigned char *)str, strlen(str));
-	sprintf(str,"Packets: recvd=%d, tossed=%d (%d for overrun)\n",
-			Radio.npacket, Radio.ndrop, Radio.nover);
-	write(argv[1], (unsigned char *)str, strlen(str));
-	sprintf(str,"         (%d missed: no buffer space)  (%d errors)\n",
-			Radio.nmiss, Radio.nerror);
-	write(argv[1], (unsigned char *)str, strlen(str));
-	
-	free(str);
 	return(OK);
 }

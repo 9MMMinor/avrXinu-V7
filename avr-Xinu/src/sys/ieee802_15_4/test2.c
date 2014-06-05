@@ -21,8 +21,15 @@
 //
 
 #include <avr-Xinu.h>
+#include <stdlib.h>
 #include <sleep.h>
 #include <shell.h>
+
+#include "mib.h"
+
+int MLME_GET_request(int, int);
+int mainShell(int, int *);
+int x_pingServer(int, int *);
 
 /*
  *------------------------------------------------------------------------
@@ -31,14 +38,21 @@
  */
 int main()
 {
-	int mainShell();
+	
 	/* main has too small of a stack! */
 	resume( create(mainShell, 600, 20, "shell", 0) );
+//	resume( create(x_pingServer, 300, 100, "pingd", 0) );
 	return 0;
 }
 
-int mainShell(void)
+int mainShell(int argc, int *argv)
 {
+//	int i;
+	
+//	for (i = 0; i < MAX_MAC_IDENTIFIER; i++)	{
+//		MLME_GET_request(i,0);
+//	}
+	sleep(1);
 	
 	while (TRUE) {
 		login(CONSOLE);

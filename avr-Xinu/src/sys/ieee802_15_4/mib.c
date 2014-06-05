@@ -114,8 +114,8 @@ uint8_t macLongAddrBuf[8];		/* for debug? */
 /*
  *-------------------------------------------------------------------------------------------------------------------------
  *	mib_info -- contains an entry for every MIB variable and some PHY variables. Each entry contains all information needed
- *	to access or modify the variable. The mib-info table is searchable by mib_objectID.
- *	Entries in the mib[] must be in numerical order by mib_objectID (ieee802.15.4 pib identifier (2003-Table 71, p135)).
+ *	to access or modify the variable. The mib-info table is searchable by mib_objectID
+ *	(ieee802.15.4 pib identifier (2003-Table 71, p135)).
  *-------------------------------------------------------------------------------------------------------------------------
  */
 struct mib_info mib[] = {
@@ -164,6 +164,9 @@ struct mib_info mib[] = {
 };
 
 int mib_entries = sizeof(mib) / sizeof(struct mib_info);
+uint8_t *mibPhyIndex;
+uint8_t *mibMacIndex;
+int mibTableInitialized = 0;
 
 
 /* FROM SICS: */
@@ -268,39 +271,55 @@ int mib_Function(void * mib_var)
 /**
  * @brief Gets the MIB table entry
  *
- * @param Binary search mib-table for pib identifier.
+ * @param Search mib-table for pib identifier.
  *
  * @return Pointer to the MIB record
  *
- *	While this works fine and relatively quickly, it does not allow the mib[]
- *	database to be dynamic. We can never add entries to the mib[].  The mib structure,
- *	mib_info, is designed to be a list which would have to be linked-up at network
- *	initialize. If we did that, the routine below would have to traverse the list
- *	until it found the entry for the pib identifier.
  *
  */
 struct mib_info *
 get_MibEntry(int pib_attribute_id)
 {
-	int low, high, mid;
+	int index;
 	
-	low = 0;
-	high = mib_entries - 1;
-	while (low <= high)	{
-		mid = (low+high)/2;
-		if (pib_attribute_id < mib[mid].mib_objectID)	{
-			high = mid - 1;
-		}
-		else if (pib_attribute_id > mib[mid].mib_objectID)	{
-			low = mid + 1;
-		}
-		else	{
-//			kprintf("MibEntry index=%d\n",mid);
-			return &mib[mid];
-		}
+	if ( (index = getMibID(pib_attribute_id)) != SYSERR)	{
+		return &mib[index];
 	}
-//	kprintf("MibEntry NOT found\n");
-    return(0);
+	return (struct mib_info *)0;
+}
+
+/*
+ *	getMibID - get the MIB table entry index
+ *
+ */
+int
+getMibID(int pib_attribute_id)
+{
+	int i, index;
+	
+	if ( !mibTableInitialized )	{
+		mibPhyIndex = (uint8_t *)malloc(MAX_PHY_IDENTIFIER-MIN_PHY_IDENTIFIER+1);
+		mibMacIndex = (uint8_t *)malloc(MAX_MAC_IDENTIFIER-MIN_MAC_IDENTIFIER+1);
+		memset(mibPhyIndex, 0xff, MAX_PHY_IDENTIFIER-MIN_PHY_IDENTIFIER+1);
+		memset(mibMacIndex, 0xff, MAX_MAC_IDENTIFIER-MIN_MAC_IDENTIFIER+1);
+		for (i = 0; i < mib_entries; i++)	{
+			index = mib[i].mib_objectID;
+			if (index < MIN_MAC_IDENTIFIER)	{
+				mibPhyIndex[index] = i;
+			}
+			else	{
+				index -= MIN_MAC_IDENTIFIER;
+				mibMacIndex[index] = i;
+			}
+		}
+		mibTableInitialized++;
+	}
+	if ( PHY_ATTRIBUTE_VALID(pib_attribute_id) || MAC_ATTRIBUTE_VALID(pib_attribute_id) )	{
+		index = (pib_attribute_id<MIN_MAC_IDENTIFIER) ?
+					mibPhyIndex[pib_attribute_id] : mibMacIndex[pib_attribute_id-MIN_MAC_IDENTIFIER];
+		return (index==0xff ? SYSERR : index);
+	}
+	return SYSERR;
 }
 
 
@@ -424,10 +443,14 @@ NOFUNCTION_error(struct sap_info *bindl, struct mib_info *mip)
 int
 MLME_GET_request(int pib, int pibIndex)
 {
+	int id;
 	struct mib_info *a;
-	char buffer[20];
+	char buffer[30];
 	
-	a = get_MibEntry(pib);
+	if ( (id = getMibID(pib)) == SYSERR )	{
+		return SYSERR;
+	}
+	a = &mib[id];
 	strcpy_P(buffer, a->mib_name);
 	printf("GET: %s pib=0x%02X\n", buffer, pib);
 	return OK;

@@ -113,17 +113,85 @@ typedef struct {
 } frame802154_t;
 
 typedef struct {
+	uint8_t	fsize;
+	union {	frameControlField_t fcf; uint16_t fcfword; } fcfField;
+	uint8_t seq;
+	uint16_t crc;
+} ackTXFrame_t;
+
+typedef struct {
 	frameControlField_t fcf;
 	uint8_t seq;
-	octet_t data[2];
-} ackFrame_t;
+	uint16_t crc;
+} ackRXFrame_t;
 
+/*============================ MAC Command Packets ===============================*/
+
+//! 5.3 MAC Command Frame identifiers (IEEE Std 802.15.4-2011. - table 5).
+enum COMMANDFRAME_Identifiers	{
+	COMMANDFRAMEAssociationRequest			= 0x01,
+	COMMANDFRAMEAssociationResponse			= 0x02,
+	COMMANDFRAMEDisassociationNotification	= 0x03,
+	COMMANDFRAMEDataRequest					= 0x04,
+	COMMANDFRAMEPanidConflictNotification	= 0x05,
+	COMMANDFRAMEOrphanNotification			= 0x06,
+	COMMANDFRAMEBeaconRequest				= 0x07,
+	COMMANDFRAMECoordinatorRealignment		= 0x08,
+	COMMANDFRAMEGTSRequest					= 0x09,
+};
+
+//! 5.3.1.2 Capability Information field (IEEE Std 802.15.4-2011. - Figure 50).
+typedef struct associateCapabilityInfo	{
+	uint8_t res0:1;
+	uint8_t type:1;			/* 1->FFD 0->RFD											*/
+	uint8_t power:1;		/* 1->AC powered device, 0->otherwise (battery)				*/
+	uint8_t recOnIdle:1;	/* 1->does not disable receiver when idle, 0-> otherwise	*/
+	uint8_t res1:2;
+	uint8_t security:1;		/* 1->capable of secure TX/RX, 0->otherwise					*/
+	uint8_t addressAlloc:1;	/* 1->coordinator selects my short address, 0->otherwise	*/
+} associateCapabilityInfo_t;
+
+//! 5.3.1 Association request command (IEEE Std 802.15.4-2011).
+typedef struct AssociationRequestPacket	{
+	uint8_t	cmd;		/* =COMMANDFRAMEAssociationRequest	*/
+	associateCapabilityInfo_t info;
+} associationRequest_t;
+
+enum associationStatusField	{
+	ASSOCIATION_SUCCESS	= 0x00,
+	PAN_AT_CAPACITY		= 0x01,
+	PAN_ACCESS_DENIED	= 0x02,
+};
+
+//! 5.3.2 Association response command (IEEE Std 802.15.4-2011).
+typedef struct AssociationResponsePacket	{
+	uint8_t	cmd;		/* =COMMANDFRAMEAssociationResponse	*/
+	ShortAddr_t addr;	/* short address on PAN, 0xffff (error), 0xfffe (use extended) */
+	uint8_t status;		/* Association status field */
+} associationResponse_t;
+
+//! 5.3.3 Disassociation notification command
+//! 5.3.4 Data request command
+//! 5.3.5 PAN ID conflict notification command
+//! 5.3.6 Orphan notification command
+//! 5.3.7 Beacon request command
+//! 5.3.8 Coordinator realignment command
+//! 5.3.9 GTS request command
+
+/*============================== MACROS =========================================*/
 #define HEADERVARPTR(var) (octet_t *)(&(var))
 #define COPY_EXTENDED_ADDR(TO, FROM) memcpy(&(TO), &(FROM), 8)
 #define IS_EQ_EXTENDED_ADDR(A, B) (0 == memcmp(&(A), &(B), 8))
 
 /*============================ PROTOTYPES =======================================*/
-frame802154_t * frame802154_create(uint8_t);
+frame802154_t *frame802154_create(uint8_t);
+octet_t	*radio_createDataHdr (
+					 frame802154_t *,	/* source packet buffer */
+					 ShortAddr_t,		/* destination address address or address_BCAST*/
+					 PanId_t,			/* destination RADIO protocol panID	*/
+					 ShortAddr_t,		/* source address		*/
+					 PanId_t			/* source RADIO protocol panID	*/
+);
 uint8_t getFrameHdrLength(frame802154_t *);
 void packTXFrame(frame802154_t *);
 void unpackRXFrame(frame802154_t *);
@@ -131,6 +199,7 @@ frame802154_t *makeMACCommandHdr(frame802154_t *);
 octet_t *copyOctets(octet_t *, octet_t *, int);
 octet_t *copyRXOctets(octet_t *, octet_t *, int);
 void frameDump(char *, uint8_t *, int);
+void frameRAWHeaderDump(char *, octet_t *, int);
 void frameHeaderDump(char *, frame802154_t *, int);
 
 #endif
