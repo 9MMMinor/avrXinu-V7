@@ -1,0 +1,18 @@
+# This Makefile contains rules to build files in the src/sys/shell directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = src/sys/shell
+
+# Source files for this component
+
+# Files for shell
+C_Files = ascdate.c
+C_Files += addarg.c lexan.c login.c shell.c
+
+# Files for execute shell processes
+C_Files += x_bpool.c x_conf.c x_date.c x_devs.c x_dg.c x_ps.c x_help.c x_mem.c
+C_Files += x_exit.c x_echo.c x_kill.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_Files:%=${DIR}/%}

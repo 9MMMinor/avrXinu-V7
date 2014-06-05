@@ -22,17 +22,17 @@ struct	cmdent	cmds[]  = 	{		/* shell commands		*/
 		{"bpool",	FALSE,		x_bpool},
 //		{"conf",	FALSE,		x_conf},
 		{"date",	FALSE,		x_date},
-//		{"devs",	FALSE,		x_devs},
+		{"devs",	FALSE,		x_devs},
 //		{"dg",		FALSE,		x_dg},
-		{"netstat",	FALSE,		x_net},
+		{"net",		FALSE,		x_net},
 //		{"cat",		FALSE,		x_cat},
 //		{"close",	FALSE,		x_close},
 //		{"cp",		FALSE,		x_cp},
 //		{"create",	FALSE,		x_creat},
-//		{"echo",	FALSE,		x_echo},
-//		{"exit",	TRUE,		x_exit},
+		{"echo",	FALSE,		x_echo},
+		{"exit",	TRUE,		x_exit},
 		{"help",	FALSE,		x_help},
-//		{"kill",	TRUE,		x_kill},
+		{"kill",	TRUE,		x_kill},
 //		{"logout",	TRUE,		x_exit},
 		{"mem",		FALSE,		x_mem},
 //		{"mount",	FALSE,		x_mount},
@@ -45,11 +45,14 @@ struct	cmdent	cmds[]  = 	{		/* shell commands		*/
 //		{"routes",	FALSE,		x_routes},
 //		{"ruptime",	FALSE,		x_uptime},
 //		{"sleep",	FALSE,		x_sleep},
-//		{"time",	FALSE,		x_date},
+		{"time",	FALSE,		x_date},
 //		{"unmount",	FALSE,		x_unmou},
 //		{"uptime",	FALSE,		x_uptime},
 //		{"who",		FALSE,		x_who},
-//		{"worm"		FALSE,		playworm},
+		{"ping",	FALSE,		x_ping},
+		{"pingd",	FALSE,		x_pingServer},
+		{"name",	FALSE,		x_name},
+		{"set",		FALSE,		x_set802154},
 		{"?",		FALSE,		x_help}	};
 
 static	char	*errhd	= "Syntax error\n"; /* global error messages	*/
@@ -152,8 +155,7 @@ int shell(int dev)
 		if (cmds[com].cbuiltin) {
 			if (innam != NULL || outnam != NULL || backgnd)
 				fprintf(stream, errhd);
-			else if ( (*cmds[com].cproc)(stdIN, stdOUT,
-				stdERR, ntokens, Shl.shtok) == SHEXIT)
+			else if ( (*cmds[com].cproc)(ntokens, Shl.shtok) == SHEXIT )
 				break;
 			continue;
 		}
@@ -191,15 +193,23 @@ int shell(int dev)
 		/* create process to execute conventional command */
 
 		if ( (child = create(cmds[com].cproc, SHCMDSTK, SHCMDPRI,
-				Shl.shtok[0],4,stdIN, stdOUT, stdERR, ntokens))
+					Shl.shtok[0],0))		/* create with 0 arguments */
 				== SYSERR ) {
 			fprintf(stream, "Cannot create\n");
 			close(stdOUT);
 			close(stdIN);
 			continue;
 		}
-		addarg(child, ntokens);		/* , len); */
+		addarg(child, ntokens);					/* add arguments */
 		setdev(child, stdIN, stdOUT);
+		if (stdIN != CONSOLE)	{				/* redirect */
+			fclose(proctab[child].fildes[0]);
+			proctab[child].fildes[0] = fdopen(stdIN,"r");
+		}
+		if (stdOUT != CONSOLE)	{				/* redirect */
+			fclose(proctab[child].fildes[1]);
+			proctab[child].fildes[1] = fdopen(stdOUT,"rw");
+		}
 		if (backgnd) {
 			fprintf(stream, fmt2, child);
 			resume(child);

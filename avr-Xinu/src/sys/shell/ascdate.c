@@ -13,36 +13,62 @@ int ascdate(long time, char * str)
 	int	year, month, day, hour, minute, second;
 	long	days;
 
+	parseTime(time,
+			  &month,
+			  &day,
+			  &year,
+			  &hour,
+			  &minute,
+			  &second);
+	sprintf(str, "%3s %d %4d %2d:%02d:%02d", Dat.dt_mnam[month],
+		day, year, hour, minute, second);
+	return(OK);
+}
+
+/*------------------------------------------------------------------------
+ *  parseTime  -  parse a Xinu time into mo, day, yr, hr, min, sec
+ *------------------------------------------------------------------------
+ */
+int
+parseTime(long time,
+		  int *month,
+		  int *day,
+		  int *year,
+		  int *hour,
+		  int *minute,
+		  int *second)
+{
+	long	tmp;
+	long	days;
+	
 	/* set year (1970-1999) */
-	for (year=1970 ; TRUE ; year++) {
-		days = isleap(year) ? 366 : 365;
+	for ((*year)=1970 ; TRUE ; (*year)++) {
+		days = isleap(*year) ? 366 : 365;
 		tmp = days * SECPERDY;
 		if (tmp > time)
 			break;
 		time -= tmp;
 	}
 	/* set month (0-11) */
-	for (month=0 ; month<12 ; month++) {
-		tmp = Dat.dt_msize[month] * SECPERDY;
-		if (isleap(year) && (month == 1))
+	for ((*month)=0 ; (*month)<12 ; (*month)++) {
+		tmp = Dat.dt_msize[*month] * SECPERDY;
+		if (isleap(*year) && (*month == 1))
 		    tmp += SECPERDY;
 		if (tmp > time)
 			break;
 		time -= tmp;
 	}
 	/* set day of month (1-31) */
-	day = (int)( time/SECPERDY ) + 1;
+	*day = (int)( time/SECPERDY ) + 1;
 	time %= SECPERDY;
 	/* set hour (0-23) */
-	hour = (int) ( time/SECPERHR );
+	*hour = (int) ( time/SECPERHR );
 	time %= SECPERHR;
 	/* set minute (0-59) */
-	minute = time / SECPERMN;
+	*minute = time / SECPERMN;
 	time %= SECPERMN;
 	/* set second (0-59) */
-	second = (int) time;
-	sprintf(str, "%3s %2d %4d %2d:%02d:%02d", Dat.dt_mnam[month],
-		day, year, hour, minute, second);
+	*second = (int) time;
 	return(OK);
 }
 

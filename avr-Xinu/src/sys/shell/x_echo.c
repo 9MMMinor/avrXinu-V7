@@ -7,12 +7,10 @@
  *  x_echo  -  (command echo) echo arguments separated by blanks
  *------------------------------------------------------------------------
  */
-COMMAND	x_echo(stdin, stdout, stderr, nargs, args)
-int	stdin, stdout, stderr, nargs;
-char	*args[];
+COMMAND	x_echo(int nargs, char *args[])
 {
-	char	str[80];
-	int	i;
+	char str[80];
+	int i;
 
 	if (nargs == 1)
 		str[0] = NULLCH;
@@ -23,6 +21,6 @@ char	*args[];
 		}
 	}
 	strcat(str, "\n");
-	write(stdout, str, strlen(str));
+	write(CONSOLE, str, strlen(str));
 	return(OK);
 }
