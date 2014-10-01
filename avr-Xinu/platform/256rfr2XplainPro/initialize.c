@@ -25,7 +25,6 @@
 #include <stdlib.h>                     /* FOR malloc() */
 #include <avr/pgmspace.h>
 
-#include "frameIO.h"
 
 #define FOSC F_CPU					// default fuse setting CKDIV8=0
 #define BAUD 9600L
@@ -119,7 +118,7 @@ void nulluser(void)
 
     PORTB = 0;
     DDRB = (1<<PINB4);		/* make the LED pin an output */
-    USART_Init(0, ubrr);	/* initialize USART transmitter for kprintf */
+    USART_Init(CONSOLE, ubrr);	/* initialize USART transmitter for kprintf */
 
     kprintf_P(PSTR("\n\nXinu Version %s"), vers);	
 	kprintf_P(PSTR("   MCUCSR=%x\n"), reboot);

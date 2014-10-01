@@ -49,7 +49,7 @@ SYSCALL create(int (*procaddr)(), int ssize, int priority, char *name, int nargs
 	pptr->fildes[1] = fdopen(CONSOLE, "w");	/* stdout set to console */
 	pptr->fildes[2] = &kprint_out;			/* stderr set to &kprint_out */
 
-	for (i=2; i < _NFILE; i++)			/* others set to unused */
+	for (i=3; i < _NFILE; i++)			/* others set to unused */
 		pptr->fildes[i] = (FILE *)FDFREE;
 
 	pptr->pstate = PRSUSP;
