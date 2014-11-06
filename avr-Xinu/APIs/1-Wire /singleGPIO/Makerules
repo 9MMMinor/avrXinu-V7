@@ -1,0 +1,12 @@
+# This Makefile contains rules to build files in the <Xinu>/avr-Xinu/APIs/1-Wire/singleGPIO directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = APIs/1-Wire/singleGPIO
+
+# Source files for this component
+
+C_FILES	= OW_SingleGPIO_Primatives.c OWSearch.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_FILES:%=${DIR}/%}

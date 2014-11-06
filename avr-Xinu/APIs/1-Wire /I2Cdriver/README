@@ -1,0 +1,32 @@
+File: twi.c, twi.h
+
+NAME
+	twi — Twi (I2C) driver functions
+
+SYNOPSIS
+	#include <avr-Xinu.h>
+	#include <twi.h>
+
+	void twi_init(void);
+
+	int
+	twi_doCommand(struct twi_Command ∗twiCommandBlock);
+
+DESCRIPTION
+	This Two-Wire driver software is implemented with just twi_init() and twi_doCommand() functions.
+	All of the difficult work is done in the AVR-TWI module and most of the software is done in interrupt
+	service.
+
+	twi_init Initializes the TWI (Two-Wire, I2C) Serial Interface and enables the AVR Microprocessor’s twi
+	module. The twi interrupt is enabled.
+
+	twi_doCommand Initiates a single or chained command in Master Mode on the twi bus pins, SCL and SDA.
+
+INSTALLATION
+
+	<Xinu_directory>/avr-Xinu/src/sys/twi/twi.c
+	<Xinu_directory>/avr-Xinu/src/sys/h/twi.h
+	<Xinu_directory>/avr-Xinu/man/man4/twi.4
+
+TEST
+	<Xinu_directory>/avr-Xinu/APIs/1-Wire/I2Cdriver/Xinu_mainEEPROM.c

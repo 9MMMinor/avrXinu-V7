@@ -1,0 +1,40 @@
+File: 1-Wire_SingleGPIO
+
+NAME
+	1-Wire functions for single-pin General Purpose I/O port pin with or without external
+		pull-up resistor.
+
+SYNOPSIS
+	#include <avr-Xinu.h>
+	#include <1-Wire_SingleGPIO.h>
+
+	void			OW_Enable(void);		//!< Enable the OW.
+	void			OW_Disable(void);		//!< Disable the OW.
+	int				OWReset(void);			//!< Reset 1-Wire bus (device); return presence.
+	int				OWSearch(void);
+	void			OWWriteByte(unsigned char byte_value);
+	void			OWWriteBit(unsigned char bit_value);
+	unsigned char	OWReadByte(void);
+	unsigned char	OWReadBit(void);
+
+DESCRIPTION
+APPLICATION NOTE 126: 1-Wire Communication Through Software, May 30, 2002
+APPLICATION NOTE 162: Interfacing the DS18X20/DS1822 1-Wire® Temperature Sensor in a
+						Microcontroller Environment, Mar 08, 2002
+APPLICATION NOTE 187: 1-Wire Search Algorithm, Mar 28, 2002
+
+INSTALLATION
+
+	<Xinu_directory>/avr-Xinu/APIs/1-Wire/singleGPIO/OW_SingleGPIO_Primatives.c
+	<Xinu_directory>/avr-Xinu/APIs/1-Wire/singleGPIO/OWSearch.c
+	<Xinu_directory>/avr-Xinu/src/sys/h/singleGPIO/1-Wire_SingleGPIO.h
+
+
+TEST
+	<Xinu_directory>/avr-Xinu/APIs/1-Wire/singleGPIO/main.c
+
+MAKE
+	make cleanall
+	make
+	avrdude  -p atmega256rfr2 -c xplainedpro -U flash:w:1-Wire_SingleGPIO.hex
+	screen  /dev/tty.usbserial* 9600

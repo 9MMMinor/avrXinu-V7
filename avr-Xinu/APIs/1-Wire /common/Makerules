@@ -1,0 +1,13 @@
+# This Makefile contains rules to build files in the APIs/1-Wire/common directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = APIs/1-Wire/common
+
+# Source files for this component
+
+C_FILES	= OWFamilySkipSetup.c OWFirst.c OWNext.c OWTargetSetup.c OWutil.c OWVerify.c \
+			DS18S20.c DS2438.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_FILES:%=${DIR}/%}

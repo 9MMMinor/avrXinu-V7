@@ -1,0 +1,15 @@
+# This Makefile contains rules to build files in the APIs/1-Wire/I2Cbridge directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = APIs/1-Wire/I2Cbridge
+
+# Source files for this component
+
+C_FILES	= 	OWLevel.c OWReadBitPower.c OWReadByte.c OWReset.c \
+            OWSearch.c OWSpeed.c OWWriteBit.c OWWriteByte.c OWWriteBytePower.c \
+			DS2482_channel_select.c DS2482_detect.c DS2482_reset.c DS2482_search_triplet.c \
+			DS2482_write_config.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_FILES:%=${DIR}/%}
