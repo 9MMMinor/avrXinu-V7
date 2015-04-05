@@ -1,0 +1,155 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		BD8BB9871AD0BC3B00FB92F8 /* .DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = .DS_Store; sourceTree = "<group>"; };
+		BD8BB9881AD0BC3B00FB92F8 /* APIs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = APIs; sourceTree = "<group>"; };
+		BD8BB9891AD0BC3B00FB92F8 /* cpu */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cpu; sourceTree = "<group>"; };
+		BD8BB98A1AD0BC3B00FB92F8 /* HelloWorld */ = {isa = PBXFileReference; lastKnownFileType = folder; path = HelloWorld; sourceTree = "<group>"; };
+		BD8BB98B1AD0BC3B00FB92F8 /* Makefile.include */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.include; sourceTree = "<group>"; };
+		BD8BB98C1AD0BC3B00FB92F8 /* man */ = {isa = PBXFileReference; lastKnownFileType = folder; path = man; sourceTree = "<group>"; };
+		BD8BB98D1AD0BC3B00FB92F8 /* mkvers.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mkvers.sh; sourceTree = "<group>"; };
+		BD8BB98E1AD0BC3B00FB92F8 /* platform */ = {isa = PBXFileReference; lastKnownFileType = folder; path = platform; sourceTree = "<group>"; };
+		BD8BB98F1AD0BC3B00FB92F8 /* ProjectTemplates */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ProjectTemplates; sourceTree = "<group>"; };
+		BD8BB9901AD0BC3B00FB92F8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		BD8BB9911AD0BC3B00FB92F8 /* ScreenApplet.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = ScreenApplet.scpt; sourceTree = "<group>"; };
+		BD8BB9921AD0BC3B00FB92F8 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		BD8BB9811AD0BC3A00FB92F8 = {
+			isa = PBXGroup;
+			children = (
+				BD8BB9871AD0BC3B00FB92F8 /* .DS_Store */,
+				BD8BB9881AD0BC3B00FB92F8 /* APIs */,
+				BD8BB9891AD0BC3B00FB92F8 /* cpu */,
+				BD8BB98A1AD0BC3B00FB92F8 /* HelloWorld */,
+				BD8BB98B1AD0BC3B00FB92F8 /* Makefile.include */,
+				BD8BB98C1AD0BC3B00FB92F8 /* man */,
+				BD8BB98D1AD0BC3B00FB92F8 /* mkvers.sh */,
+				BD8BB98E1AD0BC3B00FB92F8 /* platform */,
+				BD8BB98F1AD0BC3B00FB92F8 /* ProjectTemplates */,
+				BD8BB9901AD0BC3B00FB92F8 /* README.md */,
+				BD8BB9911AD0BC3B00FB92F8 /* ScreenApplet.scpt */,
+				BD8BB9921AD0BC3B00FB92F8 /* src */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		BD8BB9861AD0BC3A00FB92F8 /* avr-Xinu */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = BD8BB9931AD0BC3B00FB92F8 /* Build configuration list for PBXLegacyTarget "avr-Xinu" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "/Users/mmm/avrXinu-V7/avr-Xinu";
+			dependencies = (
+			);
+			name = "avr-Xinu";
+			passBuildSettingsInEnvironment = 0;
+			productName = "avr-Xinu";
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		BD8BB9821AD0BC3A00FB92F8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+			};
+			buildConfigurationList = BD8BB9851AD0BC3A00FB92F8 /* Build configuration list for PBXProject "avr-Xinu" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BD8BB9811AD0BC3A00FB92F8;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BD8BB9861AD0BC3A00FB92F8 /* avr-Xinu */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		BD8BB9831AD0BC3A00FB92F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		BD8BB9841AD0BC3A00FB92F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		BD8BB9941AD0BC3B00FB92F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "avr-Xinu";
+			};
+			name = Debug;
+		};
+		BD8BB9951AD0BC3B00FB92F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "avr-Xinu";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BD8BB9851AD0BC3A00FB92F8 /* Build configuration list for PBXProject "avr-Xinu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BD8BB9831AD0BC3A00FB92F8 /* Debug */,
+				BD8BB9841AD0BC3A00FB92F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BD8BB9931AD0BC3B00FB92F8 /* Build configuration list for PBXLegacyTarget "avr-Xinu" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BD8BB9941AD0BC3B00FB92F8 /* Debug */,
+				BD8BB9951AD0BC3B00FB92F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BD8BB9821AD0BC3A00FB92F8 /* Project object */;
+}

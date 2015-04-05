@@ -11,8 +11,9 @@
 
 
 
-# STK500 driving XTAL1, CKDIV8=1
-CLOCK      = 3686400
+#### STK500 driving XTAL1, CKDIV8=1
+# STK500 with 11.0592 Mhz crystal and jumper "OSCSEL" => ON BOARD XTAL
+CLOCK      = 11059200
 
 FUSES      = -U hfuse:w:0x99:m -U lfuse:w:0xe0:m
 # ATmega1284 fuse bits (fuse bits for other devices are different!):
