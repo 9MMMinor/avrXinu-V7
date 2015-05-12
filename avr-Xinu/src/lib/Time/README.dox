@@ -1,0 +1,36 @@
+//
+//  README
+//  Text
+//  ==================================
+//
+//  Project Time
+//  Created by Michael Minor on 3/23/15.
+//  Copyright 2015.
+//
+//	Go here: <http://www.stack.nl/~dimitri/doxygen/commands.html> for descriptions of
+//	the Doxygen commands.
+//
+
+/**
+
+@mainpage Time
+@version	0.1
+
+@author Michael Minor
+@date	3/23/15
+
+Time and date functions for avr-Xinu. Prior to the release of avr-libc 1.8.1 these functions
+were not included in the library. The functions and defines included in this module have been
+in use for several years with avr-Xinu and include a reasonable subset of those now included
+in avr-libc 1.8.1. Avr-libc 1.8.1 differs from this \a \b Time module primarily in its use of
+an unsigned \b time_t which precludes the representation of any broken-down time prior to
+the epoch.
+
+This system correctly handles negative time values. Systems using a signed 32-bit \b time_t type
+are susceptible to the year 2038 problem (See http://en.wikipedia.org/wiki/Year_2038_problem).
+This system uses a signed 64-bit \b time_t type. Also, in this implementation, broken-down time
+structure members may be manipulated, added to, and subtracted from so long as there is
+no member overflow, provided \a \b normalizeTm() is called prior to using the structure.
+The function, \a \b mktime(), always calls \a \b normalizeTm().
+
+*/

@@ -557,9 +557,7 @@
 		BD558D831892EC1300476D83 /* udpdump.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = udpdump.c; sourceTree = "<group>"; };
 		BD558D8418930EA300476D83 /* Makefile.include */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.include; sourceTree = "<group>"; };
 		BD558D8518930EB800476D83 /* mkvers.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mkvers.sh; sourceTree = "<group>"; };
-		BD558D8618930ECF00476D83 /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		BD558D8718930EDC00476D83 /* ScreenApplet.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = ScreenApplet.scpt; sourceTree = "<group>"; };
-		BD558D8A189380CF00476D83 /* bufferedGets.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bufferedGets.c; sourceTree = "<group>"; };
 		BD558D8B189380CF00476D83 /* doprnt.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = doprnt.c; sourceTree = "<group>"; };
 		BD558D8C189380CF00476D83 /* doscan.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = doscan.c; sourceTree = "<group>"; };
 		BD558D8D189380CF00476D83 /* fclose.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fclose.c; sourceTree = "<group>"; };
@@ -570,6 +568,8 @@
 		BD558D92189380CF00476D83 /* README.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = README.rtf; sourceTree = "<group>"; };
 		BD558D93189380CF00476D83 /* scanf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = scanf.c; sourceTree = "<group>"; };
 		BD558D94189380CF00476D83 /* scanf_p.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = scanf_p.c; sourceTree = "<group>"; };
+		BDAB462B1AD1BB4900C8DAD8 /* libc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = libc; sourceTree = "<group>"; };
+		BDEE67C91AD05D900001F711 /* bufferedGets.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bufferedGets.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -578,7 +578,6 @@
 			children = (
 				BD558D8418930EA300476D83 /* Makefile.include */,
 				BD558D8518930EB800476D83 /* mkvers.sh */,
-				BD558D8618930ECF00476D83 /* README.txt */,
 				BD558D8718930EDC00476D83 /* ScreenApplet.scpt */,
 				BD4E1F281896D6F200CC6FC2 /* APIs */,
 				BD4E2169189777D700CC6FC2 /* ProjectTemplates */,
@@ -1660,6 +1659,7 @@
 		BD558D88189380CF00476D83 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				BDAB462B1AD1BB4900C8DAD8 /* libc */,
 				BD558D89189380CF00476D83 /* libxc */,
 			);
 			path = lib;
@@ -1670,7 +1670,7 @@
 			children = (
 				BD558D8F189380CF00476D83 /* Makerules */,
 				BD558D92189380CF00476D83 /* README.rtf */,
-				BD558D8A189380CF00476D83 /* bufferedGets.c */,
+				BDEE67C91AD05D900001F711 /* bufferedGets.c */,
 				BD558D8B189380CF00476D83 /* doprnt.c */,
 				BD558D8C189380CF00476D83 /* doscan.c */,
 				BD558D8D189380CF00476D83 /* fclose.c */,
@@ -1696,7 +1696,7 @@
 		BD74D06A1890DA1B00899232 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0620;
 			};
 			buildConfigurationList = BD74D06D1890DA1B00899232 /* Build configuration list for PBXProject "XinuVersion7" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1717,6 +1717,7 @@
 		BD74D06E1890DA1B00899232 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};

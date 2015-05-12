@@ -1,0 +1,25 @@
+# This Makefile contains rules to build files in the src/lib/Time directory.
+
+# Name of this component (the directory this file is stored in)
+COMP = src/lib/Time
+
+# Source files for this component
+
+# Files for Time
+C_Files = SunRiseSunSet.c
+C_Files += ascdatetime.c 
+C_Files += calendar_times.c
+C_Files += day_of_epoch.c
+C_Files += day_of_year.c
+C_Files += getUTC.c
+C_Files += gmtime.c
+C_Files += isleap.c
+C_Files += localtime.c
+C_Files += mktime.c
+C_Files += normalizeTm.c
+C_Files += scanTime.c
+C_Files += time.c
+
+# Add the files to the compile source path
+DIR = ${TOPDIR}/${COMP}
+COMP_SRC += ${C_Files:%=${DIR}/%}
