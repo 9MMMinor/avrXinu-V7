@@ -1,0 +1,31 @@
+//
+//  README
+//  Text
+//  ==================================
+//
+//  Project HelloWorld
+//  Created by Michael Minor on 4/5/15.
+//  Copyright 2015.
+//
+//	Go here: <http://www.stack.nl/~dimitri/doxygen/commands.html> for descriptions of
+//	the Doxygen commands.
+//
+
+/**
+
+@mainpage HelloWorld
+@version	0.1
+
+@author Michael Minor
+@date	4/5/15
+
+Start a Terminal window and execute the following commands to build and download
+an avr-Xinu target to a ATMEGA1284p plugged into STK500.
+
+	% make usage
+	% make PLATFORM=stk500 saveplatform
+	% make
+	% make avrdude
+	% make screen
+
+*/

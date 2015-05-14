@@ -1,24 +1,24 @@
 # -*- makefile -*-
 #
-# Makefile.include
+# avrXinu.make
 #		resides in the directory $(XINU)
 
 ifndef XINU
   ${error XINU not defined! You must specify (in the caller) where Xinu resides}
 endif
 
-ifeq ($(TARGET),)
-  -include Makefile.target
-  ifeq ($(TARGET),)
-    ${info TARGET not defined, using target 'stk500'}
-    TARGET=stk500
+ifeq ($(PLATFORM),)
+  -include Makefile.platform
+  ifeq ($(PLATFORM),)
+    ${info PLATFORM not defined, using platform 'stk500'}
+    PLATFORM=stk500
   else
-    ${info using saved target '$(TARGET)'}
+    ${info using saved platform '$(PLATFORM)'}
   endif
 endif
 
 ifeq ($(DEFINES),)
-  -include Makefile.$(TARGET).defines
+  -include Makefile.$(PLATFORM).defines
   ifneq ($(DEFINES),)
     ${info using saved defines '$(DEFINES)'}
   endif
@@ -29,27 +29,27 @@ ifndef HOST_OS
 endif
 
 usage:
-	@echo "make MAKETARGETS... [TARGET=(TARGET)] [savetarget] [targets]"
+	@echo "make MAKEPLATFORMS... [PLATFORM=(PLATFORM)] [saveplatform] [platforms]"
 
-targets:
-	@ls -1 $(XINU)/platform $(TARGETDIRS) | grep -v CVS
+platforms:
+	@ls -1 $(XINU)/platform $(PLATFORMDIRS) | grep -v CVS
 
-savetarget:
-	-@rm -f Makefile.target
-	@echo "saving Makefile.target"
-	@echo >Makefile.target "TARGET = $(TARGET)"
+saveplatform:
+	-@rm -f Makefile.platform
+	@echo "saving Makefile.platform"
+	@echo >Makefile.platform "PLATFORM = $(PLATFORM)"
 
 savedefines:
-	-@rm -f Makefile.$(TARGET).defines
-	@echo "saving Makefile.$(TARGET).defines"
-	@echo >Makefile.$(TARGET).defines "DEFINES = $(DEFINES)"
+	-@rm -f Makefile.$(PLATFORM).defines
+	@echo "saving Makefile.$(PLATFORM).defines"
+	@echo >Makefile.$(PLATFORM).defines "DEFINES = $(DEFINES)"
 
-OBJECTDIR = obj_$(TARGET)
+OBJECTDIR = obj_$(PLATFORM)
 
 LOWERCASE = -abcdefghijklmnopqrstuvwxyz
 UPPERCASE = _ABCDEFGHIJKLMNOPQRSTUVWXYZ
-TARGET_UPPERCASE := ${strip ${shell echo $(TARGET) | sed y!$(LOWERCASE)!$(UPPERCASE)!}}
-CFLAGS += -DXINU=1 -DXINU_TARGET_$(TARGET_UPPERCASE)=1
+PLATFORM_UPPERCASE := ${strip ${shell echo $(PLATFORM) | sed y!$(LOWERCASE)!$(UPPERCASE)!}}
+CFLAGS += -DXINU=1 -DXINU_PLATFORM_$(PLATFORM_UPPERCASE)=1
 
 # Just a left over scheme to synch with Xcode for Mac users
 BUILD_CONFIGURATION = ../Makefile_Var.xcconfig
@@ -75,21 +75,21 @@ BUILD_CONFIGURATION = ../Makefile_Var.xcconfig
 #----------------------------------------------------------------------------
 
 
-# include Makefile.$(TARGET) to get platform specific varables: Fuses, clock frequency, etc.
+# include Makefile.$(PLATFORM) to get platform specific varables: Fuses, clock frequency, etc.
 ### Include target makefile
 
-target_makefile := $(wildcard $(XINU)/platform/$(TARGET)/Makefile.$(TARGET) ${foreach TDIR, $(TARGETDIRS), $(TDIR)/$(TARGET)/Makefile.$(TARGET)})
+target_makefile := $(wildcard $(XINU)/platform/$(PLATFORM)/Makefile.$(PLATFORM) ${foreach TDIR, $(PLATFORMDIRS), $(TDIR)/$(PLATFORM)/Makefile.$(PLATFORM)})
 
 # Check if the target makefile exists, and create the object directory if necessary.
 ifeq ($(strip $(target_makefile)),)
-	${error The target platform "$(TARGET)" does not exist (maybe it was misspelled?)}
+	${error The target platform "$(PLATFORM)" does not exist (maybe it was misspelled?)}
 else
 	ifeq (${wildcard $(OBJECTDIR)},)
 		DUMMY := ${shell mkdir $(OBJECTDIR)}
 		COPYSOURCES = yes
 	endif
 	ifneq (1, ${words $(target_makefile)})
-		${error More than one TARGET Makefile found: $(target_makefile)}
+		${error More than one PLATFORM Makefile found: $(target_makefile)}
 	endif
 	include $(target_makefile)
 endif
@@ -105,21 +105,20 @@ USE_MAKEFILE_VARS = $(origin USE_XCCONFIG)
 
 AVR-XINUDIR = $(XINU)
 MAIN_OBJ = $(patsubst %.c,%.o,$(filter %.c,$(MAIN_SRC)))
-PORT = $(USB_SERIAL)
+#PORT = $(USB_SERIAL)
 
-PROGRAMMER = -c stk500v2 -P $(HOST_SERIAL)
+#PROGRAMMER = -c stk500v2 -P $(HOST_SERIAL)
 #AVRDUDE_PROGRAMMER = arduino
-AVRDUDE_PROGRAMMER = stk500v2
+#AVRDUDE_PROGRAMMER = stk500v2
 #AVRDUDE_PROGRAMMER = avr109
-AVRDUDE_PART = $(TARGET_ARCH)
-AVRDUDE_PORT = $(PORT)
-AVRDUDE_UPLOAD_RATE = 57600
-AVRDUDE_WRITE_FLASH = -U flash:w:$(XINU_PROJECT).hex
-AVRDUDE_FLAGS = -F -p $(AVRDUDE_PART) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) \
-  -b $(AVRDUDE_UPLOAD_RATE)
+#AVRDUDE_PART = $(PLATFORM_ARCH)
+#AVRDUDE_PORT = $(PORT)
+#AVRDUDE_UPLOAD_RATE = 57600
+#AVRDUDE_WRITE_FLASH = -U flash:w:$(XINU_PROJECT).hex
+#AVRDUDE_FLAGS = -F -p $(AVRDUDE_PART) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) \
+#  -b $(AVRDUDE_UPLOAD_RATE)
 
 # Program Settings
-AVRDUDE	= avrdude
 CC = avr-gcc
 CPP = avr-g++
 #LD = avr-ld
@@ -142,7 +141,7 @@ CONFIG    = .
 LIB_ARC  = ${LIBDIR}/libx.a
 
 SYSCOMPS += src/lib/libxc
-SYSCOMPS += platform/$(TARGET)
+SYSCOMPS += platform/$(PLATFORM)
 COMPS     = ${SYSCOMPS}
 
 vpath = %.c $(COMPS)
@@ -174,16 +173,16 @@ CONFISR	=	$(CONFDIR)/confisr.c
 # Path to the conf.h file defining system devices, drivers, and other system defines
 CONFH	=	$(CONFDIR)/conf.h
 
-INCLUDE  += -I$(CONFDIR) -I$(INCDIR)
+INCLUDE  += -I$(CONFDIR) -I$(INCDIR) -I$(LIBCPATH)/avr/include
 
 # C compilation flags
-CFLAGS +=  -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(TARGET_ARCH) $(INCLUDE) $(DFLAG)
+CFLAGS +=  -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(PLATFORM_ARCH) $(INCLUDE) $(DFLAG)
 
 # Assembler flags
 ASFLAGS  = -x assembler-with-cpp
 
 # Loader flags
-LDFLAGS = -Wl,--wrap,malloc,--wrap,free,--wrap,realloc,--wrap,fdevopen $(EXTERNAL_RAM)
+LDFLAGS += -Wl,--wrap,malloc,--wrap,free,--wrap,realloc,--wrap,fdevopen $(EXTERNAL_RAM)
 
 # -ffreestanding prevents optimization from replacing 'printf("no conversions\n");'
 #    with 'puts("no conversions\n");' for example,
@@ -224,18 +223,11 @@ hex:	$(XINU_PROJECT).hex
 lss:	$(XINU_PROJECT).lss
 sym:	$(XINU_PROJECT).sym
 
-# Configuration support
-# Configuration support if 'USE_CONF_H = yes'
-# Create configuration file Makefile_Vars
-#Makefile_Vars: $(BUILD_CONFIGURATION)
-#	@echo "Converting $@ to makefile format for Xinu configuration."
-#	@echo "# Makefile_Vars (Generated file. DO NOT EDIT)" > Makefile_Vars
-#	@echo "# " >> Makefile_Vars
-#	@echo "# " >> Makefile_Vars
-#	@echo >> Makefile_Vars
-#	cat $(BUILD_CONFIGURATION) | sed 's/^\/\//#/' >> Makefile_Vars
-#-include Makefile_Vars
-
+#DEGUG make variables
+# on the command line:
+# $ make print-VAR
+#	will echo the VAR, its origin, its flavor, and its value.
+#
 print-%:
 	@echo '$*=$($*)'
 	@echo '  origin = $(origin $*)'
@@ -267,16 +259,17 @@ sizeafter:
 
 # Display compiler version information.
 gccversion :
-	@$(CC) --version
+	$(CC) --version
 
-# Special rules for special files
+## Special rules for special files
+#	Initialize Xinu gets a special VERSION
+#
 %initialize.o:	%initialize.c
 	@echo
 	@echo $(MSG_COMPILING) $(OBJECTDIR)/initialize.c
 	@sh $(XINU)/mkvers.sh
-	@VERS=`cat version`
 	$(CC) -c -DVERSION=\""`cat version`"\" $(CFLAGS) $(GCCFLAGS) $< -o $@
-#	$(CC) -c -Wall -O1 -DF_CPU=$(CLOCK) -mmcu=$(TARGET_ARCH) $(INCLUDE) $(DFLAG) $(GCCFLAGS) $< -o $@
+#	$(CC) -c -Wall -O1 -DF_CPU=$(CLOCK) -mmcu=$(PLATFORM_ARCH) $(INCLUDE) $(DFLAG) $(GCCFLAGS) $< -o $@
 	
 # Compile: create object files from C++ source files.
 %.o	: %.cpp
@@ -322,15 +315,6 @@ upload boot bootload: $(XINU_PROJECT).hex
 	
 screen look:
 	osascript $(XINU)/ScreenApplet.scpt
-
-# Build a new Xinu Library, xlib.a, based on XSRC sources
-#$(XSRC):	$(COMP_SRC)
-#	rm -f $(XINU_PROJECT).hex $(XINU_PROJECT).elf $(XINU_PROJECT).sym 
-#	rm -f *.o
-#	rm -f $(XSRC)
-#	@echo
-#	@echo $(MSG_NEWLIBRARY) $<
-#	cp -p $<  $(LIBDIR)
 	
 # Target: clean project.
 clean: begin clean_tgt finished end
@@ -346,7 +330,7 @@ cleandep: clean_tgt
 	touch .deps
 	
 cleanmost: cleandep
-	rm -f $(OBJECTDIR)/*.o
+	rm -f $(XOBJ)
 	rm -f $(MAIN_OBJ)
 	rm -f $(LIB_ARC)
 	rm -f vn version
@@ -380,13 +364,12 @@ $(CONFIGURATION):	avr-Configuration $(target_makefile)
 # Configuration support if 'USE_CONF_H = yes'
 # append configuration data to "conf.h"
 	@sh $(XINU)/mkvers.sh
-	@VERS=`cat version`
 	@echo >> conf.h
 	@echo >> conf.h
 	@echo "Appending conf.h for $(PLATFORM)"
-	@echo "// Xinu platform: $(PLATFORM)" >> conf.h
+	@echo "// Xinu platform: $(XINU_PLATFORM)" >> conf.h
 	@echo "// Xinu conf.h header file" >> conf.h
-	@echo "// MCU: $(TARGET_ARCH)" >> conf.h
+	@echo "// MCU: $(PLATFORM_ARCH)" >> conf.h
 	@echo "// F_CPU: $(CLOCK)" >> conf.h
 	@echo >> conf.h
 	@$(foreach v, \
@@ -405,7 +388,7 @@ $(CONFIGURATION):	avr-Configuration $(target_makefile)
 	echo "#define $(v)" >> conf.h ; \
 	elif [[ -n "$($(v))" && "$($(v))" != "n" && "$($(v))" != "no" ]] ; then \
 	echo "#define $(v) $($(v))" >> conf.h ; fi ;)
-#	@echo "#define VERSION \""`cat version`"\"" >> conf.h 
+	@echo "//#define VERSION \""`cat version`"\"" >> conf.h
 
 # Create an archive for this configuration
 $(LIB_ARC):	$(XOBJ)

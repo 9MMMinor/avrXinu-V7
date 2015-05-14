@@ -4,6 +4,7 @@ Start a Terminal window and execute the following commands to build and download
 an avr-Xinu target to a ATMEGA1284p plugged into STK500.
 
 % make usage
-% make TARGET=stk500 savetarget
+% make PLATFORM=stk500 saveplatform
 % make
-% make flash
+% make avrdude
+% make screen

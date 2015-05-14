@@ -1,0 +1,153 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		BD244CB21AD225150070EB71 /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; name = Doxyfile; path = HelloWorld/Doxyfile; sourceTree = SOURCE_ROOT; };
+		BD244CB31AD225240070EB71 /* avr-Configuration */ = {isa = PBXFileReference; lastKnownFileType = text; name = "avr-Configuration"; path = "HelloWorld/avr-Configuration"; sourceTree = SOURCE_ROOT; };
+		BD244CB41AD225340070EB71 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = HelloWorld/Makefile; sourceTree = SOURCE_ROOT; };
+		BD244CB51AD225390070EB71 /* Makefile.256rfr2XplainPro.defines */ = {isa = PBXFileReference; lastKnownFileType = text; name = Makefile.256rfr2XplainPro.defines; path = HelloWorld/Makefile.256rfr2XplainPro.defines; sourceTree = SOURCE_ROOT; };
+		BD244CB61AD2253E0070EB71 /* Makefile.make */ = {isa = PBXFileReference; lastKnownFileType = text; name = Makefile.make; path = HelloWorld/Makefile.make; sourceTree = SOURCE_ROOT; };
+		BD244CB71AD225450070EB71 /* Makefile.platform */ = {isa = PBXFileReference; lastKnownFileType = text; name = Makefile.platform; path = HelloWorld/Makefile.platform; sourceTree = SOURCE_ROOT; };
+		BD244CB81AD2254D0070EB71 /* README.dox */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.dox; path = HelloWorld/README.dox; sourceTree = SOURCE_ROOT; };
+		BD244CB91AD225540070EB71 /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.txt; path = HelloWorld/README.txt; sourceTree = SOURCE_ROOT; };
+		BD244CBA1AD225590070EB71 /* Xinu_main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Xinu_main.c; path = HelloWorld/Xinu_main.c; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		BD994F021AD211FD00D689A7 = {
+			isa = PBXGroup;
+			children = (
+				BD994F081AD211FD00D689A7 /* HelloWorld */,
+			);
+			sourceTree = "<group>";
+		};
+		BD994F081AD211FD00D689A7 /* HelloWorld */ = {
+			isa = PBXGroup;
+			children = (
+				BD244CB31AD225240070EB71 /* avr-Configuration */,
+				BD244CB21AD225150070EB71 /* Doxyfile */,
+				BD244CB41AD225340070EB71 /* Makefile */,
+				BD244CB51AD225390070EB71 /* Makefile.256rfr2XplainPro.defines */,
+				BD244CB61AD2253E0070EB71 /* Makefile.make */,
+				BD244CB71AD225450070EB71 /* Makefile.platform */,
+				BD244CB81AD2254D0070EB71 /* README.dox */,
+				BD244CB91AD225540070EB71 /* README.txt */,
+				BD244CBA1AD225590070EB71 /* Xinu_main.c */,
+			);
+			name = HelloWorld;
+			path = "HelloWorld~new";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		BD994F071AD211FD00D689A7 /* HelloWorld */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = BD994F111AD211FD00D689A7 /* Build configuration list for PBXLegacyTarget "HelloWorld" */;
+			buildPhases = (
+			);
+			buildToolPath = make;
+			buildWorkingDirectory = "/Users/mmm/XinuV7/avr-Xinu/HelloWorld/HelloWorld";
+			dependencies = (
+			);
+			name = HelloWorld;
+			passBuildSettingsInEnvironment = 1;
+			productName = "HelloWorld~new";
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		BD994F031AD211FD00D689A7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+				TargetAttributes = {
+					BD994F071AD211FD00D689A7 = {
+						CreatedOnToolsVersion = 6.2;
+					};
+				};
+			};
+			buildConfigurationList = BD994F061AD211FD00D689A7 /* Build configuration list for PBXProject "HelloWorld" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BD994F021AD211FD00D689A7;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BD994F071AD211FD00D689A7 /* HelloWorld */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		BD994F0F1AD211FD00D689A7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		BD994F101AD211FD00D689A7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		BD994F121AD211FD00D689A7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "/usr/local/CrossPack-AVR/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Xcode.app/Contents/Developer/usr/bin";
+				PRODUCT_NAME = HelloWorld;
+			};
+			name = Debug;
+		};
+		BD994F131AD211FD00D689A7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PATH = "/usr/local/CrossPack-AVR/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Xcode.app/Contents/Developer/usr/bin";
+				PRODUCT_NAME = HelloWorld;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BD994F061AD211FD00D689A7 /* Build configuration list for PBXProject "HelloWorld" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BD994F0F1AD211FD00D689A7 /* Debug */,
+				BD994F101AD211FD00D689A7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BD994F111AD211FD00D689A7 /* Build configuration list for PBXLegacyTarget "HelloWorld" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BD994F121AD211FD00D689A7 /* Debug */,
+				BD994F131AD211FD00D689A7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BD994F031AD211FD00D689A7 /* Project object */;
+}

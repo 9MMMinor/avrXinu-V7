@@ -2,8 +2,8 @@
 //  Xinu_main.c
 //  HelloWorld
 //
-//  Created by Michael Minor on 1/14/14.
-//  Copyright 2014.
+//  Created by Michael Minor on 4/5/15.
+//  Copyright 2015.
 //
 //	This program is free software: you can redistribute it and/or modify
 //	it under the terms of the GNU General Public License as published by
@@ -22,14 +22,28 @@
 
 /* avr-xinu */
 #include <avr-Xinu.h>	/* includes avr-libc <stdio.h>	*/
-#include <avr/io.h>
-#include <avr/interrupt.h>
 
-int
+/** @brief Xinu entrypoint.
+ *
+ *  This is the user entrypoint called from \a nulluser() with
+ *	\b INITSTK, initial stack size; \b INITPRIO, initial priority;
+ *	and \b INITNAME, process name.
+ *
+ *	@return The return value is ignored.
+ */
+int 
 main( void )
 {
-	/// Enter code here
-	kprintf("Hello World\n");
+	//
+	// Enter code here
+	//
+	
+	kprintf("kprintf: Hello World\n");
+	write(TTYA,(unsigned char *)"TTYA: Hello World\n\r", 19);
+	write(TTYB,(unsigned char *)"TTYB: Hello World\n\r", 19);
+	printf("This is the console terminal\n");
+	printf(" CONSOLE = USART%d\n", CONSOLE);
+	// End enter code
 	sleep(1);
 	
 	return 0 ;

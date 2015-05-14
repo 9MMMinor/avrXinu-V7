@@ -1,6 +1,6 @@
 /* avr-Configuration - (device configuration specifications)	*/
-/*	HelloWorld													*/
-/*  Created by ___FULLUSERNAME___ on ___DATE___.				*/
+/*	HelloWorld											*/
+/*  Created by Michael Minor on 4/5/15.				*/
 
 
 
@@ -79,11 +79,11 @@ tty:	on USART
 
 /* Device definitions starting with terminals */
 
-CONSOLE		is tty  on USART	csr=0 ivec=USART0_RX_vect ovec=USART0_UDRE_vect
+TTYA		is tty  on USART	csr=0 ivec=USART0_RX_vect ovec=USART0_UDRE_vect
 
 /* The Serial port B */
 
-/*TTYB		is tty  on USART	csr=0 ivec=USART1_RX_vect ovec=USART1_UDRE_vect*/
+TTYB		is tty  on USART	csr=0 ivec=USART1_RX_vect ovec=USART1_UDRE_vect
 		
 /* The physical ethernet raw packet interface */
 
@@ -117,6 +117,8 @@ CONSOLE		is tty  on USART	csr=0 ivec=USART0_RX_vect ovec=USART0_UDRE_vect
 /*NAMESPACE	is nam	on TOP*/
 %
 
+#define CONSOLE TTYA
+
 /* System clock dependencies */
 /* BE VERY CAREFUL: 16 is normal for 32768 Hz watch crystal */
 /*   and            10 is normal for clock driven from the system clock */
@@ -132,7 +134,7 @@ CONSOLE		is tty  on USART	csr=0 ivec=USART0_RX_vect ovec=USART0_UDRE_vect
 
 #define	NPROC	    10		/* number of user processes	*/
 #define	NSEM	    30		/* number of semaphores		*/
-//#define MEMMARK				/* define if memory marking used*/
+#define MEMMARK				/* define if memory marking used*/
 #define	RTCLOCK				/* now have RTC support		*/
 //#define STKCHK			/* resched checks stack overflow*/
 //#define	NETDAEMON			/* Ethernet network daemon runs	*/
